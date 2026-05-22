@@ -20,6 +20,7 @@ export default function App() {
   const [runMode, setRunMode]                 = useState(null)
   const [results, setResults]                 = useState(null)
   const [statuses, setStatuses]               = useState(initStatuses)
+  const [sidebarOpen, setSidebarOpen]         = useState(true)
 
   // Per-problem, per-language code cache  { problemId: { cpp, python } }
   const [userCode, setUserCode] = useState({})
@@ -126,20 +127,15 @@ export default function App() {
     state.onWrite = null
 
     if (result.error) {
-      // Show raw output on compile error so the user sees diagnostics
       const errLines = rawText.split('\n').filter(l => !l.startsWith('> clang') && !l.startsWith('> wasm-ld'))
       push(errLines.join('\n').trim() + '\n', 'stderr')
       return
     }
 
-    // Strip compiler/linker command lines — lines beginning with ">"
-    const programOutput = rawText
-      .split('\n')
-      .filter(l => !l.startsWith('>'))
-      .join('\n')
-      .trim()
-
-    if (programOutput) push(programOutput + '\n', 'stdout')
+    // Push each program output line individually so parseOutput can find the sentinel
+    const programLines = rawText.split('\n').filter(l => !l.startsWith('>'))
+    while (programLines.length && !programLines[programLines.length - 1].trim()) programLines.pop()
+    for (const line of programLines) push(line + '\n', 'stdout')
   }
 
   // ── Problem / language switch ──────────────────────────────────────────────
@@ -158,11 +154,17 @@ export default function App() {
   }
 
   return (
-    <div className="app-root">
+    <div className="app-root" style={{
+      gridTemplateColumns: sidebarOpen
+        ? 'var(--sidebar-w) 1fr 1.3fr'
+        : 'var(--sidebar-collapsed-w) 1fr 1.3fr'
+    }}>
       <Sidebar
         problems={PROBLEMS}
         selectedId={selectedProblem.id}
         onSelect={handleProblemSelect}
+        collapsed={!sidebarOpen}
+        onToggle={() => setSidebarOpen(v => !v)}
       />
       <ProblemPanel problem={selectedProblem} />
       <WorkspacePanel

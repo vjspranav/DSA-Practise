@@ -1,32 +1,16 @@
-// ── Problem definitions ────────────────────────────────────────────────────
-// Each problem has:
-//   id, title, difficulty, description, examples, constraints, hints
-//   cppStarter, pythonStarter
-//   testCases (shown in UI)
-//   buildCppHarness(mode, customInput) → string appended after user code
-//   buildPythonHarness(mode, customInput) → string appended after user code
+// ── Problem definitions ─────────────────────────────────────────────────────
+//
+// Output protocol (parsed by executor.parseOutput):
+//   Program output lines (cout / print) come first.
+//   Then a sentinel line:  ---RESULT---
+//   Then structured judgement lines:
+//     Run:    RESULT:PASS:expected:got  or  RESULT:FAIL:expected:got
+//     Submit: TEST:N:PASS:expected:got  or  TEST:N:FAIL:expected:got
+//     Submit: SUMMARY:passed:total  (last line)
+//
+// Custom mode: no sentinel, raw output only.
 
-const p = (arr) => arr.join(', ')   // array → C++ brace init contents
-
-// wasm-clang uses Clang sysroot (no bits/stdc++.h) — explicit DSA headers
-const CPP_INCLUDES = `#include <iostream>
-#include <vector>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <map>
-#include <set>
-#include <algorithm>
-#include <numeric>
-#include <climits>
-#include <cmath>
-#include <queue>
-#include <stack>
-#include <deque>
-#include <functional>
-#include <sstream>
-#include <utility>
-using namespace std;`
+const join = (arr) => arr.join(', ')   // JS array → C++ brace-init contents
 
 // ── 1. Binary Subarrays With Sum ────────────────────────────────────────────
 const binarySubarrays = {
@@ -42,12 +26,12 @@ const binarySubarrays = {
     {
       input: 'nums = [1,0,1,0,1],  goal = 2',
       output: '4',
-      explanation: 'The 4 subarrays are bolded: [<b>1,0,1</b>,0,1], [<b>1,0,1,0</b>,1], [1,<b>0,1,0,1</b>], [1,0,<b>1,0,1</b>].',
+      explanation: 'The 4 subarrays are [1,0,1], [1,0,1,0], [0,1,0,1], [1,0,1].',
     },
     {
       input: 'nums = [0,0,0,0,0],  goal = 0',
       output: '15',
-      explanation: 'Every subarray has sum 0. There are n×(n+1)/2 = 15 subarrays total.',
+      explanation: 'Every subarray has sum 0. There are n×(n+1)/2 = 15 total subarrays.',
     },
   ],
   constraints: [
@@ -58,15 +42,15 @@ const binarySubarrays = {
   hints: [
     'Counting subarrays with an <em>exact</em> sum is tricky. Try converting it: exact(k) = atMost(k) − atMost(k − 1).',
     'Implement <code>atMost(k)</code> with a sliding window: expand right, shrink left whenever <code>sum > k</code>. At each right pointer, add <code>right − left + 1</code> to the count.',
-    'Handle the edge case where <code>goal = 0</code> by calling <code>atMost(−1)</code> carefully — or guard the subtraction.',
+    'Handle the edge case where <code>goal = 0</code>: <code>atMost(−1)</code> should return 0, so guard before calling.',
   ],
   inputFormat: 'Line 1: space-separated 0s and 1s\nLine 2: goal (integer)',
   defaultCustomInput: '1 0 1 0 1\n2',
   testCases: [
     { label: 'Example 1', input: 'nums=[1,0,1,0,1], goal=2', expected: '4' },
     { label: 'Example 2', input: 'nums=[0,0,0,0,0], goal=0', expected: '15' },
-    { label: 'All ones', input: 'nums=[1,1,1,1], goal=2', expected: '3' },
-    { label: 'Mixed', input: 'nums=[1,0,0,1,1], goal=2', expected: '4' },
+    { label: 'All ones',  input: 'nums=[1,1,1,1], goal=2',   expected: '3' },
+    { label: 'Mixed',     input: 'nums=[1,0,0,1,1], goal=2', expected: '4' },
   ],
   cppStarter: `class Solution {
 public:
@@ -87,25 +71,27 @@ int main() {
     int goal = 2;
     int got = sol.numSubarraysWithSum(nums, goal);
     cout << got << "\\n";
-    cout << (got == 4 ? "✓ Matches expected (4)" : "✗ Expected 4, got " + to_string(got)) << "\\n";
+    cout << "---RESULT---\\n";
+    if (got == 4) cout << "RESULT:PASS:4:" << got << "\\n";
+    else          cout << "RESULT:FAIL:4:" << got << "\\n";
     return 0;
 }`;
     if (mode === 'submit') return `
 int main() {
     Solution sol;
     int passed = 0, total = 4;
+    cout << "---RESULT---\\n";
     auto chk = [&](vector<int> nums, int goal, int expected, int n) {
         int got = sol.numSubarraysWithSum(nums, goal);
         bool ok = got == expected;
         passed += ok;
-        if (ok) cout << "✓ Test " << n << ": passed\\n";
-        else     cout << "✗ Test " << n << ": FAILED — expected: " << expected << ", got: " << got << "\\n";
+        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
     };
-    chk({1,0,1,0,1}, 2, 4, 1);
+    chk({1,0,1,0,1}, 2, 4,  1);
     chk({0,0,0,0,0}, 0, 15, 2);
     chk({1,1,1,1},   2, 3,  3);
     chk({1,0,0,1,1}, 2, 4,  4);
-    cout << "\\n" << passed << "/" << total << " tests passed\\n";
+    cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
     if (mode === 'custom') {
@@ -115,7 +101,7 @@ int main() {
       return `
 int main() {
     Solution sol;
-    vector<int> nums = {${p(nums)}};
+    vector<int> nums = {${join(nums)}};
     int goal = ${goal};
     cout << sol.numSubarraysWithSum(nums, goal) << "\\n";
     return 0;
@@ -124,33 +110,27 @@ int main() {
   },
   buildPythonHarness(mode, customInput = '') {
     if (mode === 'run') return `
-# ── Run (Example 1) ──
+# run
 sol = Solution()
 got = sol.numSubarraysWithSum([1,0,1,0,1], 2)
 print(got)
-print("✓ Matches expected (4)" if got == 4 else f"✗ Expected 4, got {got}")`;
+print("---RESULT---")
+print(f"RESULT:{'PASS' if got == 4 else 'FAIL'}:4:{got}")`;
     if (mode === 'submit') return `
-# ── Submit ──
+# submit
 sol = Solution()
-cases = [
-    ([1,0,1,0,1], 2, 4),
-    ([0,0,0,0,0], 0, 15),
-    ([1,1,1,1],   2, 3),
-    ([1,0,0,1,1], 2, 4),
-]
+cases = [([1,0,1,0,1],2,4),([0,0,0,0,0],0,15),([1,1,1,1],2,3),([1,0,0,1,1],2,4)]
 passed = 0
-for i, (nums, goal, expected) in enumerate(cases, 1):
-    got = sol.numSubarraysWithSum(list(nums), goal)
-    ok  = got == expected
-    passed += ok
-    print(f"{'✓' if ok else '✗'} Test {i}: {'passed' if ok else f'FAILED — expected: {expected}, got: {got}'}")
-print(f"\\n{passed}/{len(cases)} tests passed")`;
+print("---RESULT---")
+for i,(nums,goal,exp) in enumerate(cases,1):
+    got=sol.numSubarraysWithSum(list(nums),goal); ok=got==exp; passed+=ok
+    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
       const nums = (lines[0] || '1 0 1 0 1').trim().split(/\s+/).filter(Boolean).map(Number);
       const goal = parseInt(lines[1] ?? '2');
       return `
-# ── Custom Run ──
 sol = Solution()
 print(sol.numSubarraysWithSum([${nums.join(', ')}], ${goal}))`;
     }
@@ -165,19 +145,19 @@ const maxCards = {
   category: 'Sliding Window',
   description: [
     'There are several cards arranged in a row, each with an associated number of points given in <code>cardPoints</code>.',
-    'In one step, you can take one card from the <strong>beginning</strong> or from the <strong>end</strong> of the row. You have to take exactly <code>k</code> cards.',
+    'In one step, you can take one card from the <strong>beginning</strong> or the <strong>end</strong> of the row. You must take exactly <code>k</code> cards.',
     'Return the <strong>maximum score</strong> you can obtain.',
   ],
   examples: [
     {
       input: 'cardPoints = [1,2,3,4,5,6,1],  k = 3',
       output: '12',
-      explanation: 'Take the three cards from the right: 6 + 5 + 1 = 12. (Taking from left gives at most 1+2+3 = 6.)',
+      explanation: 'Take [6,1] from the right and [1] from the left: 1 + 6 + 1 = 12.',
     },
     {
       input: 'cardPoints = [2,2,2],  k = 2',
       output: '4',
-      explanation: 'Regardless of which two cards you take, the score is 4.',
+      explanation: 'Any 2 cards give score 4.',
     },
   ],
   constraints: [
@@ -186,17 +166,17 @@ const maxCards = {
     '1 ≤ k ≤ cardPoints.length',
   ],
   hints: [
-    'Instead of deciding which cards to take, think about which cards you are <em>leaving behind</em>.',
-    'You always leave a contiguous subarray of length <code>n − k</code>. To maximize the cards you take, minimize this middle window\'s sum.',
-    'Use a fixed-size sliding window of size <code>n − k</code>. Track the minimum window sum, then answer = totalSum − minWindowSum.',
+    'Instead of choosing which cards to <em>take</em>, think about which subarray you are <em>leaving behind</em>.',
+    'You always leave a contiguous subarray of length <code>n − k</code>. Minimising that window\'s sum maximises your score.',
+    'Use a fixed-size sliding window of length <code>n − k</code>. Track its minimum sum, then answer = totalSum − minWindowSum.',
   ],
   inputFormat: 'Line 1: space-separated card points\nLine 2: k (integer)',
   defaultCustomInput: '1 2 3 4 5 6 1\n3',
   testCases: [
-    { label: 'Example 1', input: 'cardPoints=[1,2,3,4,5,6,1], k=3', expected: '12' },
-    { label: 'Example 2', input: 'cardPoints=[2,2,2], k=2', expected: '4' },
-    { label: 'Take all', input: 'cardPoints=[9,7,7,9,7,7,9], k=7', expected: '55' },
-    { label: 'k=1 endpoints', input: 'cardPoints=[1,1000,1], k=1', expected: '1' },
+    { label: 'Example 1',    input: 'cardPoints=[1,2,3,4,5,6,1], k=3', expected: '12' },
+    { label: 'Example 2',    input: 'cardPoints=[2,2,2], k=2',          expected: '4'  },
+    { label: 'Take all',     input: 'cardPoints=[9,7,7,9,7,7,9], k=7', expected: '55' },
+    { label: 'k=1 boundary', input: 'cardPoints=[1,1000,1], k=1',       expected: '1'  },
   ],
   cppStarter: `class Solution {
 public:
@@ -213,29 +193,31 @@ class Solution:
     if (mode === 'run') return `
 int main() {
     Solution sol;
-    vector<int> pts = {1, 2, 3, 4, 5, 6, 1};
+    vector<int> pts = {1,2,3,4,5,6,1};
     int k = 3;
     int got = sol.maxScore(pts, k);
     cout << got << "\\n";
-    cout << (got == 12 ? "✓ Matches expected (12)" : "✗ Expected 12, got " + to_string(got)) << "\\n";
+    cout << "---RESULT---\\n";
+    if (got == 12) cout << "RESULT:PASS:12:" << got << "\\n";
+    else           cout << "RESULT:FAIL:12:" << got << "\\n";
     return 0;
 }`;
     if (mode === 'submit') return `
 int main() {
     Solution sol;
     int passed = 0, total = 4;
+    cout << "---RESULT---\\n";
     auto chk = [&](vector<int> pts, int k, int expected, int n) {
         int got = sol.maxScore(pts, k);
         bool ok = got == expected;
         passed += ok;
-        if (ok) cout << "✓ Test " << n << ": passed\\n";
-        else     cout << "✗ Test " << n << ": FAILED — expected: " << expected << ", got: " << got << "\\n";
+        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
     };
     chk({1,2,3,4,5,6,1}, 3, 12, 1);
     chk({2,2,2},          2, 4,  2);
     chk({9,7,7,9,7,7,9},  7, 55, 3);
     chk({1,1000,1},        1, 1,  4);
-    cout << "\\n" << passed << "/" << total << " tests passed\\n";
+    cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
     if (mode === 'custom') {
@@ -245,7 +227,7 @@ int main() {
       return `
 int main() {
     Solution sol;
-    vector<int> pts = {${p(pts)}};
+    vector<int> pts = {${join(pts)}};
     int k = ${k};
     cout << sol.maxScore(pts, k) << "\\n";
     return 0;
@@ -254,33 +236,25 @@ int main() {
   },
   buildPythonHarness(mode, customInput = '') {
     if (mode === 'run') return `
-# ── Run (Example 1) ──
 sol = Solution()
 got = sol.maxScore([1,2,3,4,5,6,1], 3)
 print(got)
-print("✓ Matches expected (12)" if got == 12 else f"✗ Expected 12, got {got}")`;
+print("---RESULT---")
+print(f"RESULT:{'PASS' if got == 12 else 'FAIL'}:12:{got}")`;
     if (mode === 'submit') return `
-# ── Submit ──
 sol = Solution()
-cases = [
-    ([1,2,3,4,5,6,1], 3, 12),
-    ([2,2,2],          2, 4),
-    ([9,7,7,9,7,7,9],  7, 55),
-    ([1,1000,1],        1, 1),
-]
+cases = [([1,2,3,4,5,6,1],3,12),([2,2,2],2,4),([9,7,7,9,7,7,9],7,55),([1,1000,1],1,1)]
 passed = 0
-for i, (pts, k, expected) in enumerate(cases, 1):
-    got = sol.maxScore(list(pts), k)
-    ok  = got == expected
-    passed += ok
-    print(f"{'✓' if ok else '✗'} Test {i}: {'passed' if ok else f'FAILED — expected: {expected}, got: {got}'}")
-print(f"\\n{passed}/{len(cases)} tests passed")`;
+print("---RESULT---")
+for i,(pts,k,exp) in enumerate(cases,1):
+    got=sol.maxScore(list(pts),k); ok=got==exp; passed+=ok
+    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
       const pts = (lines[0] || '1 2 3 4 5 6 1').trim().split(/\s+/).filter(Boolean).map(Number);
       const k = parseInt(lines[1] ?? '3');
       return `
-# ── Custom Run ──
 sol = Solution()
 print(sol.maxScore([${pts.join(', ')}], ${k}))`;
     }
@@ -294,19 +268,19 @@ const kDistinct = {
   difficulty: 'Hard',
   category: 'Sliding Window',
   description: [
-    'Given an integer array <code>nums</code> and an integer <code>k</code>, return the number of <strong>good subarrays</strong> of <code>nums</code>.',
-    'A <strong>good subarray</strong> is one where the number of <em>distinct</em> integers is exactly <code>k</code>.',
+    'Given an integer array <code>nums</code> and an integer <code>k</code>, return the number of <strong>good subarrays</strong>.',
+    'A subarray is <strong>good</strong> if the number of distinct integers in it is <em>exactly</em> <code>k</code>.',
   ],
   examples: [
     {
       input: 'nums = [1,2,1,2,3],  k = 2',
       output: '7',
-      explanation: 'Subarrays with exactly 2 distinct: [1,2], [2,1], [1,2,1], [2,1,2], [1,2,1,2], [2,3], [1,2,3] — wait, seven of them.',
+      explanation: '[1,2], [2,1], [1,2,1], [2,1,2], [1,2,1,2], [2,3], [1,2] — seven subarrays with exactly 2 distinct integers.',
     },
     {
       input: 'nums = [1,2,1,3,4],  k = 3',
       output: '3',
-      explanation: 'Subarrays with exactly 3 distinct: [1,2,1,3], [2,1,3], [1,3,4].',
+      explanation: '[1,2,1,3], [2,1,3], [1,3,4].',
     },
   ],
   constraints: [
@@ -315,17 +289,17 @@ const kDistinct = {
     '1 ≤ k ≤ nums.length',
   ],
   hints: [
-    'Exactly K distinct = atMost(K) − atMost(K − 1). Same trick as Binary Subarrays.',
-    'Implement <code>atMost(k)</code>: use a frequency map. Expand right; when distinct count exceeds k, shrink left and remove elements from the map.',
-    'At each right pointer, <code>right − left + 1</code> counts all subarrays ending at right with ≤ k distinct elements.',
+    'Exact K distinct = atMost(K) − atMost(K − 1). Same trick as Binary Subarrays.',
+    'Implement <code>atMost(k)</code>: use a frequency map. Expand right; when distinct count exceeds k, shrink left and update the map.',
+    'At each right pointer, <code>right − left + 1</code> counts all valid subarrays ending at <code>right</code>.',
   ],
   inputFormat: 'Line 1: space-separated integers\nLine 2: k (integer)',
   defaultCustomInput: '1 2 1 2 3\n2',
   testCases: [
-    { label: 'Example 1', input: 'nums=[1,2,1,2,3], k=2', expected: '7' },
-    { label: 'Example 2', input: 'nums=[1,2,1,3,4], k=3', expected: '3' },
-    { label: 'Single element', input: 'nums=[1], k=1', expected: '1' },
-    { label: 'All same', input: 'nums=[1,1,1,1,1], k=1', expected: '15' },
+    { label: 'Example 1',    input: 'nums=[1,2,1,2,3], k=2',   expected: '7'  },
+    { label: 'Example 2',    input: 'nums=[1,2,1,3,4], k=3',   expected: '3'  },
+    { label: 'Single elem',  input: 'nums=[1], k=1',           expected: '1'  },
+    { label: 'All same',     input: 'nums=[1,1,1,1,1], k=1',   expected: '15' },
   ],
   cppStarter: `class Solution {
 public:
@@ -342,29 +316,31 @@ class Solution:
     if (mode === 'run') return `
 int main() {
     Solution sol;
-    vector<int> nums = {1, 2, 1, 2, 3};
+    vector<int> nums = {1,2,1,2,3};
     int k = 2;
     int got = sol.subarraysWithKDistinct(nums, k);
     cout << got << "\\n";
-    cout << (got == 7 ? "✓ Matches expected (7)" : "✗ Expected 7, got " + to_string(got)) << "\\n";
+    cout << "---RESULT---\\n";
+    if (got == 7) cout << "RESULT:PASS:7:" << got << "\\n";
+    else          cout << "RESULT:FAIL:7:" << got << "\\n";
     return 0;
 }`;
     if (mode === 'submit') return `
 int main() {
     Solution sol;
     int passed = 0, total = 4;
+    cout << "---RESULT---\\n";
     auto chk = [&](vector<int> nums, int k, int expected, int n) {
         int got = sol.subarraysWithKDistinct(nums, k);
         bool ok = got == expected;
         passed += ok;
-        if (ok) cout << "✓ Test " << n << ": passed\\n";
-        else     cout << "✗ Test " << n << ": FAILED — expected: " << expected << ", got: " << got << "\\n";
+        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
     };
-    chk({1,2,1,2,3},     2, 7,  1);
-    chk({1,2,1,3,4},     3, 3,  2);
-    chk({1},             1, 1,  3);
-    chk({1,1,1,1,1},     1, 15, 4);
-    cout << "\\n" << passed << "/" << total << " tests passed\\n";
+    chk({1,2,1,2,3},   2, 7,  1);
+    chk({1,2,1,3,4},   3, 3,  2);
+    chk({1},           1, 1,  3);
+    chk({1,1,1,1,1},   1, 15, 4);
+    cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
     if (mode === 'custom') {
@@ -374,7 +350,7 @@ int main() {
       return `
 int main() {
     Solution sol;
-    vector<int> nums = {${p(nums)}};
+    vector<int> nums = {${join(nums)}};
     int k = ${k};
     cout << sol.subarraysWithKDistinct(nums, k) << "\\n";
     return 0;
@@ -383,33 +359,25 @@ int main() {
   },
   buildPythonHarness(mode, customInput = '') {
     if (mode === 'run') return `
-# ── Run (Example 1) ──
 sol = Solution()
 got = sol.subarraysWithKDistinct([1,2,1,2,3], 2)
 print(got)
-print("✓ Matches expected (7)" if got == 7 else f"✗ Expected 7, got {got}")`;
+print("---RESULT---")
+print(f"RESULT:{'PASS' if got == 7 else 'FAIL'}:7:{got}")`;
     if (mode === 'submit') return `
-# ── Submit ──
 sol = Solution()
-cases = [
-    ([1,2,1,2,3],   2, 7),
-    ([1,2,1,3,4],   3, 3),
-    ([1],           1, 1),
-    ([1,1,1,1,1],   1, 15),
-]
+cases = [([1,2,1,2,3],2,7),([1,2,1,3,4],3,3),([1],1,1),([1,1,1,1,1],1,15)]
 passed = 0
-for i, (nums, k, expected) in enumerate(cases, 1):
-    got = sol.subarraysWithKDistinct(list(nums), k)
-    ok  = got == expected
-    passed += ok
-    print(f"{'✓' if ok else '✗'} Test {i}: {'passed' if ok else f'FAILED — expected: {expected}, got: {got}'}")
-print(f"\\n{passed}/{len(cases)} tests passed")`;
+print("---RESULT---")
+for i,(nums,k,exp) in enumerate(cases,1):
+    got=sol.subarraysWithKDistinct(list(nums),k); ok=got==exp; passed+=ok
+    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
       const nums = (lines[0] || '1 2 1 2 3').trim().split(/\s+/).filter(Boolean).map(Number);
       const k = parseInt(lines[1] ?? '2');
       return `
-# ── Custom Run ──
 sol = Solution()
 print(sol.subarraysWithKDistinct([${nums.join(', ')}], ${k}))`;
     }
@@ -423,19 +391,19 @@ const minWindowSubseq = {
   difficulty: 'Hard',
   category: 'Two Pointers',
   description: [
-    'Given strings <code>s</code> and <code>t</code>, return the minimum contiguous substring of <code>s</code> such that <code>t</code> appears as a <strong>subsequence</strong> of that substring.',
-    'If there is no such window, return <code>""</code>. If there are multiple minimum-length windows, return the one with the <strong>left-most starting index</strong>.',
+    'Given strings <code>s</code> and <code>t</code>, return the minimum contiguous substring of <code>s</code> such that <code>t</code> is a <strong>subsequence</strong> of that substring.',
+    'If no such window exists return <code>""</code>. If multiple minimum-length windows exist, return the <strong>left-most</strong> one.',
   ],
   examples: [
     {
       input: 's = "abcdebdde",  t = "bde"',
       output: '"bcde"',
-      explanation: '"bcde" (length 4) is shorter than "bdde" (length 4, same length but starts later). Both contain "bde" as a subsequence.',
+      explanation: '"bcde" (length 4) is shorter than any other window containing "b","d","e" in order.',
     },
     {
       input: 's = "jmeqksfrcdcmsarqjssrqnmjgcgxabegksnfhxekrzq",  t = "sf"',
-      output: '"sfrcdcmsarqjssrqnmjgcgxabegksnf"',
-      explanation: 'Find the shortest window where s and f appear in order as a subsequence.',
+      output: '"sfr"',
+      explanation: 'The first occurrence of s then f in sequence gives the window "sfr" (shortest).',
     },
   ],
   constraints: [
@@ -444,17 +412,17 @@ const minWindowSubseq = {
     's and t consist of lowercase English letters',
   ],
   hints: [
-    'Use two pointers: scan s forward to find the first window that contains t as a subsequence (extend right until all of t is matched).',
-    'Once you have a valid window end, scan <em>backward</em> from that end to minimize the window start. This gives the shortest window ending at that position.',
-    'Record the minimum window found. Then advance the start pointer by 1 and repeat the forward scan. O(|s| × |t|) overall.',
+    'Use two pointers on <code>s</code> and <code>t</code>. Scan forward until all characters of <code>t</code> are matched as a subsequence — this gives the window end.',
+    'Once you have the window end, scan <em>backward</em> from that position to minimise the window start. This is the shortest window ending there.',
+    'Record the minimum, then advance the start by 1 and repeat the forward scan. Overall O(|s| × |t|).',
   ],
   inputFormat: 'Line 1: s (string)\nLine 2: t (string)',
   defaultCustomInput: 'abcdebdde\nbde',
   testCases: [
-    { label: 'Example 1', input: 's="abcdebdde", t="bde"', expected: '"bcde"' },
-    { label: 'End match', input: 's="xyzabc", t="abc"', expected: '"abc"' },
-    { label: 'Same string', input: 's="aa", t="aa"', expected: '"aa"' },
-    { label: 'Long search', input: 's="fgrqsqsnodwmxzkzxwqegkndaa", t="kzed"', expected: '"kzxwqegknd"' },
+    { label: 'Example 1',  input: 's="abcdebdde", t="bde"',                        expected: '"bcde"'       },
+    { label: 'End match',  input: 's="xyzabc", t="abc"',                            expected: '"abc"'        },
+    { label: 'Same str',   input: 's="aa", t="aa"',                                 expected: '"aa"'         },
+    { label: 'Long search',input: 's="fgrqsqsnodwmxzkzxwqegkndaa", t="kzed"',      expected: '"kzxwqegknd"' },
   ],
   cppStarter: `class Solution {
 public:
@@ -470,26 +438,28 @@ public:
 int main() {
     Solution sol;
     string got = sol.minWindow("abcdebdde", "bde");
-    cout << "\\"" << got << "\\"" << "\\n";
-    cout << (got == "bcde" ? "✓ Matches expected (\\"bcde\\")" : "✗ Expected \\"bcde\\", got \\"" + got + "\\"") << "\\n";
+    cout << "\\"" << got << "\\"\\n";
+    cout << "---RESULT---\\n";
+    if (got == "bcde") cout << "RESULT:PASS:bcde:" << got << "\\n";
+    else               cout << "RESULT:FAIL:bcde:" << got << "\\n";
     return 0;
 }`;
     if (mode === 'submit') return `
 int main() {
     Solution sol;
     int passed = 0, total = 4;
+    cout << "---RESULT---\\n";
     auto chk = [&](string s, string t, string expected, int n) {
         string got = sol.minWindow(s, t);
         bool ok = got == expected;
         passed += ok;
-        if (ok) cout << "✓ Test " << n << ": passed\\n";
-        else     cout << "✗ Test " << n << ": FAILED — expected: \\"" << expected << "\\", got: \\"" << got << "\\"\\n";
+        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
     };
     chk("abcdebdde",                  "bde",  "bcde",       1);
     chk("xyzabc",                     "abc",  "abc",        2);
     chk("aa",                         "aa",   "aa",         3);
     chk("fgrqsqsnodwmxzkzxwqegkndaa", "kzed", "kzxwqegknd", 4);
-    cout << "\\n" << passed << "/" << total << " tests passed\\n";
+    cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
     if (mode === 'custom') {
@@ -499,40 +469,32 @@ int main() {
       return `
 int main() {
     Solution sol;
-    cout << "\\"" << sol.minWindow("${s}", "${t}") << "\\"" << "\\n";
+    cout << "\\"" << sol.minWindow("${s}", "${t}") << "\\"\\n";
     return 0;
 }`;
     }
   },
   buildPythonHarness(mode, customInput = '') {
     if (mode === 'run') return `
-# ── Run (Example 1) ──
 sol = Solution()
 got = sol.minWindow("abcdebdde", "bde")
 print(f'"{got}"')
-print('✓ Matches expected ("bcde")' if got == "bcde" else f'✗ Expected "bcde", got "{got}"')`;
+print("---RESULT---")
+print(f"RESULT:{'PASS' if got == 'bcde' else 'FAIL'}:bcde:{got}")`;
     if (mode === 'submit') return `
-# ── Submit ──
 sol = Solution()
-cases = [
-    ("abcdebdde",                  "bde",  "bcde"),
-    ("xyzabc",                     "abc",  "abc"),
-    ("aa",                         "aa",   "aa"),
-    ("fgrqsqsnodwmxzkzxwqegkndaa", "kzed", "kzxwqegknd"),
-]
+cases = [("abcdebdde","bde","bcde"),("xyzabc","abc","abc"),("aa","aa","aa"),("fgrqsqsnodwmxzkzxwqegkndaa","kzed","kzxwqegknd")]
 passed = 0
-for i, (s, t, expected) in enumerate(cases, 1):
-    got = sol.minWindow(s, t)
-    ok  = got == expected
-    passed += ok
-    print(f"{'✓' if ok else '✗'} Test {i}: {'passed' if ok else f'FAILED — expected: \"{expected}\", got: \"{got}\"'}")
-print(f"\\n{passed}/{len(cases)} tests passed")`;
+print("---RESULT---")
+for i,(s,t,exp) in enumerate(cases,1):
+    got=sol.minWindow(s,t); ok=got==exp; passed+=ok
+    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
       const s = (lines[0] || 'abcdebdde').trim();
       const t = (lines[1] || 'bde').trim();
       return `
-# ── Custom Run ──
 sol = Solution()
 got = sol.minWindow("${s}", "${t}")
 print(f'"{got}"')`;

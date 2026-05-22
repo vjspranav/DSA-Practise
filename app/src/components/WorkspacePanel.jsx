@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import Editor from '@monaco-editor/react'
-import { parseSubmitOutput } from '../runtime/executor'
+import { parseOutput } from '../runtime/executor'
 
 const LANG_LABEL = { cpp: 'C++', python: 'Python' }
 const MONACO_LANG = { cpp: 'cpp', python: 'python' }
@@ -10,7 +10,7 @@ export default function WorkspacePanel({
   problem,
   code, onCodeChange,
   running, runMode,
-  onRun, onSubmit,
+  onRun,
   results,
   statuses,
 }) {
@@ -19,9 +19,7 @@ export default function WorkspacePanel({
   const [customInput, setCustomInput] = useState('')
   const [resultsOpen, setResultsOpen] = useState(false)
 
-  // Sync results panel open state
   useEffect(() => { if (results) setResultsOpen(true) }, [results])
-  // Reset custom input when problem changes
   useEffect(() => {
     setCustomInput(problem?.defaultCustomInput ?? '')
     setCustomOpen(false)
@@ -32,32 +30,31 @@ export default function WorkspacePanel({
     editor.setValue(code)
   }
 
-  const handleEditorChange = (val) => {
-    onCodeChange(val ?? '')
-  }
+  const handleEditorChange = (val) => onCodeChange(val ?? '')
 
-  // Update editor content when code prop changes (problem/language switch)
   useEffect(() => {
     if (editorRef.current && editorRef.current.getValue() !== code) {
       editorRef.current.setValue(code)
     }
   }, [code])
 
-  const submitOutput = results?.mode === 'submit' ? parseSubmitOutput(results.lines) : null
-
   const statusReady = language === 'python'
     ? statuses.pyodide === 'ok'
     : statuses['wasm-clang'] === 'ok'
 
+  const parsed = results ? parseOutput(results.lines) : null
+  const hasStructuredResult = parsed && parsed.tests.length > 0
+  const hasOutput = parsed && parsed.outputLines.some(l => l.text.trim())
+
   return (
     <div className="workspace">
-      {/* Workspace Header */}
+      {/* Header */}
       <div className="workspace-header">
         <div className="lang-toggle">
           {['cpp', 'python'].map(lang => (
             <button
               key={lang}
-              className={`lang-btn ${language === lang ? 'active' : ''}`}
+              className={`lang-btn${language === lang ? ' active' : ''}`}
               onClick={() => onLanguageChange(lang)}
               disabled={running}
             >
@@ -73,7 +70,7 @@ export default function WorkspacePanel({
             disabled={running || !statusReady}
             title={!statusReady ? 'Runtime loading…' : 'Run example'}
           >
-            {running && runMode === 'run' ? <span className="spinner" /> : '▶'}
+            {running && runMode === 'run' ? <span className="spinner" /> : <span className="btn-icon">▶</span>}
             Run
           </button>
           <button
@@ -82,15 +79,15 @@ export default function WorkspacePanel({
             disabled={running || !statusReady}
             title={!statusReady ? 'Runtime loading…' : 'Run all test cases'}
           >
-            {running && runMode === 'submit' ? <span className="spinner" /> : '⚡'}
+            {running && runMode === 'submit' ? <span className="spinner" /> : null}
             Submit
           </button>
           <button
-            className={`btn btn-custom ${customOpen ? 'active' : ''}`}
+            className={`btn btn-custom${customOpen ? ' active' : ''}`}
             onClick={() => setCustomOpen(v => !v)}
             disabled={running}
           >
-            ⌨ Custom
+            Custom
           </button>
         </div>
 
@@ -125,8 +122,8 @@ export default function WorkspacePanel({
             onClick={() => onRun('custom', customInput)}
             disabled={running || !statusReady}
           >
-            {running && runMode === 'custom' ? <span className="spinner" /> : '▶'}
-            Run Custom
+            {running && runMode === 'custom' ? <span className="spinner" /> : <span className="btn-icon">▶</span>}
+            Run
           </button>
         </div>
       )}
@@ -157,26 +154,51 @@ export default function WorkspacePanel({
         <div className="results-panel">
           <div className="results-header">
             <span className="results-title">
-              {results.mode === 'submit' ? 'Test Results' : results.mode === 'custom' ? 'Custom Output' : 'Output'}
+              {results.mode === 'submit' ? 'Test Results'
+                : results.mode === 'custom' ? 'Custom Output'
+                : 'Output'}
             </span>
-            {submitOutput?.summary && (
-              <span className={`summary-badge ${submitOutput.summary.passed === submitOutput.summary.total ? 'all-pass' : 'some-fail'}`}>
-                {submitOutput.summary.passed}/{submitOutput.summary.total} passed
+            {parsed?.summary && (
+              <span className={`summary-badge ${parsed.summary.passed === parsed.summary.total ? 'all-pass' : 'some-fail'}`}>
+                {parsed.summary.passed}/{parsed.summary.total} passed
               </span>
             )}
             <button className="close-results" onClick={() => setResultsOpen(false)}>✕</button>
           </div>
 
           <div className="results-body">
-            {results.mode === 'submit' && submitOutput?.results.length > 0 ? (
-              <div className="test-result-list">
-                {submitOutput.results.map((r, i) => (
-                  <div key={i} className={`tr-item ${r.passed ? 'pass' : 'fail'}`}>
-                    <span className="tr-icon">{r.passed ? '✓' : '✗'}</span>
-                    <span className="tr-text">{r.text}</span>
+            {hasStructuredResult ? (
+              <>
+                {/* Program output section */}
+                {hasOutput && (
+                  <div className="output-section">
+                    <div className="output-section-label">Output</div>
+                    <pre className="raw-output">
+                      {parsed.outputLines.map((o, i) => (
+                        <span key={i} className={`out-${o.cls}`}>{o.text}</span>
+                      ))}
+                    </pre>
                   </div>
-                ))}
-              </div>
+                )}
+                {/* Structured result section */}
+                <div className={`result-section${hasOutput ? ' has-output' : ''}`}>
+                  {hasOutput && <div className="result-section-label">Result</div>}
+                  <div className="test-result-list">
+                    {parsed.tests.map((r) => (
+                      <div key={r.n} className={`tr-item ${r.passed ? 'pass' : 'fail'}`}>
+                        <span className="tr-status">{r.passed ? 'PASS' : 'FAIL'}</span>
+                        <span className="tr-detail">
+                          {results.mode === 'submit' && (
+                            <span className="tr-case-num">Test {r.n}</span>
+                          )}
+                          <span>expected <code>{r.expected}</code></span>
+                          {!r.passed && <span>got <code className="got-wrong">{r.got}</code></span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             ) : (
               <pre className="raw-output">
                 {results.lines.map((o, i) => (

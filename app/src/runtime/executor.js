@@ -44,20 +44,35 @@ function buildPython(userCode, problem, mode, customInput) {
   return userCode + '\n' + harness
 }
 
-// ── Parse submit output into structured test results ───────────────────────
-// Looks for lines starting with ✓ or ✗ and a summary "N/M tests passed" line.
-export function parseSubmitOutput(lines) {
-  const results = []
+// Parses harness output split by the ---RESULT--- sentinel.
+// Each element of `lines` is { text: string, cls: string } where text is one line + \n.
+// Returns { outputLines, tests, summary } where:
+//   outputLines — lines before the sentinel (user program output)
+//   tests       — [{ n, passed, expected, got }]
+//   summary     — { passed, total } | null  (submit mode only)
+export function parseOutput(lines) {
+  const sentinelIdx = lines.findIndex(l => l.text.trim() === '---RESULT---')
+  const outputLines = sentinelIdx >= 0 ? lines.slice(0, sentinelIdx) : lines
+  const resultLines = sentinelIdx >= 0 ? lines.slice(sentinelIdx + 1) : []
+
+  const tests = []
   let summary = null
 
-  for (const { text } of lines) {
-    const t = text.trimEnd()
-    if (t.startsWith('✓') || t.startsWith('✗')) {
-      results.push({ passed: t.startsWith('✓'), text: t.slice(2).trim() })
+  for (const { text } of resultLines) {
+    const t = text.trim()
+    const mTest = t.match(/^TEST:(\d+):(PASS|FAIL):(.+):(.+)$/)
+    if (mTest) {
+      tests.push({ n: parseInt(mTest[1]), passed: mTest[2] === 'PASS', expected: mTest[3], got: mTest[4] })
+      continue
     }
-    const m = t.match(/(\d+)\/(\d+) tests passed/)
-    if (m) summary = { passed: parseInt(m[1]), total: parseInt(m[2]) }
+    const mResult = t.match(/^RESULT:(PASS|FAIL):(.+):(.+)$/)
+    if (mResult) {
+      tests.push({ n: 1, passed: mResult[1] === 'PASS', expected: mResult[2], got: mResult[3] })
+      continue
+    }
+    const mSum = t.match(/^SUMMARY:(\d+):(\d+)$/)
+    if (mSum) summary = { passed: parseInt(mSum[1]), total: parseInt(mSum[2]) }
   }
 
-  return { results, summary }
+  return { outputLines, tests, summary }
 }
