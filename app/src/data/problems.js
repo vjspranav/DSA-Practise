@@ -70,7 +70,6 @@ int main() {
     vector<int> nums = {1, 0, 1, 0, 1};
     int goal = 2;
     int got = sol.numSubarraysWithSum(nums, goal);
-    cout << got << "\\n";
     cout << "---RESULT---\\n";
     if (got == 4) cout << "RESULT:PASS:4:" << got << "\\n";
     else          cout << "RESULT:FAIL:4:" << got << "\\n";
@@ -113,7 +112,6 @@ int main() {
 # run
 sol = Solution()
 got = sol.numSubarraysWithSum([1,0,1,0,1], 2)
-print(got)
 print("---RESULT---")
 print(f"RESULT:{'PASS' if got == 4 else 'FAIL'}:4:{got}")`;
     if (mode === 'submit') return `
@@ -196,7 +194,6 @@ int main() {
     vector<int> pts = {1,2,3,4,5,6,1};
     int k = 3;
     int got = sol.maxScore(pts, k);
-    cout << got << "\\n";
     cout << "---RESULT---\\n";
     if (got == 12) cout << "RESULT:PASS:12:" << got << "\\n";
     else           cout << "RESULT:FAIL:12:" << got << "\\n";
@@ -238,7 +235,6 @@ int main() {
     if (mode === 'run') return `
 sol = Solution()
 got = sol.maxScore([1,2,3,4,5,6,1], 3)
-print(got)
 print("---RESULT---")
 print(f"RESULT:{'PASS' if got == 12 else 'FAIL'}:12:{got}")`;
     if (mode === 'submit') return `
@@ -319,7 +315,6 @@ int main() {
     vector<int> nums = {1,2,1,2,3};
     int k = 2;
     int got = sol.subarraysWithKDistinct(nums, k);
-    cout << got << "\\n";
     cout << "---RESULT---\\n";
     if (got == 7) cout << "RESULT:PASS:7:" << got << "\\n";
     else          cout << "RESULT:FAIL:7:" << got << "\\n";
@@ -361,7 +356,6 @@ int main() {
     if (mode === 'run') return `
 sol = Solution()
 got = sol.subarraysWithKDistinct([1,2,1,2,3], 2)
-print(got)
 print("---RESULT---")
 print(f"RESULT:{'PASS' if got == 7 else 'FAIL'}:7:{got}")`;
     if (mode === 'submit') return `
@@ -438,7 +432,6 @@ public:
 int main() {
     Solution sol;
     string got = sol.minWindow("abcdebdde", "bde");
-    cout << "\\"" << got << "\\"\\n";
     cout << "---RESULT---\\n";
     if (got == "bcde") cout << "RESULT:PASS:bcde:" << got << "\\n";
     else               cout << "RESULT:FAIL:bcde:" << got << "\\n";
@@ -478,7 +471,6 @@ int main() {
     if (mode === 'run') return `
 sol = Solution()
 got = sol.minWindow("abcdebdde", "bde")
-print(f'"{got}"')
 print("---RESULT---")
 print(f"RESULT:{'PASS' if got == 'bcde' else 'FAIL'}:bcde:{got}")`;
     if (mode === 'submit') return `
