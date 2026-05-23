@@ -90,17 +90,19 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "\\n---RESULT---\\n";
+    vector<string> res;
     auto chk = [&](vector<int> nums, int goal, int expected, int n) {
         int got = sol.numSubarraysWithSum(nums, goal);
         bool ok = got == expected;
         passed += ok;
-        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
+        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + to_string(expected) + ":" + to_string(got));
     };
     chk({1,0,1,0,1}, 2, 4,  1);
     chk({0,0,0,0,0}, 0, 15, 2);
     chk({1,1,1,1},   2, 3,  3);
     chk({1,0,0,1,1}, 2, 4,  4);
+    cout << "\\n---RESULT---\\n";
+    for (auto& s : res) cout << s << "\\n";
     cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
@@ -130,10 +132,12 @@ print(f"RESULT:{'PASS' if got == 4 else 'FAIL'}:4:{got}")`;
 sol = Solution()
 cases = [([1,0,1,0,1],2,4),([0,0,0,0,0],0,15),([1,1,1,1],2,3),([1,0,0,1,1],2,4)]
 passed = 0
-print("\n---RESULT---")
+res = []
 for i,(nums,goal,exp) in enumerate(cases,1):
     got=sol.numSubarraysWithSum(list(nums),goal); ok=got==exp; passed+=ok
-    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\n---RESULT---")
+for r in res: print(r)
 print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -221,17 +225,19 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "\\n---RESULT---\\n";
+    vector<string> res;
     auto chk = [&](vector<int> pts, int k, int expected, int n) {
         int got = sol.maxScore(pts, k);
         bool ok = got == expected;
         passed += ok;
-        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
+        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + to_string(expected) + ":" + to_string(got));
     };
     chk({1,2,3,4,5,6,1}, 3, 12, 1);
     chk({2,2,2},          2, 4,  2);
     chk({9,7,7,9,7,7,9},  7, 55, 3);
     chk({1,1000,1},        1, 1,  4);
+    cout << "\\n---RESULT---\\n";
+    for (auto& s : res) cout << s << "\\n";
     cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
@@ -259,10 +265,12 @@ print(f"RESULT:{'PASS' if got == 12 else 'FAIL'}:12:{got}")`;
 sol = Solution()
 cases = [([1,2,3,4,5,6,1],3,12),([2,2,2],2,4),([9,7,7,9,7,7,9],7,55),([1,1000,1],1,1)]
 passed = 0
-print("\n---RESULT---")
+res = []
 for i,(pts,k,exp) in enumerate(cases,1):
     got=sol.maxScore(list(pts),k); ok=got==exp; passed+=ok
-    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\n---RESULT---")
+for r in res: print(r)
 print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -342,17 +350,19 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "\\n---RESULT---\\n";
+    vector<string> res;
     auto chk = [&](vector<int> nums, int k, int expected, int n) {
         int got = sol.subarraysWithKDistinct(nums, k);
         bool ok = got == expected;
         passed += ok;
-        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
+        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + to_string(expected) + ":" + to_string(got));
     };
     chk({1,2,1,2,3},   2, 7,  1);
     chk({1,2,1,3,4},   3, 3,  2);
     chk({1},           1, 1,  3);
     chk({1,1,1,1,1},   1, 15, 4);
+    cout << "\\n---RESULT---\\n";
+    for (auto& s : res) cout << s << "\\n";
     cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
@@ -380,10 +390,12 @@ print(f"RESULT:{'PASS' if got == 7 else 'FAIL'}:7:{got}")`;
 sol = Solution()
 cases = [([1,2,1,2,3],2,7),([1,2,1,3,4],3,3),([1],1,1),([1,1,1,1,1],1,15)]
 passed = 0
-print("\n---RESULT---")
+res = []
 for i,(nums,k,exp) in enumerate(cases,1):
     got=sol.subarraysWithKDistinct(list(nums),k); ok=got==exp; passed+=ok
-    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\n---RESULT---")
+for r in res: print(r)
 print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -467,17 +479,19 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "\\n---RESULT---\\n";
+    vector<string> res;
     auto chk = [&](string s, string t, string expected, int n) {
         string got = sol.minWindow(s, t);
         bool ok = got == expected;
         passed += ok;
-        cout << "TEST:" << n << (ok ? ":PASS:" : ":FAIL:") << expected << ":" << got << "\\n";
+        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + expected + ":" + got);
     };
     chk("abcdebdde",                  "bde",  "bcde",       1);
     chk("xyzabc",                     "abc",  "abc",        2);
     chk("aa",                         "aa",   "aa",         3);
     chk("fgrqsqsnodwmxzkzxwqegkndaa", "kzed", "kzxwqegknd", 4);
+    cout << "\\n---RESULT---\\n";
+    for (auto& s : res) cout << s << "\\n";
     cout << "SUMMARY:" << passed << ":" << total << "\\n";
     return passed == total ? 0 : 1;
 }`;
@@ -503,10 +517,12 @@ print(f"RESULT:{'PASS' if got == 'bcde' else 'FAIL'}:bcde:{got}")`;
 sol = Solution()
 cases = [("abcdebdde","bde","bcde"),("xyzabc","abc","abc"),("aa","aa","aa"),("fgrqsqsnodwmxzkzxwqegkndaa","kzed","kzxwqegknd")]
 passed = 0
-print("\n---RESULT---")
+res = []
 for i,(s,t,exp) in enumerate(cases,1):
     got=sol.minWindow(s,t); ok=got==exp; passed+=ok
-    print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\n---RESULT---")
+for r in res: print(r)
 print(f"SUMMARY:{passed}:{len(cases)}")`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
