@@ -169,10 +169,9 @@ export default function WorkspacePanel({
           <div className="results-body">
             {hasStructuredResult ? (
               <>
-                {/* Program output section */}
+                {/* Program stdout (user couts/prints before sentinel) */}
                 {hasOutput && (
                   <div className="output-section">
-                    <div className="output-section-label">Output</div>
                     <pre className="raw-output">
                       {parsed.outputLines.map((o, i) => (
                         <span key={i} className={`out-${o.cls}`}>{o.text}</span>
@@ -180,19 +179,26 @@ export default function WorkspacePanel({
                     </pre>
                   </div>
                 )}
-                {/* Structured result section */}
+                {/* Structured verdict rows */}
                 <div className={`result-section${hasOutput ? ' has-output' : ''}`}>
                   {hasOutput && <div className="result-section-label">Result</div>}
                   <div className="test-result-list">
                     {parsed.tests.map((r) => (
                       <div key={r.n} className={`tr-item ${r.passed ? 'pass' : 'fail'}`}>
+                        {results.mode === 'submit' && (
+                          <span className="tr-case-num">Test {r.n}</span>
+                        )}
                         <span className="tr-status">{r.passed ? 'PASS' : 'FAIL'}</span>
-                        <span className="tr-detail">
-                          {results.mode === 'submit' && (
-                            <span className="tr-case-num">Test {r.n}</span>
-                          )}
-                          <span>expected <code>{r.expected}</code></span>
-                          {!r.passed && <span>got <code className="got-wrong">{r.got}</code></span>}
+                        <span className="tr-comparison">
+                          <span className="tr-field">
+                            <span className="tr-field-label">Expected</span>
+                            <code className="tr-value">{r.expected}</code>
+                          </span>
+                          <span className="tr-sep">·</span>
+                          <span className="tr-field">
+                            <span className="tr-field-label">Got</span>
+                            <code className={`tr-value${!r.passed ? ' wrong' : ''}`}>{r.got}</code>
+                          </span>
                         </span>
                       </div>
                     ))}

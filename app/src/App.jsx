@@ -135,6 +135,7 @@ export default function App() {
     // Push each program output line individually so parseOutput can find the sentinel
     const programLines = rawText.split('\n').filter(l => !l.startsWith('>'))
     while (programLines.length && !programLines[programLines.length - 1].trim()) programLines.pop()
+    while (programLines.length && !programLines[0].trim()) programLines.shift()
     for (const line of programLines) push(line + '\n', 'stdout')
   }
 
