@@ -95,10 +95,18 @@ export default function ProblemPanel({ problem }) {
         <div className="test-cases-grid">
           {problem.testCases.map((tc, i) => (
             <div key={i} className="tc-card">
-              <div className="tc-label">{tc.label}</div>
-              <div className="tc-input">{tc.input}</div>
-              <div className="tc-arrow">→</div>
-              <div className="tc-expected">{tc.expected}</div>
+              <div className="tc-card-header">
+                <span className="tc-number">{String(i + 1).padStart(2, '0')}</span>
+                <span className="tc-label">{tc.label}</span>
+              </div>
+              <div className="tc-card-body">
+                <span className="tc-field-label">Input</span>
+                <code className="tc-input">{tc.input}</code>
+              </div>
+              <div className="tc-card-footer">
+                <span className="tc-expected-label">Expected</span>
+                <span className="tc-expected">{tc.expected}</span>
+              </div>
             </div>
           ))}
         </div>
