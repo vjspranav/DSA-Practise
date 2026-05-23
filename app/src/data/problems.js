@@ -26,7 +26,18 @@ const binarySubarrays = {
     {
       input: 'nums = [1,0,1,0,1],  goal = 2',
       output: '4',
-      explanation: 'The 4 subarrays are [1,0,1], [1,0,1,0], [0,1,0,1], [1,0,1].',
+      explanation: 'Each highlighted window below sums to 2.',
+      visualization: {
+        type: 'array-windows',
+        array: [1, 0, 1, 0, 1],
+        windows: [
+          { range: [0, 2], color: 'teal',  label: 'sum = 2' },
+          { range: [0, 3], color: 'blue',  label: 'sum = 2' },
+          { range: [1, 4], color: 'mauve', label: 'sum = 2' },
+          { range: [2, 4], color: 'peach', label: 'sum = 2' },
+        ],
+        caption: '4 non-overlapping windows — all sum to goal = 2',
+      },
     },
     {
       input: 'nums = [0,0,0,0,0],  goal = 0',
@@ -70,7 +81,7 @@ int main() {
     vector<int> nums = {1, 0, 1, 0, 1};
     int goal = 2;
     int got = sol.numSubarraysWithSum(nums, goal);
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     if (got == 4) cout << "RESULT:PASS:4:" << got << "\\n";
     else          cout << "RESULT:FAIL:4:" << got << "\\n";
     return 0;
@@ -79,7 +90,7 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     auto chk = [&](vector<int> nums, int goal, int expected, int n) {
         int got = sol.numSubarraysWithSum(nums, goal);
         bool ok = got == expected;
@@ -112,14 +123,14 @@ int main() {
 # run
 sol = Solution()
 got = sol.numSubarraysWithSum([1,0,1,0,1], 2)
-print("---RESULT---")
+print("\n---RESULT---")
 print(f"RESULT:{'PASS' if got == 4 else 'FAIL'}:4:{got}")`;
     if (mode === 'submit') return `
 # submit
 sol = Solution()
 cases = [([1,0,1,0,1],2,4),([0,0,0,0,0],0,15),([1,1,1,1],2,3),([1,0,0,1,1],2,4)]
 passed = 0
-print("---RESULT---")
+print("\n---RESULT---")
 for i,(nums,goal,exp) in enumerate(cases,1):
     got=sol.numSubarraysWithSum(list(nums),goal); ok=got==exp; passed+=ok
     print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
@@ -150,7 +161,14 @@ const maxCards = {
     {
       input: 'cardPoints = [1,2,3,4,5,6,1],  k = 3',
       output: '12',
-      explanation: 'Take [6,1] from the right and [1] from the left: 1 + 6 + 1 = 12.',
+      explanation: 'Take 1 from the left and 2 from the right — teal cards are selected, middle is skipped.',
+      visualization: {
+        type: 'array-ends',
+        array: [1, 2, 3, 4, 5, 6, 1],
+        leftCount: 1,
+        rightCount: 2,
+        caption: '1 + 6 + 1 = 12 (maximum possible with k = 3)',
+      },
     },
     {
       input: 'cardPoints = [2,2,2],  k = 2',
@@ -194,7 +212,7 @@ int main() {
     vector<int> pts = {1,2,3,4,5,6,1};
     int k = 3;
     int got = sol.maxScore(pts, k);
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     if (got == 12) cout << "RESULT:PASS:12:" << got << "\\n";
     else           cout << "RESULT:FAIL:12:" << got << "\\n";
     return 0;
@@ -203,7 +221,7 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     auto chk = [&](vector<int> pts, int k, int expected, int n) {
         int got = sol.maxScore(pts, k);
         bool ok = got == expected;
@@ -235,13 +253,13 @@ int main() {
     if (mode === 'run') return `
 sol = Solution()
 got = sol.maxScore([1,2,3,4,5,6,1], 3)
-print("---RESULT---")
+print("\n---RESULT---")
 print(f"RESULT:{'PASS' if got == 12 else 'FAIL'}:12:{got}")`;
     if (mode === 'submit') return `
 sol = Solution()
 cases = [([1,2,3,4,5,6,1],3,12),([2,2,2],2,4),([9,7,7,9,7,7,9],7,55),([1,1000,1],1,1)]
 passed = 0
-print("---RESULT---")
+print("\n---RESULT---")
 for i,(pts,k,exp) in enumerate(cases,1):
     got=sol.maxScore(list(pts),k); ok=got==exp; passed+=ok
     print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
@@ -271,12 +289,12 @@ const kDistinct = {
     {
       input: 'nums = [1,2,1,2,3],  k = 2',
       output: '7',
-      explanation: '[1,2], [2,1], [1,2,1], [2,1,2], [1,2,1,2], [2,3], [1,2] — seven subarrays with exactly 2 distinct integers.',
+      explanation: '<span class="hl hl-1">[1,2]</span>, <span class="hl hl-2">[2,1]</span>, <span class="hl hl-3">[1,2,1]</span>, <span class="hl hl-4">[2,1,2]</span>, <span class="hl hl-5">[1,2,1,2]</span>, <span class="hl hl-6">[2,3]</span>, <span class="hl hl-1">[1,2]</span> — seven subarrays each containing exactly 2 distinct integers.',
     },
     {
       input: 'nums = [1,2,1,3,4],  k = 3',
       output: '3',
-      explanation: '[1,2,1,3], [2,1,3], [1,3,4].',
+      explanation: '<span class="hl hl-1">[1,2,1,3]</span>, <span class="hl hl-2">[2,1,3]</span>, <span class="hl hl-3">[1,3,4]</span> — three subarrays with exactly 3 distinct integers.',
     },
   ],
   constraints: [
@@ -315,7 +333,7 @@ int main() {
     vector<int> nums = {1,2,1,2,3};
     int k = 2;
     int got = sol.subarraysWithKDistinct(nums, k);
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     if (got == 7) cout << "RESULT:PASS:7:" << got << "\\n";
     else          cout << "RESULT:FAIL:7:" << got << "\\n";
     return 0;
@@ -324,7 +342,7 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     auto chk = [&](vector<int> nums, int k, int expected, int n) {
         int got = sol.subarraysWithKDistinct(nums, k);
         bool ok = got == expected;
@@ -356,13 +374,13 @@ int main() {
     if (mode === 'run') return `
 sol = Solution()
 got = sol.subarraysWithKDistinct([1,2,1,2,3], 2)
-print("---RESULT---")
+print("\n---RESULT---")
 print(f"RESULT:{'PASS' if got == 7 else 'FAIL'}:7:{got}")`;
     if (mode === 'submit') return `
 sol = Solution()
 cases = [([1,2,1,2,3],2,7),([1,2,1,3,4],3,3),([1],1,1),([1,1,1,1,1],1,15)]
 passed = 0
-print("---RESULT---")
+print("\n---RESULT---")
 for i,(nums,k,exp) in enumerate(cases,1):
     got=sol.subarraysWithKDistinct(list(nums),k); ok=got==exp; passed+=ok
     print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
@@ -392,7 +410,15 @@ const minWindowSubseq = {
     {
       input: 's = "abcdebdde",  t = "bde"',
       output: '"bcde"',
-      explanation: '"bcde" (length 4) is shorter than any other window containing "b","d","e" in order.',
+      explanation: 'Window <b>"bcde"</b> (indices 1–4) contains b→d→e in order. Teal cells match t; blue cells are in the window but unmatched.',
+      visualization: {
+        type: 'string-window',
+        s: 'abcdebdde',
+        t: 'bde',
+        window: { start: 1, end: 4 },
+        matches: [1, 3, 4],
+        caption: '"bcde" length 4 — shortest window containing "bde" as a subsequence',
+      },
     },
     {
       input: 's = "jmeqksfrcdcmsarqjssrqnmjgcgxabegksnfhxekrzq",  t = "sf"',
@@ -432,7 +458,7 @@ public:
 int main() {
     Solution sol;
     string got = sol.minWindow("abcdebdde", "bde");
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     if (got == "bcde") cout << "RESULT:PASS:bcde:" << got << "\\n";
     else               cout << "RESULT:FAIL:bcde:" << got << "\\n";
     return 0;
@@ -441,7 +467,7 @@ int main() {
 int main() {
     Solution sol;
     int passed = 0, total = 4;
-    cout << "---RESULT---\\n";
+    cout << "\\n---RESULT---\\n";
     auto chk = [&](string s, string t, string expected, int n) {
         string got = sol.minWindow(s, t);
         bool ok = got == expected;
@@ -471,13 +497,13 @@ int main() {
     if (mode === 'run') return `
 sol = Solution()
 got = sol.minWindow("abcdebdde", "bde")
-print("---RESULT---")
+print("\n---RESULT---")
 print(f"RESULT:{'PASS' if got == 'bcde' else 'FAIL'}:bcde:{got}")`;
     if (mode === 'submit') return `
 sol = Solution()
 cases = [("abcdebdde","bde","bcde"),("xyzabc","abc","abc"),("aa","aa","aa"),("fgrqsqsnodwmxzkzxwqegkndaa","kzed","kzxwqegknd")]
 passed = 0
-print("---RESULT---")
+print("\n---RESULT---")
 for i,(s,t,exp) in enumerate(cases,1):
     got=sol.minWindow(s,t); ok=got==exp; passed+=ok
     print(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")

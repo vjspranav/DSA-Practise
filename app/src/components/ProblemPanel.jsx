@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ExampleViz from './ExampleViz'
 
 const DIFF_COLOR = { Easy: 'easy', Medium: 'medium', Hard: 'hard' }
 
@@ -21,7 +22,7 @@ function HintAccordion({ hints }) {
                   Reveal Hint {i + 1}
                 </button>
               ) : (
-                <span className="hint-locked">Hint {i + 1} — unlock previous hint first</span>
+                <span className="hint-locked">— Hint {i + 1} locked</span>
               )}
             </div>
           )
@@ -47,7 +48,7 @@ export default function ProblemPanel({ problem }) {
         </div>
       </div>
 
-      {/* Description */}
+      {/* Body */}
       <div className="problem-body">
         <div className="problem-description">
           {problem.description.map((para, i) => (
@@ -67,7 +68,7 @@ export default function ProblemPanel({ problem }) {
               </div>
               <div className="io-row">
                 <span className="io-label">Output</span>
-                <code className="io-value">{ex.output}</code>
+                <code className="io-value io-value-output">{ex.output}</code>
               </div>
             </div>
             {ex.explanation && (
@@ -76,6 +77,7 @@ export default function ProblemPanel({ problem }) {
                 dangerouslySetInnerHTML={{ __html: ex.explanation }}
               />
             )}
+            {ex.visualization && <ExampleViz viz={ex.visualization} />}
           </div>
         ))}
 
@@ -87,7 +89,7 @@ export default function ProblemPanel({ problem }) {
           ))}
         </ul>
 
-        {/* Test Cases — visible unlike LeetCode */}
+        {/* Test Cases */}
         <div className="section-label">
           Test Cases
           <span className="section-sublabel">all visible</span>

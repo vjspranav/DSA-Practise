@@ -51,8 +51,14 @@ function buildPython(userCode, problem, mode, customInput) {
 //   tests       — [{ n, passed, expected, got }]
 //   summary     — { passed, total } | null  (submit mode only)
 export function parseOutput(lines) {
-  const sentinelIdx = lines.findIndex(l => l.text.trim() === '---RESULT---')
-  const outputLines = sentinelIdx >= 0 ? lines.slice(0, sentinelIdx) : lines
+  const sentinelIdx = lines.findIndex(l => l.text.includes('---RESULT---'))
+  let outputLines = sentinelIdx >= 0 ? lines.slice(0, sentinelIdx) : lines
+  // Handle case where user omitted endl: "val---RESULT---" ends up on one line
+  if (sentinelIdx >= 0) {
+    const sl = lines[sentinelIdx]
+    const prefix = sl.text.slice(0, sl.text.indexOf('---RESULT---')).trimEnd()
+    if (prefix) outputLines = [...outputLines, { text: prefix + '\n', cls: sl.cls }]
+  }
   const resultLines = sentinelIdx >= 0 ? lines.slice(sentinelIdx + 1) : []
 
   const tests = []

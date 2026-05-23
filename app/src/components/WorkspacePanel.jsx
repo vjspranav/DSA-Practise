@@ -143,6 +143,12 @@ export default function WorkspacePanel({
             lineNumbers: 'on',
             renderLineHighlight: 'gutter',
             padding: { top: 16, bottom: 16 },
+            quickSuggestions: true,
+            suggestOnTriggerCharacters: true,
+            acceptSuggestionOnEnter: 'on',
+            tabCompletion: 'on',
+            wordBasedSuggestions: 'matchingDocuments',
+            parameterHints: { enabled: true },
           }}
           onMount={handleMount}
           onChange={handleEditorChange}
@@ -172,6 +178,10 @@ export default function WorkspacePanel({
                 {/* Program stdout (user couts/prints before sentinel) */}
                 {hasOutput && (
                   <div className="output-section">
+                    <div className="output-section-label">
+                      <span className="output-dot" />
+                      stdout
+                    </div>
                     <pre className="raw-output">
                       {parsed.outputLines.map((o, i) => (
                         <span key={i} className={`out-${o.cls}`}>{o.text}</span>
