@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import _ from 'lodash'
 import { PROBLEMS, CATEGORIES } from './data/problems'
 import { buildCode } from './runtime/executor'
+import { usePracticeStore } from './hooks/usePracticeStore'
 import Sidebar from './components/Sidebar'
 import ProblemPanel from './components/ProblemPanel'
 import WorkspacePanel from './components/WorkspacePanel'
@@ -22,27 +23,14 @@ export default function App() {
   const [statuses, setStatuses]               = useState(initStatuses)
   const [sidebarOpen, setSidebarOpen]         = useState(true)
 
-  // Per-problem, per-language code cache  { problemId: { cpp, python } }
-  const [userCode, setUserCode] = useState({})
-
   const pyodideRef     = useRef(null)
   const wasmClangRef   = useRef(null)   // { port, handlers, onWrite }
   const wasmClangMsgId = useRef(0)
 
   const setStatus = (lib, state) => setStatuses(p => ({ ...p, [lib]: state }))
 
-  // ── Code helpers ─────────────────────────────────────────────────────────
-  const getCode = useCallback((problemId, lang) =>
-    userCode[problemId]?.[lang] ??
-    PROBLEMS.find(p => p.id === problemId)?.[`${lang}Starter`] ?? '',
-  [userCode])
-
-  const saveCode = useCallback((problemId, lang, code) =>
-    setUserCode(prev => ({
-      ...prev,
-      [problemId]: { ...prev[problemId], [lang]: code },
-    })),
-  [])
+  // ── Code + problem-status helpers (localStorage-backed) ──────────────────
+  const { getCode, saveCode, getStatus, setStatus: setProblemStatus } = usePracticeStore()
 
   const currentCode = getCode(selectedProblem.id, language)
 
@@ -161,9 +149,12 @@ export default function App() {
         : 'var(--sidebar-collapsed-w) 1fr 1.3fr'
     }}>
       <Sidebar
+        categories={CATEGORIES}
         problems={PROBLEMS}
         selectedId={selectedProblem.id}
         onSelect={handleProblemSelect}
+        getStatus={getStatus}
+        onStatusChange={setProblemStatus}
         collapsed={!sidebarOpen}
         onToggle={() => setSidebarOpen(v => !v)}
       />
@@ -179,6 +170,8 @@ export default function App() {
         onRun={handleRun}
         results={results}
         statuses={statuses}
+        problemStatus={getStatus(selectedProblem.id)}
+        onStatusChange={(s) => setProblemStatus(selectedProblem.id, s)}
       />
     </div>
   )

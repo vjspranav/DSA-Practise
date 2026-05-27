@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ExampleViz from './ExampleViz'
+import { CATEGORIES } from '../data/problems'
 
 const DIFF_COLOR = { Easy: 'easy', Medium: 'medium', Hard: 'hard' }
 
@@ -44,7 +45,9 @@ export default function ProblemPanel({ problem }) {
           <span className={`diff-badge ${DIFF_COLOR[problem.difficulty]}`}>
             {problem.difficulty}
           </span>
-          <span className="category-tag">{problem.category}</span>
+          <span className="category-tag">
+            {CATEGORIES.find(c => c.id === problem.category)?.label ?? problem.category}
+          </span>
         </div>
       </div>
 
