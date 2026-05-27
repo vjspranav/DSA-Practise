@@ -13,6 +13,8 @@ export default function WorkspacePanel({
   onRun,
   results,
   statuses,
+  problemStatus,
+  onStatusChange,
 }) {
   const editorRef = useRef(null)
   const [customOpen, setCustomOpen] = useState(false)
@@ -89,6 +91,20 @@ export default function WorkspacePanel({
           >
             Custom
           </button>
+
+          <span className="action-sep" />
+
+          <button
+            className={`btn btn-status-complete${problemStatus === 'complete' ? ' active' : ''}`}
+            onClick={() => onStatusChange(problemStatus === 'complete' ? null : 'complete')}
+            title="Mark as complete"
+          >✓ Done</button>
+
+          <button
+            className={`btn btn-status-revise${problemStatus === 'revise' ? ' active' : ''}`}
+            onClick={() => onStatusChange(problemStatus === 'revise' ? null : 'revise')}
+            title="Mark to revise"
+          >↩ Revise</button>
         </div>
 
         <div className="runtime-pills">
