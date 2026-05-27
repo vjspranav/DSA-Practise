@@ -518,7 +518,7 @@ const zigzagLevelOrder = {
   askedBy: 'vjs',
   description: [
     'Given a binary tree, return the zigzag level order traversal of its node values.',
-    'Odd levels go left-to-right; even levels go right-to-left.',
+    'Even levels (0-indexed) go left-to-right; odd levels go right-to-left.',
   ],
   examples: [
     { input: 'root=[3,9,20,-1,-1,15,7]', output: '[[3],[20,9],[15,7]]' },
@@ -527,7 +527,7 @@ const zigzagLevelOrder = {
   constraints: ['0 ≤ nodes ≤ 2000', '-100 ≤ node.val ≤ 100'],
   hints: [
     'Standard BFS level-order traversal.',
-    'After collecting each level, reverse it if the level index is even (0-indexed).',
+    'After collecting each level, reverse it if the level index is odd (0-indexed).',
     'Use a deque or just reverse the level vector on alternating levels.',
   ],
   inputFormat: 'Conceptual — use run/submit modes',
