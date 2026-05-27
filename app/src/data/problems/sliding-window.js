@@ -671,7 +671,7 @@ const niceSubarrays = {
   testCases: [
     { label: 'Example 1', input: 'nums=[1,1,2,1,1], k=3', expected: '2' },
     { label: 'No odds',   input: 'nums=[2,4,6], k=1',     expected: '0' },
-    { label: 'k=1',       input: 'nums=[1,2,3,4,5], k=1', expected: '9' },
+    { label: 'k=1',       input: 'nums=[1,2,3,4,5], k=1', expected: '8' },
     { label: 'All odd',   input: 'nums=[1,1,1,1,1], k=2', expected: '4' },
   ],
   cppStarter: `class Solution {
@@ -706,7 +706,7 @@ int main() {
     };
     chk({1,1,2,1,1},3,2,1);
     chk({2,4,6},1,0,2);
-    chk({1,2,3,4,5},1,9,3);
+    chk({1,2,3,4,5},1,8,3);
     chk({1,1,1,1,1},2,4,4);
     cout<<"\\n---RESULT---\\n";
     for(auto& s:res) cout<<s<<"\\n";
@@ -734,7 +734,7 @@ print("\\n---RESULT---")
 print(f"RESULT:{'PASS' if got==2 else 'FAIL'}:2:{got}")`
     if (mode === 'submit') return `
 sol = Solution()
-cases=[([1,1,2,1,1],3,2),([2,4,6],1,0),([1,2,3,4,5],1,9),([1,1,1,1,1],2,4)]
+cases=[([1,1,2,1,1],3,2),([2,4,6],1,0),([1,2,3,4,5],1,8),([1,1,1,1,1],2,4)]
 passed=0; res=[]
 for i,(n,k,exp) in enumerate(cases,1):
     got=sol.numberOfSubarrays(list(n),k); ok=got==exp; passed+=ok
@@ -779,7 +779,7 @@ const substringsAllThree = {
     { label: 'Example 1', input: 's="abcabc"', expected: '10' },
     { label: 'Example 2', input: 's="aaacb"',  expected: '3'  },
     { label: 'Minimal',   input: 's="abc"',    expected: '1'  },
-    { label: 'Repeated',  input: 's="aabbcc"', expected: '6'  },
+    { label: 'Repeated',  input: 's="aabbcc"', expected: '4'  },
   ],
   cppStarter: `class Solution {
 public:
@@ -811,7 +811,7 @@ int main() {
     chk("abcabc",10,1);
     chk("aaacb",3,2);
     chk("abc",1,3);
-    chk("aabbcc",6,4);
+    chk("aabbcc",4,4);
     cout<<"\\n---RESULT---\\n";
     for(auto& s:res) cout<<s<<"\\n";
     cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
@@ -835,7 +835,7 @@ print("\\n---RESULT---")
 print(f"RESULT:{'PASS' if got==10 else 'FAIL'}:10:{got}")`
     if (mode === 'submit') return `
 sol = Solution()
-cases=[("abcabc",10),("aaacb",3),("abc",1),("aabbcc",6)]
+cases=[("abcabc",10),("aaacb",3),("abc",1),("aabbcc",4)]
 passed=0; res=[]
 for i,(s,exp) in enumerate(cases,1):
     got=sol.numberOfSubstrings(s); ok=got==exp; passed+=ok
