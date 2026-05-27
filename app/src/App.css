@@ -1064,3 +1064,196 @@ body {
 .hl-4 { background: rgba(250,179,135,.18); color: #fab387; }
 .hl-5 { background: rgba(166,227,161,.18); color: #a6e3a1; }
 .hl-6 { background: rgba(249,226,175,.18); color: #f9e2af; }
+
+/* ── Category groups ───────────────────────────────────────────────────── */
+.category-group { margin-bottom: 4px; }
+
+.category-header {
+  padding: 10px 20px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.category-group:first-child .category-header { border-top: none; margin-top: 0; }
+
+/* ── Problem row (wraps button + context) ──────────────────────────────── */
+.problem-row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.problem-row .problem-item {
+  flex: 1;
+  min-width: 0;
+  border-left: 2px solid transparent;
+  padding: 9px 8px 9px 20px;
+}
+
+.problem-row.active .problem-item {
+  background: var(--accent-dim);
+  border-left-color: var(--accent);
+  box-shadow: inset 4px 0 12px -6px var(--accent);
+}
+
+.problem-row.active .problem-number { color: var(--accent); }
+.problem-row.active .problem-item-title { color: var(--text-bright); }
+
+/* ── Problem item meta (pill + status) ────────────────────────────────── */
+.problem-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+/* ── Attribution pills ────────────────────────────────────────────────── */
+.asked-pill {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.asked-pill.himali {
+  color: #94e2d5;
+  background: rgba(148,226,213,.18);
+  border: 1px solid rgba(148,226,213,.3);
+}
+
+.asked-pill.vjs {
+  color: #cba6f7;
+  background: rgba(203,166,247,.18);
+  border: 1px solid rgba(203,166,247,.3);
+}
+
+/* ── Status icons ─────────────────────────────────────────────────────── */
+.status-icon {
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.status-icon.complete { color: var(--success); }
+.status-icon.revise   { color: var(--warn); }
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.complete { background: var(--success); box-shadow: 0 0 5px var(--success); }
+.status-dot.revise   { background: var(--warn);    box-shadow: 0 0 5px var(--warn); }
+
+/* ── Context button + popover ─────────────────────────────────────────── */
+.context-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.context-btn {
+  width: 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+}
+
+.problem-row:hover .context-btn { opacity: 1; }
+.context-btn:hover { color: var(--text); }
+
+.context-popover {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 100;
+  background: var(--surface-3);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  min-width: 160px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+  overflow: hidden;
+  animation: slideDown 0.1s ease;
+}
+
+.context-popover button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+
+.context-popover button:hover { background: var(--surface-2); color: var(--text); }
+
+.ctx-icon { font-size: 11px; }
+.ctx-icon.complete { color: var(--success); }
+.ctx-icon.revise   { color: var(--warn); }
+
+/* ── Workspace status buttons ─────────────────────────────────────────── */
+.action-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+.btn-status-complete {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+.btn-status-complete:hover:not(:disabled) {
+  background: var(--success-dim);
+  border-color: rgba(166,227,161,.3);
+  color: var(--success);
+}
+.btn-status-complete.active {
+  background: var(--success-dim);
+  border-color: rgba(166,227,161,.4);
+  color: var(--success);
+}
+
+.btn-status-revise {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+.btn-status-revise:hover:not(:disabled) {
+  background: rgba(250,179,135,.12);
+  border-color: rgba(250,179,135,.3);
+  color: var(--warn);
+}
+.btn-status-revise.active {
+  background: rgba(250,179,135,.14);
+  border-color: rgba(250,179,135,.4);
+  color: var(--warn);
+}
