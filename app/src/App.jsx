@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import _ from 'lodash'
-import { PROBLEMS } from './data/problems'
+import { PROBLEMS, CATEGORIES } from './data/problems'
 import { buildCode } from './runtime/executor'
 import Sidebar from './components/Sidebar'
 import ProblemPanel from './components/ProblemPanel'

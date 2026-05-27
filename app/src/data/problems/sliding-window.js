@@ -17,7 +17,8 @@ const binarySubarrays = {
   id: 'binary-subarrays-sum',
   title: 'Binary Subarrays With Sum',
   difficulty: 'Medium',
-  category: 'Sliding Window',
+  category: 'sliding-window',
+  askedBy: 'vjs',
   description: [
     'Given a binary array <code>nums</code> and an integer <code>goal</code>, return the number of non-empty subarrays with a sum equal to <code>goal</code>.',
     'A <strong>subarray</strong> is a contiguous part of the array.',
@@ -155,7 +156,8 @@ const maxCards = {
   id: 'max-cards',
   title: 'Maximum Points You Can Obtain from Cards',
   difficulty: 'Medium',
-  category: 'Sliding Window',
+  category: 'sliding-window',
+  askedBy: 'vjs',
   description: [
     'There are several cards arranged in a row, each with an associated number of points given in <code>cardPoints</code>.',
     'In one step, you can take one card from the <strong>beginning</strong> or the <strong>end</strong> of the row. You must take exactly <code>k</code> cards.',
@@ -288,7 +290,8 @@ const kDistinct = {
   id: 'k-distinct-integers',
   title: 'Subarrays with K Different Integers',
   difficulty: 'Hard',
-  category: 'Sliding Window',
+  category: 'sliding-window',
+  askedBy: 'vjs',
   description: [
     'Given an integer array <code>nums</code> and an integer <code>k</code>, return the number of <strong>good subarrays</strong>.',
     'A subarray is <strong>good</strong> if the number of distinct integers in it is <em>exactly</em> <code>k</code>.',
@@ -413,7 +416,8 @@ const minWindowSubseq = {
   id: 'min-window-subseq',
   title: 'Minimum Window Subsequence',
   difficulty: 'Hard',
-  category: 'Two Pointers',
+  category: 'sliding-window',
+  askedBy: 'vjs',
   description: [
     'Given strings <code>s</code> and <code>t</code>, return the minimum contiguous substring of <code>s</code> such that <code>t</code> is a <strong>subsequence</strong> of that substring.',
     'If no such window exists return <code>""</code>. If multiple minimum-length windows exist, return the <strong>left-most</strong> one.',
