@@ -4,7 +4,7 @@ const join = arr => arr.join(', ')
 const fractionalKnapsack = {
   id: 'fractional-knapsack',
   title: 'Fractional Knapsack',
-  difficulty: 'Medium',
+  difficulty: 'Easy',
   category: 'greedy',
   askedBy: 'himali',
   description: [
