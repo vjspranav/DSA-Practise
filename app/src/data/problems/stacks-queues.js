@@ -811,7 +811,7 @@ int main() {
     return passed==total?0:1;
 }`
     if (mode === 'custom') {
-      const rows = customInput.trim().split('\n').map(l => l.trim().split(/\s+/).map(c => `'${c}'`))
+      const rows = customInput.trim().split('\n').map(l => l.trim().split(/\s+/).map(c => c === '1' ? "'1'" : "'0'"))
       return `
 int main() {
     Solution sol;
