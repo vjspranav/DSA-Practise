@@ -854,11 +854,12 @@ int main() {
     return passed==total?0:1;
 }`
     if (mode === 'custom') {
-      const s = customInput.trim() || '()[]{}'
+      const raw = customInput.trim() || '()[]{}'
+      const escaped = raw.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
       return `
 int main() {
     Solution sol;
-    cout<<(sol.isValid("${s}")?1:0)<<"\\n";
+    cout<<(sol.isValid("${escaped}")?1:0)<<"\\n";
     return 0;
 }`
     }
@@ -880,10 +881,11 @@ print("\\n---RESULT---")
 for r in res: print(r)
 print(f"SUMMARY:{passed}:{len(cases)}")`
     if (mode === 'custom') {
-      const s = customInput.trim() || '()[]{}'
+      const raw = customInput.trim() || '()[]{}'
+      const escaped = raw.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
       return `
 sol = Solution()
-print(1 if sol.isValid("${s}") else 0)`
+print(1 if sol.isValid("${escaped}") else 0)`
     }
   },
 }

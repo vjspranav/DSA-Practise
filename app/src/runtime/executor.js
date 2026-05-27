@@ -16,6 +16,8 @@ export const CPP_DSA_PREAMBLE = `#include <iostream>
 #include <functional>
 #include <sstream>
 #include <utility>
+#include <iomanip>
+#include <list>
 using namespace std;
 `
 
