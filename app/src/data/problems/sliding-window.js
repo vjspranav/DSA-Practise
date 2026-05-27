@@ -540,4 +540,421 @@ print(f'"{got}"')`;
   },
 }
 
-export const PROBLEMS = [binarySubarrays, maxCards, kDistinct, minWindowSubseq]
+
+// ── 5. Fruit Into Baskets ────────────────────────────────────────────────
+const fruitIntoBaskets = {
+  id: 'fruit-into-baskets',
+  title: 'Fruit Into Baskets',
+  difficulty: 'Medium',
+  category: 'sliding-window',
+  askedBy: 'himali',
+  description: [
+    'You have a row of trees where <code>fruits[i]</code> is the type of fruit at tree <code>i</code>. You have two baskets, each holding only one type of fruit.',
+    'Starting from any tree, pick one fruit from each tree you visit and move right. Return the maximum number of fruits you can collect.',
+  ],
+  examples: [
+    { input: 'fruits = [1,2,1]', output: '3', explanation: 'Take all — only 2 fruit types.' },
+    { input: 'fruits = [0,1,2,2]', output: '3', explanation: 'Take [1,2,2] — types {1,2}.' },
+  ],
+  constraints: ['1 ≤ fruits.length ≤ 10⁵', '0 ≤ fruits[i] < fruits.length'],
+  hints: [
+    'Equivalent to: longest subarray with at most 2 distinct integers.',
+    'Sliding window: expand right, shrink left when distinct count > 2.',
+    'Use a frequency map. Window size is right−left+1.',
+  ],
+  inputFormat: 'Line 1: space-separated fruit types',
+  defaultCustomInput: '1 2 1',
+  testCases: [
+    { label: 'Example 1', input: 'fruits=[1,2,1]',     expected: '3' },
+    { label: 'Example 2', input: 'fruits=[0,1,2,2]',   expected: '3' },
+    { label: 'All same',  input: 'fruits=[1,1,1,1]',   expected: '4' },
+    { label: 'Example 3', input: 'fruits=[1,2,3,2,2]', expected: '4' },
+  ],
+  cppStarter: `class Solution {
+public:
+    int totalFruit(vector<int>& fruits) {
+
+    }
+};`,
+  pythonStarter: `from typing import List
+
+class Solution:
+    def totalFruit(self, fruits: List[int]) -> int:
+        `,
+  buildCppHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+int main() {
+    Solution sol;
+    vector<int> f={1,2,1};
+    int got=sol.totalFruit(f);
+    cout<<"\\n---RESULT---\\n";
+    if(got==3) cout<<"RESULT:PASS:3:"<<got<<"\\n";
+    else       cout<<"RESULT:FAIL:3:"<<got<<"\\n";
+    return 0;
+}`
+    if (mode === 'submit') return `
+int main() {
+    Solution sol;
+    int passed=0,total=4; vector<string> res;
+    auto chk=[&](vector<int> f,int exp,int n){
+        int got=sol.totalFruit(f); bool ok=got==exp; passed+=ok;
+        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
+    };
+    chk({1,2,1},3,1);
+    chk({0,1,2,2},3,2);
+    chk({1,1,1,1},4,3);
+    chk({1,2,3,2,2},4,4);
+    cout<<"\\n---RESULT---\\n";
+    for(auto& s:res) cout<<s<<"\\n";
+    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
+    return passed==total?0:1;
+}`
+    if (mode === 'custom') {
+      const f = (customInput.trim()||'1 2 1').split(/\s+/).map(Number)
+      return `
+int main() {
+    Solution sol;
+    vector<int> f={${f.join(',')}};
+    cout<<sol.totalFruit(f)<<"\\n";
+    return 0;
+}`
+    }
+  },
+  buildPythonHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+sol = Solution()
+got=sol.totalFruit([1,2,1])
+print("\\n---RESULT---")
+print(f"RESULT:{'PASS' if got==3 else 'FAIL'}:3:{got}")`
+    if (mode === 'submit') return `
+sol = Solution()
+cases=[([1,2,1],3),([0,1,2,2],3),([1,1,1,1],4),([1,2,3,2,2],4)]
+passed=0; res=[]
+for i,(f,exp) in enumerate(cases,1):
+    got=sol.totalFruit(list(f)); ok=got==exp; passed+=ok
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\\n---RESULT---")
+for r in res: print(r)
+print(f"SUMMARY:{passed}:{len(cases)}")`
+    if (mode === 'custom') {
+      const f = (customInput.trim()||'1 2 1').split(/\s+/).map(Number)
+      return `
+sol = Solution()
+print(sol.totalFruit([${f.join(',')}]))`
+    }
+  },
+}
+
+// ── 6. Count Number of Nice Subarrays ────────────────────────────────────
+const niceSubarrays = {
+  id: 'count-nice-subarrays',
+  title: 'Count Number of Nice Subarrays',
+  difficulty: 'Medium',
+  category: 'sliding-window',
+  askedBy: 'himali',
+  description: [
+    'Given an array of integers <code>nums</code> and an integer <code>k</code>, return the number of <strong>nice</strong> subarrays.',
+    'A subarray is nice if it contains exactly <code>k</code> odd numbers.',
+  ],
+  examples: [
+    { input: 'nums=[1,1,2,1,1], k=3', output: '2', explanation: '[1,1,2,1] and [1,2,1,1].' },
+    { input: 'nums=[2,4,6], k=1',     output: '0' },
+  ],
+  constraints: ['1 ≤ nums.length ≤ 5×10⁴', '1 ≤ nums[i] ≤ 10⁵', '1 ≤ k ≤ nums.length'],
+  hints: [
+    'Transform: replace each number with 1 (odd) or 0 (even). Now count subarrays with exactly k ones.',
+    'Use the atMost(k) − atMost(k−1) trick, or prefix sum counting.',
+    'Same pattern as Binary Subarrays With Sum.',
+  ],
+  inputFormat: 'Line 1: space-separated integers\nLine 2: k',
+  defaultCustomInput: '1 1 2 1 1\n3',
+  testCases: [
+    { label: 'Example 1', input: 'nums=[1,1,2,1,1], k=3', expected: '2' },
+    { label: 'No odds',   input: 'nums=[2,4,6], k=1',     expected: '0' },
+    { label: 'k=1',       input: 'nums=[1,2,3,4,5], k=1', expected: '9' },
+    { label: 'All odd',   input: 'nums=[1,1,1,1,1], k=2', expected: '4' },
+  ],
+  cppStarter: `class Solution {
+public:
+    int numberOfSubarrays(vector<int>& nums, int k) {
+
+    }
+};`,
+  pythonStarter: `from typing import List
+
+class Solution:
+    def numberOfSubarrays(self, nums: List[int], k: int) -> int:
+        `,
+  buildCppHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+int main() {
+    Solution sol;
+    vector<int> n={1,1,2,1,1};
+    int got=sol.numberOfSubarrays(n,3);
+    cout<<"\\n---RESULT---\\n";
+    if(got==2) cout<<"RESULT:PASS:2:"<<got<<"\\n";
+    else       cout<<"RESULT:FAIL:2:"<<got<<"\\n";
+    return 0;
+}`
+    if (mode === 'submit') return `
+int main() {
+    Solution sol;
+    int passed=0,total=4; vector<string> res;
+    auto chk=[&](vector<int> n,int k,int exp,int t){
+        int got=sol.numberOfSubarrays(n,k); bool ok=got==exp; passed+=ok;
+        res.push_back("TEST:"+to_string(t)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
+    };
+    chk({1,1,2,1,1},3,2,1);
+    chk({2,4,6},1,0,2);
+    chk({1,2,3,4,5},1,9,3);
+    chk({1,1,1,1,1},2,4,4);
+    cout<<"\\n---RESULT---\\n";
+    for(auto& s:res) cout<<s<<"\\n";
+    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
+    return passed==total?0:1;
+}`
+    if (mode === 'custom') {
+      const lines = customInput.trim().split('\n')
+      const nums = (lines[0]||'1 1 2 1 1').trim().split(/\s+/).map(Number)
+      const k = parseInt(lines[1]??'3')
+      return `
+int main() {
+    Solution sol;
+    vector<int> n={${nums.join(',')}};
+    cout<<sol.numberOfSubarrays(n,${k})<<"\\n";
+    return 0;
+}`
+    }
+  },
+  buildPythonHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+sol = Solution()
+got=sol.numberOfSubarrays([1,1,2,1,1],3)
+print("\\n---RESULT---")
+print(f"RESULT:{'PASS' if got==2 else 'FAIL'}:2:{got}")`
+    if (mode === 'submit') return `
+sol = Solution()
+cases=[([1,1,2,1,1],3,2),([2,4,6],1,0),([1,2,3,4,5],1,9),([1,1,1,1,1],2,4)]
+passed=0; res=[]
+for i,(n,k,exp) in enumerate(cases,1):
+    got=sol.numberOfSubarrays(list(n),k); ok=got==exp; passed+=ok
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\\n---RESULT---")
+for r in res: print(r)
+print(f"SUMMARY:{passed}:{len(cases)}")`
+    if (mode === 'custom') {
+      const lines = customInput.trim().split('\n')
+      const nums = (lines[0]||'1 1 2 1 1').trim().split(/\s+/).map(Number)
+      const k = parseInt(lines[1]??'3')
+      return `
+sol = Solution()
+print(sol.numberOfSubarrays([${nums.join(',')}],${k}))`
+    }
+  },
+}
+
+// ── 7. Number of Substrings Containing All Three Characters ───────────────
+const substringsAllThree = {
+  id: 'substrings-all-three-chars',
+  title: 'Number of Substrings Containing All Three Characters',
+  difficulty: 'Medium',
+  category: 'sliding-window',
+  askedBy: 'himali',
+  description: [
+    'Given a string <code>s</code> consisting only of characters <code>a</code>, <code>b</code>, and <code>c</code>, return the number of substrings containing at least one occurrence of all three characters.',
+  ],
+  examples: [
+    { input: 's = "abcabc"', output: '10' },
+    { input: 's = "aaacb"',  output: '3'  },
+  ],
+  constraints: ['3 ≤ s.length ≤ 5×10⁴', 's consists only of a, b, c'],
+  hints: [
+    'For each right pointer, find the smallest left such that s[left..right] contains all 3 chars.',
+    'The number of valid substrings ending at right is (left + 1) — all starting positions from 0 to left are valid.',
+    'Use a frequency array of size 3. Shrink left when all 3 counts are > 0.',
+  ],
+  inputFormat: 'Line 1: string s',
+  defaultCustomInput: 'abcabc',
+  testCases: [
+    { label: 'Example 1', input: 's="abcabc"', expected: '10' },
+    { label: 'Example 2', input: 's="aaacb"',  expected: '3'  },
+    { label: 'Minimal',   input: 's="abc"',    expected: '1'  },
+    { label: 'Repeated',  input: 's="aabbcc"', expected: '6'  },
+  ],
+  cppStarter: `class Solution {
+public:
+    int numberOfSubstrings(string s) {
+
+    }
+};`,
+  pythonStarter: `class Solution:
+    def numberOfSubstrings(self, s: str) -> int:
+        `,
+  buildCppHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+int main() {
+    Solution sol;
+    int got=sol.numberOfSubstrings("abcabc");
+    cout<<"\\n---RESULT---\\n";
+    if(got==10) cout<<"RESULT:PASS:10:"<<got<<"\\n";
+    else        cout<<"RESULT:FAIL:10:"<<got<<"\\n";
+    return 0;
+}`
+    if (mode === 'submit') return `
+int main() {
+    Solution sol;
+    int passed=0,total=4; vector<string> res;
+    auto chk=[&](string s,int exp,int n){
+        int got=sol.numberOfSubstrings(s); bool ok=got==exp; passed+=ok;
+        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
+    };
+    chk("abcabc",10,1);
+    chk("aaacb",3,2);
+    chk("abc",1,3);
+    chk("aabbcc",6,4);
+    cout<<"\\n---RESULT---\\n";
+    for(auto& s:res) cout<<s<<"\\n";
+    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
+    return passed==total?0:1;
+}`
+    if (mode === 'custom') {
+      const s = customInput.trim() || 'abcabc'
+      return `
+int main() {
+    Solution sol;
+    cout<<sol.numberOfSubstrings("${s}")<<"\\n";
+    return 0;
+}`
+    }
+  },
+  buildPythonHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+sol = Solution()
+got=sol.numberOfSubstrings("abcabc")
+print("\\n---RESULT---")
+print(f"RESULT:{'PASS' if got==10 else 'FAIL'}:10:{got}")`
+    if (mode === 'submit') return `
+sol = Solution()
+cases=[("abcabc",10),("aaacb",3),("abc",1),("aabbcc",6)]
+passed=0; res=[]
+for i,(s,exp) in enumerate(cases,1):
+    got=sol.numberOfSubstrings(s); ok=got==exp; passed+=ok
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\\n---RESULT---")
+for r in res: print(r)
+print(f"SUMMARY:{passed}:{len(cases)}")`
+    if (mode === 'custom') {
+      const s = customInput.trim() || 'abcabc'
+      return `
+sol = Solution()
+print(sol.numberOfSubstrings("${s}"))`
+    }
+  },
+}
+
+// ── 8. Minimum Window Substring ──────────────────────────────────────────
+const minWindowSubstring = {
+  id: 'minimum-window-substring',
+  title: 'Minimum Window Substring',
+  difficulty: 'Hard',
+  category: 'sliding-window',
+  askedBy: 'himali',
+  description: [
+    'Given strings <code>s</code> and <code>t</code>, return the minimum window substring of <code>s</code> such that every character in <code>t</code> (including duplicates) is present in the window.',
+    'Return <code>""</code> if no such window exists.',
+  ],
+  examples: [
+    { input: 's="ADOBECODEBANC", t="ABC"', output: '"BANC"' },
+    { input: 's="a", t="a"',               output: '"a"'    },
+    { input: 's="a", t="aa"',              output: '""'     },
+  ],
+  constraints: ['1 ≤ s.length ≤ 10⁵', '1 ≤ t.length ≤ 10⁴', 's and t contain English letters'],
+  hints: [
+    'Sliding window with two frequency maps (one for t, one for current window).',
+    'Expand right until window is valid (all t chars covered). Then shrink left while still valid.',
+    'Track "formed" count: how many unique chars in t have their required frequency met.',
+  ],
+  inputFormat: 'Line 1: s\nLine 2: t',
+  defaultCustomInput: 'ADOBECODEBANC\nABC',
+  testCases: [
+    { label: 'Example 1', input: 's="ADOBECODEBANC", t="ABC"', expected: 'BANC' },
+    { label: 'Single',    input: 's="a", t="a"',               expected: 'a'    },
+    { label: 'No window', input: 's="a", t="aa"',              expected: ''     },
+    { label: 'Exact',     input: 's="abc", t="abc"',           expected: 'abc'  },
+  ],
+  cppStarter: `class Solution {
+public:
+    string minWindow(string s, string t) {
+
+    }
+};`,
+  pythonStarter: `class Solution:
+    def minWindow(self, s: str, t: str) -> str:
+        `,
+  buildCppHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+int main() {
+    Solution sol;
+    string got=sol.minWindow("ADOBECODEBANC","ABC"), exp="BANC";
+    cout<<"\\n---RESULT---\\n";
+    if(got==exp) cout<<"RESULT:PASS:"<<exp<<":"<<got<<"\\n";
+    else         cout<<"RESULT:FAIL:"<<exp<<":"<<got<<"\\n";
+    return 0;
+}`
+    if (mode === 'submit') return `
+int main() {
+    Solution sol;
+    int passed=0,total=4; vector<string> res;
+    auto chk=[&](string s,string t,string exp,int n){
+        string got=sol.minWindow(s,t); bool ok=got==exp; passed+=ok;
+        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
+    };
+    chk("ADOBECODEBANC","ABC","BANC",1);
+    chk("a","a","a",2);
+    chk("a","aa","",3);
+    chk("abc","abc","abc",4);
+    cout<<"\\n---RESULT---\\n";
+    for(auto& s:res) cout<<s<<"\\n";
+    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
+    return passed==total?0:1;
+}`
+    if (mode === 'custom') {
+      const lines = customInput.trim().split('\n')
+      const s = (lines[0]||'ADOBECODEBANC').trim()
+      const t = (lines[1]||'ABC').trim()
+      return `
+int main() {
+    Solution sol;
+    cout<<sol.minWindow("${s}","${t}")<<"\\n";
+    return 0;
+}`
+    }
+  },
+  buildPythonHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+sol = Solution()
+got=sol.minWindow("ADOBECODEBANC","ABC"); exp="BANC"
+print("\\n---RESULT---")
+print(f"RESULT:{'PASS' if got==exp else 'FAIL'}:{exp}:{got}")`
+    if (mode === 'submit') return `
+sol = Solution()
+cases=[("ADOBECODEBANC","ABC","BANC"),("a","a","a"),("a","aa",""),("abc","abc","abc")]
+passed=0; res=[]
+for i,(s,t,exp) in enumerate(cases,1):
+    got=sol.minWindow(s,t); ok=got==exp; passed+=ok
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\\n---RESULT---")
+for r in res: print(r)
+print(f"SUMMARY:{passed}:{len(cases)}")`
+    if (mode === 'custom') {
+      const lines = customInput.trim().split('\n')
+      const s = (lines[0]||'ADOBECODEBANC').trim()
+      const t = (lines[1]||'ABC').trim()
+      return `
+sol = Solution()
+print(sol.minWindow("${s}","${t}"))`
+    }
+  },
+}
+
+export const PROBLEMS = [binarySubarrays, maxCards, kDistinct, minWindowSubseq, fruitIntoBaskets, niceSubarrays, substringsAllThree, minWindowSubstring]
