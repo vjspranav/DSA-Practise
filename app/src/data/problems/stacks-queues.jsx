@@ -884,7 +884,7 @@ function MaxRectangleViz() {
           return (
             <g key={`${r}-${c}`}>
               <rect x={c*cellSize} y={r*cellSize} width={cellSize-2} height={cellSize-2}
-                fill={cell==='0' ? 'var(--surface0)' : isHL ? 'var(--green)' : 'var(--blue)'}
+                fill={cell==='0' ? 'var(--surface-3)' : isHL ? 'var(--success)' : 'var(--accent)'}
                 rx={4}
               />
               <text x={c*cellSize+cellSize/2} y={r*cellSize+cellSize/2+5} textAnchor="middle"

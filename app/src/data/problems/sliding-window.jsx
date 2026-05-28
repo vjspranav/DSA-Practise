@@ -967,7 +967,7 @@ function FruitBasketsViz() {
   const cells = arr.map((v, i) => ({
     val: v,
     inWindow: i >= left && i <= right,
-    color: v === 1 ? 'var(--teal)' : v === 2 ? 'var(--mauve)' : 'var(--surface0)',
+    color: v === 1 ? 'var(--accent)' : v === 2 ? 'var(--warn)' : 'var(--surface-3)',
   }))
   const cellW = 40, cellH = 36
   const svgW = arr.length * (cellW + 4) + 4
@@ -1008,7 +1008,7 @@ function MinWindowViz() {
           return (
             <g key={i}>
               <rect x={2 + i*(cellW+2)} y={4} width={cellW} height={cellH}
-                fill={inWin ? (isTarget ? 'var(--green)' : 'var(--surface1)') : 'var(--surface0)'}
+                fill={inWin ? (isTarget ? 'var(--success)' : 'var(--surface-2)') : 'var(--surface-3)'}
                 stroke={inWin ? 'var(--text)' : 'none'} strokeWidth={1.5} rx={3}
               />
               <text x={2 + i*(cellW+2) + cellW/2} y={24} textAnchor="middle"

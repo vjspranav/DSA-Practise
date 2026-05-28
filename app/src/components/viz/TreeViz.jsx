@@ -44,7 +44,7 @@ export default function TreeViz({ nodes, root = 0, highlight = new Set(), highli
       {label && <div className="viz-label">{label}</div>}
       <svg viewBox={`0 0 ${svgW} ${svgH}`} width={svgW} height={svgH} className="viz-tree">
         {edges.map((e, i) => (
-          <line key={i} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} stroke="var(--surface2)" strokeWidth={2} />
+          <line key={i} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} stroke="var(--border-bright)" strokeWidth={2} />
         ))}
         {items.map(({ idx }) => {
           const { x, y } = positions[idx]
@@ -53,8 +53,8 @@ export default function TreeViz({ nodes, root = 0, highlight = new Set(), highli
           return (
             <g key={idx}>
               <circle cx={x} cy={y} r={16}
-                fill={isHighlit ? highlightColor : 'var(--surface0)'}
-                stroke={isHighlit ? highlightColor : 'var(--overlay0)'}
+                fill={isHighlit ? highlightColor : 'var(--surface-3)'}
+                stroke={isHighlit ? highlightColor : 'var(--border-bright)'}
                 strokeWidth={2}
               />
               <text x={x} y={y + 5} textAnchor="middle" fontSize={12} fill="var(--text)" fontFamily="monospace">

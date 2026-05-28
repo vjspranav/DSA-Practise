@@ -32,17 +32,17 @@ export default function HistogramViz({ heights, highlight = [], waterFill = fals
             <g key={i}>
               <rect
                 x={x} y={svgH - 20 - barH} width={barW} height={barH}
-                fill={isHL ? 'var(--green)' : 'var(--blue)'}
+                fill={isHL ? 'var(--success)' : 'var(--accent)'}
                 rx={3}
               />
               {waterH > 0 && (
                 <rect
                   x={x} y={svgH - 20 - barH - waterH} width={barW} height={waterH}
-                  fill="var(--sapphire)" opacity={0.5}
+                  fill="var(--accent-hi)" opacity={0.5}
                   rx={3}
                 />
               )}
-              <text x={x + barW / 2} y={svgH - 4} textAnchor="middle" fontSize={11} fill="var(--subtext0)" fontFamily="monospace">
+              <text x={x + barW / 2} y={svgH - 4} textAnchor="middle" fontSize={11} fill="var(--text-dim)" fontFamily="monospace">
                 {h}
               </text>
             </g>

@@ -871,7 +871,7 @@ function LCAViz() {
     { val: 7, left: null, right: null },
     { val: 4, left: null, right: null },
   ]
-  return <TreeViz nodes={nodes} root={0} highlight={new Set([3, 5, 6, 4])} highlightColor="var(--teal)" label="LCA(6, 4) = 3 — highlighted path" />
+  return <TreeViz nodes={nodes} root={0} highlight={new Set([3, 5, 6, 4])} highlightColor="var(--accent)" label="LCA(6, 4) = 3 — highlighted path" />
 }
 
 function BurnViz() {
@@ -882,7 +882,7 @@ function BurnViz() {
     { val: 4, left: null, right: null },
     { val: 5, left: null, right: null },
   ]
-  return <TreeViz nodes={nodes} root={0} highlight={new Set([1])} highlightColor="var(--red)" label="Fire starts at node 1" />
+  return <TreeViz nodes={nodes} root={0} highlight={new Set([1])} highlightColor="var(--error)" label="Fire starts at node 1" />
 }
 
 function ZigZagViz() {
