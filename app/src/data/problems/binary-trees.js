@@ -1,3 +1,5 @@
+import TreeViz from '../../components/viz/TreeViz'
+
 const treeBuilderCpp = `
 TreeNode* buildTree(vector<int> a) {
     if(a.empty()||a[0]==-1) return nullptr;
@@ -856,3 +858,46 @@ print(f"SUMMARY:{passed}:4")`
 }
 
 export const PROBLEMS = [lcaBT, burnBT, morrisTraversal, childrenSum, zigzagLevelOrder, constructBT, boundaryTraversal]
+
+function LCAViz() {
+  const nodes = [
+    { val: 3, left: 1, right: 2 },
+    { val: 5, left: 3, right: 4 },
+    { val: 1, left: 5, right: 6 },
+    { val: 6, left: null, right: null },
+    { val: 2, left: 7, right: 8 },
+    { val: 0, left: null, right: null },
+    { val: 8, left: null, right: null },
+    { val: 7, left: null, right: null },
+    { val: 4, left: null, right: null },
+  ]
+  return <TreeViz nodes={nodes} root={0} highlight={new Set([3, 5, 6, 4])} highlightColor="var(--teal)" label="LCA(6, 4) = 3 — highlighted path" />
+}
+
+function BurnViz() {
+  const nodes = [
+    { val: 1, left: 1, right: 2 },
+    { val: 2, left: 3, right: 4 },
+    { val: 3, left: null, right: null },
+    { val: 4, left: null, right: null },
+    { val: 5, left: null, right: null },
+  ]
+  return <TreeViz nodes={nodes} root={0} highlight={new Set([1])} highlightColor="var(--red)" label="Fire starts at node 1" />
+}
+
+function ZigZagViz() {
+  const nodes = [
+    { val: 3, left: 1, right: 2 },
+    { val: 9, left: null, right: null },
+    { val: 20, left: 3, right: 4 },
+    { val: 15, left: null, right: null },
+    { val: 7, left: null, right: null },
+  ]
+  return <TreeViz nodes={nodes} root={0} highlight={new Set([])} label="Zig-zag: [[3],[20,9],[15,7]]" />
+}
+
+export const VIZ = {
+  'lca-binary-tree': () => <LCAViz />,
+  'burn-binary-tree': () => <BurnViz />,
+  'zigzag-level-order': () => <ZigZagViz />,
+}

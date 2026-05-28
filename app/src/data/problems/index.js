@@ -1,6 +1,6 @@
 import { PROBLEMS as BINARY_SEARCH  } from './binary-search'
 import { PROBLEMS as GREEDY         } from './greedy'
-import { PROBLEMS as BINARY_TREES   } from './binary-trees'
+import { PROBLEMS as BINARY_TREES, VIZ as BINARY_TREES_VIZ } from './binary-trees'
 import { PROBLEMS as HEAP           } from './heap'
 import { PROBLEMS as SLIDING_WINDOW } from './sliding-window'
 import { PROBLEMS as STACKS_QUEUES  } from './stacks-queues'
@@ -22,3 +22,7 @@ export const PROBLEMS = [
   ...SLIDING_WINDOW,
   ...STACKS_QUEUES,
 ]
+
+export const vizComponents = {
+  ...BINARY_TREES_VIZ,
+}

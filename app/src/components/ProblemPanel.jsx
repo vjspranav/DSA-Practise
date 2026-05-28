@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ExampleViz from './ExampleViz'
-import { CATEGORIES } from '../data/problems'
+import { CATEGORIES, vizComponents } from '../data/problems'
 
 const DIFF_COLOR = { Easy: 'easy', Medium: 'medium', Hard: 'hard' }
 
@@ -83,6 +83,12 @@ export default function ProblemPanel({ problem }) {
             {ex.visualization && <ExampleViz viz={ex.visualization} />}
           </div>
         ))}
+
+        {vizComponents[problem.id] && (
+          <div className="viz-section">
+            {vizComponents[problem.id]()}
+          </div>
+        )}
 
         {/* Constraints */}
         <div className="section-label">Constraints</div>
