@@ -98,13 +98,13 @@ export default function WorkspacePanel({
             className={`btn btn-status-complete${problemStatus === 'complete' ? ' active' : ''}`}
             onClick={() => onStatusChange(problemStatus === 'complete' ? null : 'complete')}
             title="Mark as complete"
-          >✓ Done</button>
+          >{problemStatus === 'complete' ? '✓' : '○'} Done</button>
 
           <button
             className={`btn btn-status-revise${problemStatus === 'revise' ? ' active' : ''}`}
             onClick={() => onStatusChange(problemStatus === 'revise' ? null : 'revise')}
             title="Mark to revise"
-          >↩ Revise</button>
+          >{problemStatus === 'revise' ? '↩' : '○'} Revise</button>
         </div>
 
         <div className="runtime-pills">

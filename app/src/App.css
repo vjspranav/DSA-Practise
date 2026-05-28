@@ -1226,36 +1226,42 @@ body {
   margin: 0 2px;
 }
 
-.btn-status-complete {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--text-dim);
+.btn-status-complete,
+.btn-status-revise {
+  background: var(--surface-3);
+  border-color: var(--border-bright);
+  color: var(--text-muted);
 }
 .btn-status-complete:hover:not(:disabled) {
-  background: var(--success-dim);
-  border-color: rgba(166,227,161,.3);
-  color: var(--success);
-}
-.btn-status-complete.active {
   background: var(--success-dim);
   border-color: rgba(166,227,161,.4);
   color: var(--success);
 }
+.btn-status-complete.active {
+  background: var(--success);
+  border-color: var(--success);
+  color: #1e1e2e;
+  box-shadow: 0 0 12px rgba(166,227,161,.35);
+}
+.btn-status-complete.active:hover:not(:disabled) {
+  background: #b6f3b1;
+  border-color: #b6f3b1;
+}
 
-.btn-status-revise {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--text-dim);
-}
 .btn-status-revise:hover:not(:disabled) {
-  background: rgba(250,179,135,.12);
-  border-color: rgba(250,179,135,.3);
-  color: var(--warn);
-}
-.btn-status-revise.active {
   background: rgba(250,179,135,.14);
   border-color: rgba(250,179,135,.4);
   color: var(--warn);
+}
+.btn-status-revise.active {
+  background: var(--warn);
+  border-color: var(--warn);
+  color: #1e1e2e;
+  box-shadow: 0 0 12px rgba(250,179,135,.35);
+}
+.btn-status-revise.active:hover:not(:disabled) {
+  background: #fcc4a0;
+  border-color: #fcc4a0;
 }
 
 /* --- Tree Viz --- */
