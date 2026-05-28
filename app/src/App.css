@@ -1262,4 +1262,8 @@ body {
 .viz-tree-wrap { overflow-x: auto; margin: 8px 0; }
 .viz-tree { display: block; max-width: 100%; }
 .viz-label { font-size: 11px; color: var(--subtext0); margin-bottom: 4px; }
+
+/* --- Histogram Viz --- */
+.viz-histogram-wrap { overflow-x: auto; margin: 8px 0; }
+.viz-histogram { display: block; }
 .viz-section { margin: 16px 0 8px; }

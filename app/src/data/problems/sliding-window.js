@@ -1,3 +1,5 @@
+import HistogramViz from '../../components/viz/HistogramViz'
+
 // ── Problem definitions ─────────────────────────────────────────────────────
 //
 // Output protocol (parsed by executor.parseOutput):
@@ -958,3 +960,68 @@ print(sol.minWindow("${s}","${t}"))`
 }
 
 export const PROBLEMS = [binarySubarrays, maxCards, kDistinct, minWindowSubseq, fruitIntoBaskets, niceSubarrays, substringsAllThree, minWindowSubstring]
+
+function FruitBasketsViz() {
+  const arr = [1, 2, 1, 2, 3, 3, 4]
+  const left = 0, right = 3
+  const cells = arr.map((v, i) => ({
+    val: v,
+    inWindow: i >= left && i <= right,
+    color: v === 1 ? 'var(--teal)' : v === 2 ? 'var(--mauve)' : 'var(--surface0)',
+  }))
+  const cellW = 40, cellH = 36
+  const svgW = arr.length * (cellW + 4) + 4
+  return (
+    <div>
+      <div className="viz-label">Sliding window: [1,2,1,2] — 2 fruit types, 4 fruits</div>
+      <svg viewBox={`0 0 ${svgW} ${cellH + 20}`} width={svgW} height={cellH + 20}>
+        {cells.map((c, i) => (
+          <g key={i}>
+            <rect x={4 + i*(cellW+4)} y={4} width={cellW} height={cellH}
+              fill={c.color} opacity={c.inWindow ? 1 : 0.35} rx={4}
+              stroke={c.inWindow ? 'var(--text)' : 'none'} strokeWidth={2}
+            />
+            <text x={4 + i*(cellW+4) + cellW/2} y={28} textAnchor="middle"
+              fontSize={13} fill="var(--text)" fontFamily="monospace">{c.val}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+function MinWindowViz() {
+  const s = 'ADOBECODEBANC'
+  const t = 'ABC'
+  const winStart = 9, winEnd = 12
+  const chars = s.split('')
+  const cellW = 26, cellH = 32
+  const svgW = chars.length * (cellW + 2) + 2
+  const tSet = new Set(t)
+  return (
+    <div>
+      <div className="viz-label">Min window in "ADOBECODEBANC" containing "ABC" → "BANC"</div>
+      <svg viewBox={`0 0 ${svgW} ${cellH + 16}`} width={svgW} height={cellH + 16}>
+        {chars.map((ch, i) => {
+          const inWin = i >= winStart && i <= winEnd
+          const isTarget = tSet.has(ch)
+          return (
+            <g key={i}>
+              <rect x={2 + i*(cellW+2)} y={4} width={cellW} height={cellH}
+                fill={inWin ? (isTarget ? 'var(--green)' : 'var(--surface1)') : 'var(--surface0)'}
+                stroke={inWin ? 'var(--text)' : 'none'} strokeWidth={1.5} rx={3}
+              />
+              <text x={2 + i*(cellW+2) + cellW/2} y={24} textAnchor="middle"
+                fontSize={12} fill="var(--text)" fontFamily="monospace">{ch}</text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
+  )
+}
+
+export const VIZ = {
+  'fruit-into-baskets': () => <FruitBasketsViz />,
+  'minimum-window-substring': () => <MinWindowViz />,
+}

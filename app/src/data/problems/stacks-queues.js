@@ -1,3 +1,5 @@
+import HistogramViz from '../../components/viz/HistogramViz'
+
 const join = arr => arr.join(', ')
 
 // ── 1. Trapping Rain Water ───────────────────────────────────────────────
@@ -853,3 +855,50 @@ print(sol.maximalRectangle(m))`
 }
 
 export const PROBLEMS = [trappingRainWater, asteroidCollision, celebrityProblem, lfuCache, stockSpan, largestRectangle, subarrayMins, maxRectangle]
+
+function TrappingRainWaterViz() {
+  return <HistogramViz heights={[0,1,0,2,1,0,1,3,2,1,2,1]} waterFill={true} label="Blue bars = water trapped above each column" />
+}
+
+function LargestRectangleViz() {
+  return <HistogramViz heights={[2,1,5,6,2,3]} highlight={[2,3]} label="Largest rectangle = 10 (bars at index 2,3 with height 5,6)" />
+}
+
+function MaxRectangleViz() {
+  const grid = [
+    ["1","0","1","0","0"],
+    ["1","0","1","1","1"],
+    ["1","1","1","1","1"],
+    ["1","0","0","1","0"],
+  ]
+  const highlight = new Set(["1,2","1,3","1,4","2,2","2,3","2,4"])
+  const cellSize = 32
+  const svgW = grid[0].length * cellSize
+  const svgH = grid.length * cellSize
+  return (
+    <div className="viz-label-wrap">
+      <div className="viz-label">Max rectangle = 6 (highlighted region)</div>
+      <svg viewBox={`0 0 ${svgW} ${svgH}`} width={svgW} height={svgH} className="viz-grid">
+        {grid.map((row, r) => row.map((cell, c) => {
+          const isHL = highlight.has(`${r},${c}`)
+          return (
+            <g key={`${r}-${c}`}>
+              <rect x={c*cellSize} y={r*cellSize} width={cellSize-2} height={cellSize-2}
+                fill={cell==='0' ? 'var(--surface0)' : isHL ? 'var(--green)' : 'var(--blue)'}
+                rx={4}
+              />
+              <text x={c*cellSize+cellSize/2} y={r*cellSize+cellSize/2+5} textAnchor="middle"
+                fontSize={13} fill="var(--text)" fontFamily="monospace">{cell}</text>
+            </g>
+          )
+        }))}
+      </svg>
+    </div>
+  )
+}
+
+export const VIZ = {
+  'trapping-rain-water': () => <TrappingRainWaterViz />,
+  'largest-rectangle-histogram': () => <LargestRectangleViz />,
+  'maximum-rectangle': () => <MaxRectangleViz />,
+}
