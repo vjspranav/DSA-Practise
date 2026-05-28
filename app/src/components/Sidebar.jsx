@@ -51,8 +51,9 @@ export default function Sidebar({
                           <span className={`asked-pill ${p.askedBy}`}>
                             {p.askedBy === 'himali' ? 'H' : 'V'}
                           </span>
-                          {status === 'complete' && <span className="status-icon complete">✓</span>}
-                          {status === 'revise'   && <span className="status-icon revise">↩</span>}
+                          <span className={`status-badge ${status || 'none'}`}>
+                            {status === 'complete' ? '✓' : status === 'revise' ? '↩' : '○'}
+                          </span>
                         </span>
                       </span>
                     )}
