@@ -859,7 +859,43 @@ function TrappingRainWaterViz() {
 }
 
 function LargestRectangleViz() {
-  return <HistogramViz heights={[2,1,5,6,2,3]} highlight={[2,3]} label="Largest rectangle = 10 (bars at index 2,3 with height 5,6)" />
+  const heights = [2, 1, 5, 6, 2, 3]
+  const maxH = Math.max(...heights)
+  const bs = 20, bg = 3, cg = 8   // block size, block gap, col gap
+  const colW = bs + cg, rowH = bs + bg
+  const labelH = 20
+  const svgW = heights.length * colW - cg
+  const svgH = maxH * rowH + labelH
+
+  // rectangle: cols 2–3, rows 0–4 from bottom (height=5)
+  const rL = 2, rR = 3, rH = 5
+
+  return (
+    <div className="viz-label-wrap">
+      <div className="viz-label">Largest rectangle = 10 (highlighted blocks)</div>
+      <svg viewBox={`0 0 ${svgW} ${svgH}`} width={svgW} height={svgH}>
+        {heights.map((h, col) => (
+          <g key={col}>
+            {Array.from({ length: h }, (_, row) => {
+              const isHL = col >= rL && col <= rR && row < rH
+              return (
+                <rect key={row}
+                  x={col * colW}
+                  y={(maxH - 1 - row) * rowH}
+                  width={bs} height={bs}
+                  fill={isHL ? 'var(--success)' : 'var(--accent)'}
+                  opacity={isHL ? 0.85 : 0.3}
+                  rx={3}
+                />
+              )
+            })}
+            <text x={col * colW + bs / 2} y={svgH - 4} textAnchor="middle"
+              fontSize={11} fill="var(--text-muted)" fontFamily="monospace">{h}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
 }
 
 function MaxRectangleViz() {
@@ -870,23 +906,28 @@ function MaxRectangleViz() {
     ["1","0","0","1","0"],
   ]
   const highlight = new Set(["1,2","1,3","1,4","2,2","2,3","2,4"])
-  const cellSize = 32
-  const svgW = grid[0].length * cellSize
-  const svgH = grid.length * cellSize
+  const cellSize = 44, pad = 6
+  const svgW = grid[0].length * cellSize + pad * 2
+  const svgH = grid.length * cellSize + pad * 2
   return (
     <div className="viz-label-wrap">
       <div className="viz-label">Max rectangle = 6 (highlighted region)</div>
       <svg viewBox={`0 0 ${svgW} ${svgH}`} width={svgW} height={svgH} className="viz-grid">
         {grid.map((row, r) => row.map((cell, c) => {
           const isHL = highlight.has(`${r},${c}`)
+          const x = pad + c * cellSize
+          const y = pad + r * cellSize
           return (
             <g key={`${r}-${c}`}>
-              <rect x={c*cellSize} y={r*cellSize} width={cellSize-2} height={cellSize-2}
-                fill={cell==='0' ? 'var(--surface-3)' : isHL ? 'var(--success)' : 'var(--accent)'}
-                rx={4}
+              <rect x={x + 2} y={y + 2} width={cellSize - 4} height={cellSize - 4}
+                fill={cell === '0' ? 'var(--surface-3)' : isHL ? 'var(--success)' : 'var(--accent)'}
+                rx={6}
               />
-              <text x={c*cellSize+cellSize/2} y={r*cellSize+cellSize/2+5} textAnchor="middle"
-                fontSize={13} fill="var(--text)" fontFamily="monospace">{cell}</text>
+              <text x={x + cellSize / 2} y={y + cellSize / 2 + 5} textAnchor="middle"
+                fontSize={14} fontFamily="monospace" fontWeight={isHL ? 'bold' : 'normal'}
+                fill={cell === '0' ? 'var(--text-bright)' : '#1e1e2e'}>
+                {cell}
+              </text>
             </g>
           )
         }))}
