@@ -52,20 +52,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> s,int exp,int n){
-        int got=sol.connectSticks(s); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({2,4,3},14,1);
-    chk({1,8,3,5},30,2);
-    chk({5},0,3);
-    chk({1,1,1,1},8,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> s={2,4,3};p(sol.connectSticks(s),14,1);}
+    else if(tc==2){vector<int> s={1,8,3,5};p(sol.connectSticks(s),30,2);}
+    else if(tc==3){vector<int> s={5};p(sol.connectSticks(s),0,3);}
+    else if(tc==4){vector<int> s={1,1,1,1};p(sol.connectSticks(s),8,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const s = (customInput.trim()||'2 4 3').split(/\s+/).map(Number)
@@ -174,20 +169,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
-    int passed=0,total=4; vector<string> res;
-    auto fmt=[](double v){ostringstream o;o<<fixed<<setprecision(2)<<v;return o.str();};
-    {MedianFinder mf; mf.addNum(1);mf.addNum(2);string g=fmt(mf.findMedian());mf.addNum(3);g+=","+fmt(mf.findMedian());
-     bool ok=g=="1.50,2.00";passed+=ok;res.push_back("TEST:1"+(ok?string(":PASS:"):string(":FAIL:"))+"1.50,2.00:"+g);}
-    {MedianFinder mf; mf.addNum(1);mf.addNum(3);string g=fmt(mf.findMedian());
-     bool ok=g=="2.00";passed+=ok;res.push_back("TEST:2"+(ok?string(":PASS:"):string(":FAIL:"))+"2.00:"+g);}
-    {MedianFinder mf; mf.addNum(1);mf.addNum(2);mf.addNum(3);string g=fmt(mf.findMedian());
-     bool ok=g=="2.00";passed+=ok;res.push_back("TEST:3"+(ok?string(":PASS:"):string(":FAIL:"))+"2.00:"+g);}
-    {MedianFinder mf; mf.addNum(-1);mf.addNum(-2);mf.addNum(-3);string g=fmt(mf.findMedian());
-     bool ok=g=="-2.00";passed+=ok;res.push_back("TEST:4"+(ok?string(":PASS:"):string(":FAIL:"))+"-2.00:"+g);}
+    int tc; cin>>tc;
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":4\\n";
-    return passed==4?0:1;
+    auto fmt=[](double v){ostringstream o;o<<fixed<<setprecision(2)<<v;return o.str();};
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){MedianFinder mf; mf.addNum(1);mf.addNum(2);string g=fmt(mf.findMedian());mf.addNum(3);g+=","+fmt(mf.findMedian()); ps(g,"1.50,2.00",1);}
+    else if(tc==2){MedianFinder mf; mf.addNum(1);mf.addNum(3); ps(fmt(mf.findMedian()),"2.00",2);}
+    else if(tc==3){MedianFinder mf; mf.addNum(1);mf.addNum(2);mf.addNum(3); ps(fmt(mf.findMedian()),"2.00",3);}
+    else if(tc==4){MedianFinder mf; mf.addNum(-1);mf.addNum(-2);mf.addNum(-3); ps(fmt(mf.findMedian()),"-2.00",4);}
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -287,21 +277,15 @@ int main() {
     if (mode === 'submit') return `
 ${helpers}
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<vector<int>> vv,string exp,int n){
-        vector<ListNode*> ls; for(auto& v:vv) ls.push_back(makeList(v));
-        string got=listToStr(sol.mergeKLists(ls)); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk({{1,4,5},{1,3,4},{2,6}},"1,1,2,3,4,4,5,6",1);
-    chk({},"",2);
-    chk({{1,2,3}},"1,2,3",3);
-    chk({{3},{1},{2}},"1,2,3",4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<ListNode*> ls={makeList({1,4,5}),makeList({1,3,4}),makeList({2,6})};ps(listToStr(sol.mergeKLists(ls)),"1,1,2,3,4,4,5,6",1);}
+    else if(tc==2){vector<ListNode*> ls;ps(listToStr(sol.mergeKLists(ls)),"",2);}
+    else if(tc==3){vector<ListNode*> ls={makeList({1,2,3})};ps(listToStr(sol.mergeKLists(ls)),"1,2,3",3);}
+    else if(tc==4){vector<ListNode*> ls={makeList({3}),makeList({1}),makeList({2})};ps(listToStr(sol.mergeKLists(ls)),"1,2,3",4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lists = customInput.trim().split('\n').map(l => l.trim()).filter(Boolean)
@@ -424,20 +408,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> h,int g,int exp,int n){
-        int got=sol.isNStraightHand(h,g)?1:0; bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({1,2,3,6,2,3,4,7,8},3,1,1);
-    chk({1,2,3,4,5},4,0,2);
-    chk({1,2,3},1,1,3);
-    chk({1,2,4,5},2,1,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> h={1,2,3,6,2,3,4,7,8};p(sol.isNStraightHand(h,3)?1:0,1,1);}
+    else if(tc==2){vector<int> h={1,2,3,4,5};p(sol.isNStraightHand(h,4)?1:0,0,2);}
+    else if(tc==3){vector<int> h={1,2,3};p(sol.isNStraightHand(h,1)?1:0,1,3);}
+    else if(tc==4){vector<int> h={1,2,4,5};p(sol.isNStraightHand(h,2)?1:0,1,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -532,20 +511,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<char> t,int n,int exp,int tc){
-        int got=sol.leastInterval(t,n); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(tc)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({'A','A','A','B','B','B'},2,8,1);
-    chk({'A','A','A','B','B','B'},0,6,2);
-    chk({'A','A','A'},2,7,3);
-    chk({'A','B','C','D','E','F'},2,6,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<char> t={'A','A','A','B','B','B'};p(sol.leastInterval(t,2),8,1);}
+    else if(tc==2){vector<char> t={'A','A','A','B','B','B'};p(sol.leastInterval(t,0),6,2);}
+    else if(tc==3){vector<char> t={'A','A','A'};p(sol.leastInterval(t,2),7,3);}
+    else if(tc==4){vector<char> t={'A','B','C','D','E','F'};p(sol.leastInterval(t,2),6,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -650,24 +624,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
-    int passed=0,total=4; vector<string> res;
-    auto run=[](int k,vector<int> n,vector<int> adds){
-        KthLargest kl(k,n); string s;
-        for(int v:adds){if(s.size())s+=",";s+=to_string(kl.add(v));}
-        return s;
-    };
-    auto chk=[&](int k,vector<int> n,vector<int> a,string exp,int t){
-        string got=run(k,n,a); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(t)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk(3,{4,5,8,2},{3,5,10,9,4},"4,5,5,8,8",1);
-    chk(1,{1,2},{3,1,1},"3,3,3",2);
-    chk(1,{},{1,2,3},"1,2,3",3);
-    chk(2,{0},{1,2,3},"0,1,2",4);
+    int tc; cin>>tc;
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    auto run=[](int k,vector<int> n,vector<int> adds){KthLargest kl(k,n); string s; for(int v:adds){if(s.size())s+=",";s+=to_string(kl.add(v));}return s;};
+    if(tc==1) ps(run(3,{4,5,8,2},{3,5,10,9,4}),"4,5,5,8,8",1);
+    else if(tc==2) ps(run(1,{1,2},{3,1,1}),"3,3,3",2);
+    else if(tc==3) ps(run(1,{},{1,2,3}),"1,2,3",3);
+    else if(tc==4) ps(run(2,{0},{1,2,3}),"0,1,2",4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -784,20 +749,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
-    int passed=0,total=4; vector<string> res;
-    auto fmtFeed=[](vector<int> v){string s="[";for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s+"]";};
-    {Twitter t; t.postTweet(1,5); string g=fmtFeed(t.getNewsFeed(1)); t.follow(1,2); t.postTweet(2,6); g+=","+fmtFeed(t.getNewsFeed(1)); t.unfollow(1,2); g+=","+fmtFeed(t.getNewsFeed(1));
-     bool ok=g=="[5],[6,5],[5]"; passed+=ok; res.push_back("TEST:1"+(ok?string(":PASS:"):string(":FAIL:"))+"[5],[6,5],[5]:"+g);}
-    {Twitter t; t.postTweet(1,1); t.postTweet(1,2); string g=fmtFeed(t.getNewsFeed(1));
-     bool ok=g=="[2,1]"; passed+=ok; res.push_back("TEST:2"+(ok?string(":PASS:"):string(":FAIL:"))+"[2,1]:"+g);}
-    {Twitter t; string g=fmtFeed(t.getNewsFeed(1));
-     bool ok=g=="[]"; passed+=ok; res.push_back("TEST:3"+(ok?string(":PASS:"):string(":FAIL:"))+"[]:"+g);}
-    {Twitter t; for(int i=1;i<=11;i++) t.postTweet(1,i); string g=fmtFeed(t.getNewsFeed(1));
-     bool ok=g=="[11,10,9,8,7,6,5,4,3,2]"; passed+=ok; res.push_back("TEST:4"+(ok?string(":PASS:"):string(":FAIL:"))+"[11,10,9,8,7,6,5,4,3,2]:"+g);}
+    int tc; cin>>tc;
+    ${fmtFeed}
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":4\\n";
-    return passed==4?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){Twitter t; t.postTweet(1,5); string g=fmtFeed(t.getNewsFeed(1)); t.follow(1,2); t.postTweet(2,6); g+=","+fmtFeed(t.getNewsFeed(1)); t.unfollow(1,2); g+=","+fmtFeed(t.getNewsFeed(1)); ps(g,"[5],[6,5],[5]",1);}
+    else if(tc==2){Twitter t; t.postTweet(1,1); t.postTweet(1,2); ps(fmtFeed(t.getNewsFeed(1)),"[2,1]",2);}
+    else if(tc==3){Twitter t; ps(fmtFeed(t.getNewsFeed(1)),"[]",3);}
+    else if(tc==4){Twitter t; for(int i=1;i<=11;i++) t.postTweet(1,i); ps(fmtFeed(t.getNewsFeed(1)),"[11,10,9,8,7,6,5,4,3,2]",4);}
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -893,21 +853,16 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    auto fmtV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> A,vector<int> B,int k,string exp,int n){
-        string got=fmtV(sol.maxSumCombination(A,B,k)); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk({3,2},{1,4},2,"7,6",1);
-    chk({1,4,2,3},{2,5,1,4},3,"9,8,8",2);
-    chk({1,2,3},{4,5,6},1,"9",3);
-    chk({1,2},{3,4},4,"6,5,5,4",4);
+    ${fmtV}
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> A={3,2},B={1,4};ps(fmtV(sol.maxSumCombination(A,B,2)),"7,6",1);}
+    else if(tc==2){vector<int> A={1,4,2,3},B={2,5,1,4};ps(fmtV(sol.maxSumCombination(A,B,3)),"9,8,8",2);}
+    else if(tc==3){vector<int> A={1,2,3},B={4,5,6};ps(fmtV(sol.maxSumCombination(A,B,1)),"9",3);}
+    else if(tc==4){vector<int> A={1,2},B={3,4};ps(fmtV(sol.maxSumCombination(A,B,4)),"6,5,5,4",4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')

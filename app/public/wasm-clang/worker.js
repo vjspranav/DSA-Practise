@@ -42,6 +42,7 @@ const apiOptions = {
 };
 
 let currentApp = null;
+let currentModule = null;
 
 const onAnyMessage = async event => {
   switch (event.data.id) {
@@ -94,6 +95,44 @@ const onAnyMessage = async event => {
       result.exitCode = (e.code !== undefined) ? e.code : 1;
     }
     port.postMessage({ id: 'compileLinkRunDone', responseId, data: result });
+    break;
+  }
+
+  case 'compileLinkOnly': {
+    const responseId = event.data.responseId;
+    if (currentApp) currentApp.allowRequestAnimationFrame = false;
+    currentModule = null;
+    let result = { error: null };
+    try {
+      await api.compile({ input: 'test.cc', contents: event.data.data, obj: 'test.o' });
+      await api.link('test.o', 'test.wasm');
+      const buffer = api.memfs.getFileContents('test.wasm');
+      currentModule = await WebAssembly.compile(buffer);
+    } catch(e) {
+      result.error = e.message || String(e);
+    }
+    port.postMessage({ id: 'compileLinkOnlyDone', responseId, data: result });
+    break;
+  }
+
+  case 'runWasm': {
+    const responseId = event.data.responseId;
+    let result = { error: null, exitCode: 0 };
+    if (!currentModule) {
+      result.error = 'No compiled module available';
+      port.postMessage({ id: 'runWasmDone', responseId, data: result });
+      break;
+    }
+    if (event.data.stdin != null) api.memfs.setStdinStr(event.data.stdin);
+    try {
+      currentApp = await api.run(currentModule, 'test.wasm');
+    } catch(e) {
+      if (!e || e.code !== 0) {
+        result.error = e ? (e.message || String(e)) : 'Unknown error';
+        result.exitCode = (e && e.code !== undefined) ? e.code : 1;
+      }
+    }
+    port.postMessage({ id: 'runWasmDone', responseId, data: result });
     break;
   }
 

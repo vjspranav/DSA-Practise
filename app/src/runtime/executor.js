@@ -46,6 +46,55 @@ function buildPython(userCode, problem, mode, customInput) {
   return userCode + '\n' + harness
 }
 
+// Compiles + links code into a stored wasm module (no run).
+// Returns true on success, false on error (error lines pushed via push).
+export async function compileLinkOnly(state, msgIdRef, code, push) {
+  if (!state) { push('wasm-clang not ready.\n', 'warn'); return false }
+  const msgId = String(++msgIdRef.current)
+  const stripAnsi = s => s.replace(/\x1b\[[0-9;]*m/g, '')
+  let rawText = ''
+  state.onWrite = s => { rawText += stripAnsi(s) }
+
+  const result = await new Promise(resolve => {
+    state.handlers[msgId] = resolve
+    state.port.postMessage({ id: 'compileLinkOnly', data: code, responseId: msgId })
+  })
+  state.onWrite = null
+
+  if (result.error) {
+    const errLines = rawText.split('\n').filter(l => !l.startsWith('> clang') && !l.startsWith('> wasm-ld'))
+    push(errLines.join('\n').trim() + '\n', 'stderr')
+    return false
+  }
+  return true
+}
+
+// Runs the previously compiled wasm module with the given stdin string.
+// Program output lines are pushed via push.
+export async function runWasm(state, msgIdRef, stdin, push) {
+  if (!state) { push('wasm-clang not ready.\n', 'warn'); return }
+  const msgId = String(++msgIdRef.current)
+  const stripAnsi = s => s.replace(/\x1b\[[0-9;]*m/g, '')
+  let rawText = ''
+  state.onWrite = s => { rawText += stripAnsi(s) }
+
+  const result = await new Promise(resolve => {
+    state.handlers[msgId] = resolve
+    state.port.postMessage({ id: 'runWasm', stdin, responseId: msgId })
+  })
+  state.onWrite = null
+
+  if (result.error) {
+    push('[Runtime Error] ' + result.error + '\n', 'stderr')
+    return
+  }
+
+  const programLines = rawText.split('\n').filter(l => !l.startsWith('>'))
+  while (programLines.length && !programLines[programLines.length - 1].trim()) programLines.pop()
+  while (programLines.length && !programLines[0].trim()) programLines.shift()
+  for (const line of programLines) push(line + '\n', 'stdout')
+}
+
 // Parses harness output split by the ---RESULT--- sentinel.
 // Each element of `lines` is { text: string, cls: string } where text is one line + \n.
 // Returns { outputLines, tests, summary } where:

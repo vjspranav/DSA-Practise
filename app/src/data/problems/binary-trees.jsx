@@ -102,23 +102,19 @@ int main() {
     if (mode === 'submit') return `
 ${helper}
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,int pv,int qv,int exp,int n){
-        auto root=buildTree(a);
-        auto p=findNode(root,pv),q=findNode(root,qv);
-        auto got=sol.lowestCommonAncestor(root,p,q);
-        int gv=got?got->val:-1; bool ok=gv==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(gv));
-    };
-    chk({3,5,1,6,2,0,8,-1,-1,7,4},5,1,3,1);
-    chk({3,5,1,6,2,0,8,-1,-1,7,4},5,6,5,2);
-    chk({1,2,3},2,3,1,3);
-    chk({1,2,3,4,5},4,5,2,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto run=[&](vector<int> a,int pv,int qv,int exp,int n){
+        auto root=buildTree(a); auto p=findNode(root,pv),q=findNode(root,qv);
+        auto got=sol.lowestCommonAncestor(root,p,q); int gv=got?got->val:-1;
+        bool ok=gv==exp; cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<exp<<":"<<gv<<"\\n";
+    };
+    if(tc==1) run({3,5,1,6,2,0,8,-1,-1,7,4},5,1,3,1);
+    else if(tc==2) run({3,5,1,6,2,0,8,-1,-1,7,4},5,6,5,2);
+    else if(tc==3) run({1,2,3},2,3,1,3);
+    else if(tc==4) run({1,2,3,4,5},4,5,2,4);
+    return 0;
 }`
     if (mode === 'custom') return `
 int main(){cout<<"Use run/submit mode\\n";return 0;}`
@@ -218,20 +214,15 @@ int main() {
     if (mode === 'submit') return `
 ${helper}
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,int t,int exp,int n){
-        int got=sol.timeToBurn(buildTree(a),t); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({1,2,3,4,5,6,7},5,3,1);
-    chk({1},1,0,2);
-    chk({1,2,3,-1,-1,-1,4},4,3,3);
-    chk({1,2,-1,3,-1},3,2,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1) p(sol.timeToBurn(buildTree({1,2,3,4,5,6,7}),5),3,1);
+    else if(tc==2) p(sol.timeToBurn(buildTree({1}),1),0,2);
+    else if(tc==3) p(sol.timeToBurn(buildTree({1,2,3,-1,-1,-1,4}),4),3,3);
+    else if(tc==4) p(sol.timeToBurn(buildTree({1,2,-1,3,-1}),3),2,4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -337,23 +328,20 @@ int main() {
     if (mode === 'submit') return `
 ${helper}
 int main() {
+    int tc; cin>>tc;
     Solution sol; ${fmtV}
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,string exp,int n){
+    cout<<"\\n---RESULT---\\n";
+    auto run=[&](vector<int> a,string exp,int n){
         string pre=fmtV(sol.morrisPreorder(buildTree(a)));
         string in_=fmtV(sol.morrisInorder(buildTree(a)));
         string got="pre:"+pre+"|in:"+in_;
-        bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
+        bool ok=got==exp; cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<exp<<":"<<got<<"\\n";
     };
-    chk({1,2,3,4,5,6,7},"pre:1,2,4,5,3,6,7|in:4,2,5,1,6,3,7",1);
-    chk({1},"pre:1|in:1",2);
-    chk({3,2,-1,1,-1},"pre:3,2,1|in:1,2,3",3);
-    chk({1,-1,2,-1,3},"pre:1,2,3|in:1,2,3",4);
-    cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    if(tc==1) run({1,2,3,4,5,6,7},"pre:1,2,4,5,3,6,7|in:4,2,5,1,6,3,7",1);
+    else if(tc==2) run({1},"pre:1|in:1",2);
+    else if(tc==3) run({3,2,-1,1,-1},"pre:3,2,1|in:1,2,3",3);
+    else if(tc==4) run({1,-1,2,-1,3},"pre:1,2,3|in:1,2,3",4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -460,21 +448,18 @@ int main() {
     if (mode === 'submit') return `
 ${helper}${verify}
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,int n){
-        auto root=buildTree(a); sol.changeTree(root);
-        bool ok=verify(root); passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:valid:valid":":FAIL:valid:invalid"));
-    };
-    chk({2,35,10,2,3,5,2},1);
-    chk({5},2);
-    chk({1,2},3);
-    chk({10,4,6,1,3,2,4},4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto run=[&](vector<int> a,int n){
+        auto root=buildTree(a); sol.changeTree(root); bool ok=verify(root);
+        cout<<"TEST:"<<n<<":"<<(ok?"PASS:valid:valid":"FAIL:valid:invalid")<<"\\n";
+    };
+    if(tc==1) run({2,35,10,2,3,5,2},1);
+    else if(tc==2) run({5},2);
+    else if(tc==3) run({1,2},3);
+    else if(tc==4) run({10,4,6,1,3,2,4},4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -579,20 +564,18 @@ int main() {
     if (mode === 'submit') return `
 ${helper}
 int main() {
+    int tc; cin>>tc;
     Solution sol; ${fmt}
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,string exp,int n){
-        string got=fmtR(sol.zigzagLevelOrder(buildTree(a))); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk({3,9,20,-1,-1,15,7},"[[3],[20,9],[15,7]]",1);
-    chk({1},"[[1]]",2);
-    chk({1,2,3},"[[1],[3,2]]",3);
-    chk({1,2,3,4,5,6,7},"[[1],[3,2],[4,5,6,7]]",4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto run=[&](vector<int> a,string exp,int n){
+        string got=fmtR(sol.zigzagLevelOrder(buildTree(a))); bool ok=got==exp;
+        cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<exp<<":"<<got<<"\\n";
+    };
+    if(tc==1) run({3,9,20,-1,-1,15,7},"[[3],[20,9],[15,7]]",1);
+    else if(tc==2) run({1},"[[1]]",2);
+    else if(tc==3) run({1,2,3},"[[1],[3,2]]",3);
+    else if(tc==4) run({1,2,3,4,5,6,7},"[[1],[3,2],[4,5,6,7]]",4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -690,25 +673,21 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
     function<void(TreeNode*,vector<int>&)> inord=[&](TreeNode* r,vector<int>& v){if(!r)return;inord(r->left,v);v.push_back(r->val);inord(r->right,v);};
     auto joinV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};
-    auto chk=[&](vector<int> pre,vector<int> in_,string expIn,int n){
-        auto root=sol.buildTree(pre,in_);
-        vector<int> gi; inord(root,gi);
-        string gis=joinV(gi);
-        bool ok=(gis==expIn); passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+expIn+":"+gis);
-    };
-    chk({3,9,20,15,7},{9,3,15,20,7},"9,3,15,20,7",1);
-    chk({1},{1},"1",2);
-    chk({1,2},{2,1},"2,1",3);
-    chk({1,2,3},{1,2,3},"1,2,3",4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto run=[&](vector<int> pre,vector<int> in_,string expIn,int n){
+        auto root=sol.buildTree(pre,in_); vector<int> gi; inord(root,gi);
+        string gis=joinV(gi); bool ok=gis==expIn;
+        cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<expIn<<":"<<gis<<"\\n";
+    };
+    if(tc==1) run({3,9,20,15,7},{9,3,15,20,7},"9,3,15,20,7",1);
+    else if(tc==2) run({1},{1},"1",2);
+    else if(tc==3) run({1,2},{2,1},"2,1",3);
+    else if(tc==4) run({1,2,3},{1,2,3},"1,2,3",4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -812,20 +791,18 @@ int main() {
     if (mode === 'submit') return `
 ${helper}
 int main() {
+    int tc; cin>>tc;
     Solution sol; ${fmtV}
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,string exp,int n){
-        string got=fmtV(sol.boundaryOfBinaryTree(buildTree(a))); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk({1,2,3,4,5,6,7},"1,2,4,5,6,7,3",1);
-    chk({1},"1",2);
-    chk({1,2,-1,3,-1},"1,2,3",3);
-    chk({1,2,3},"1,2,3",4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto run=[&](vector<int> a,string exp,int n){
+        string got=fmtV(sol.boundaryOfBinaryTree(buildTree(a))); bool ok=got==exp;
+        cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<exp<<":"<<got<<"\\n";
+    };
+    if(tc==1) run({1,2,3,4,5,6,7},"1,2,4,5,6,7,3",1);
+    else if(tc==2) run({1},"1",2);
+    else if(tc==3) run({1,2,-1,3,-1},"1,2,3",3);
+    else if(tc==4) run({1,2,3},"1,2,3",4);
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },

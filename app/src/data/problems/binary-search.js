@@ -59,22 +59,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed = 0, total = 4;
-    vector<string> res;
-    auto chk = [&](vector<int> p, int h, int exp, int n) {
-        int got = sol.minEatingSpeed(p, h);
-        bool ok = got == exp; passed += ok;
-        res.push_back("TEST:" + to_string(n) + (ok?":PASS:":":FAIL:") + to_string(exp) + ":" + to_string(got));
-    };
-    chk({3,6,7,11},      8,         4, 1);
-    chk({30,11,23,4,20}, 5,        30, 2);
-    chk({30,11,23,4,20}, 6,        23, 3);
-    chk({1000000000},    2, 500000000, 4);
-    cout << "\\n---RESULT---\\n";
-    for (auto& s : res) cout << s << "\\n";
-    cout << "SUMMARY:" << passed << ":" << total << "\\n";
-    return passed == total ? 0 : 1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> v={3,6,7,11};p(sol.minEatingSpeed(v,8),4,1);}
+    else if(tc==2){vector<int> v={30,11,23,4,20};p(sol.minEatingSpeed(v,5),30,2);}
+    else if(tc==3){vector<int> v={30,11,23,4,20};p(sol.minEatingSpeed(v,6),23,3);}
+    else if(tc==4){vector<int> v={1000000000};p(sol.minEatingSpeed(v,2),500000000,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -173,21 +166,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0, total=4;
-    vector<string> res;
-    auto chk=[&](vector<int> s,int k,int exp,int n){
-        int got=sol.aggressiveCows(s,k); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({1,2,4,8,9},3,3,1);
-    chk({1,2,3},2,2,2);
-    chk({1,2,4,8,9},5,1,3);
-    chk({1,10,20,30},2,29,4);
-    cout << "\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> s={1,2,4,8,9};p(sol.aggressiveCows(s,3),3,1);}
+    else if(tc==2){vector<int> s={1,2,3};p(sol.aggressiveCows(s,2),2,2);}
+    else if(tc==3){vector<int> s={1,2,4,8,9};p(sol.aggressiveCows(s,5),1,3);}
+    else if(tc==4){vector<int> s={1,10,20,30};p(sol.aggressiveCows(s,2),29,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -287,21 +274,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0, total=4;
-    vector<string> res;
-    auto chk=[&](vector<int> n,int exp,int t){
-        int got=sol.findPeakElement(n); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(t)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({1,2,3,1},2,1);
-    chk({3,1},0,2);
-    chk({1,3},1,3);
-    chk({1},0,4);
-    cout << "\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> v={1,2,3,1};p(sol.findPeakElement(v),2,1);}
+    else if(tc==2){vector<int> v={3,1};p(sol.findPeakElement(v),0,2);}
+    else if(tc==3){vector<int> v={1,3};p(sol.findPeakElement(v),1,3);}
+    else if(tc==4){vector<int> v={1};p(sol.findPeakElement(v),0,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const nums = (customInput.trim()||'1 2 3 1').split(/\s+/).map(Number)
@@ -396,21 +377,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0, total=4;
-    vector<string> res;
-    auto chk=[&](vector<int> n,int t,int exp,int tc){
-        int got=sol.search(n,t); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(tc)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({4,5,6,7,0,1,2},0,4,1);
-    chk({4,5,6,7,0,1,2},3,-1,2);
-    chk({1},0,-1,3);
-    chk({1,3},3,1,4);
-    cout << "\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> v={4,5,6,7,0,1,2};p(sol.search(v,0),4,1);}
+    else if(tc==2){vector<int> v={4,5,6,7,0,1,2};p(sol.search(v,3),-1,2);}
+    else if(tc==3){vector<int> v={1};p(sol.search(v,0),-1,3);}
+    else if(tc==4){vector<int> v={1,3};p(sol.search(v,3),1,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -508,21 +483,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0, total=4;
-    vector<string> res;
-    auto chk=[&](vector<int> b,int k,int exp,int n){
-        int got=sol.minTime(b,k); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({10,20,30,40},2,60,1);
-    chk({10,20,30,40},4,40,2);
-    chk({7,2,5,10,8},2,18,3);
-    chk({5,5,5,5},1,20,4);
-    cout << "\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> b={10,20,30,40};p(sol.minTime(b,2),60,1);}
+    else if(tc==2){vector<int> b={10,20,30,40};p(sol.minTime(b,4),40,2);}
+    else if(tc==3){vector<int> b={7,2,5,10,8};p(sol.minTime(b,2),18,3);}
+    else if(tc==4){vector<int> b={5,5,5,5};p(sol.minTime(b,1),20,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -622,21 +591,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0, total=4;
-    vector<string> res;
-    auto chk=[&](vector<long long> a,vector<long long> b,long long k,long long exp,int n){
-        long long got=sol.maxBatches(a,b,k); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({2,1,4},{11,3,16},1,4,1);
-    chk({2,1,4},{11,3,16},0,3,2);
-    chk({1,1,1},{3,3,3},3,4,3);
-    chk({5},{0},10,2,4);
-    cout << "\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](long long g,long long e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<long long> a={2,1,4},b={11,3,16};p(sol.maxBatches(a,b,1),4,1);}
+    else if(tc==2){vector<long long> a={2,1,4},b={11,3,16};p(sol.maxBatches(a,b,0),3,2);}
+    else if(tc==3){vector<long long> a={1,1,1},b={3,3,3};p(sol.maxBatches(a,b,3),4,3);}
+    else if(tc==4){vector<long long> a={5},b={0};p(sol.maxBatches(a,b,10),2,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')

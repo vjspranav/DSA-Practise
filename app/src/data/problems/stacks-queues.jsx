@@ -54,20 +54,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> h,int exp,int n){
-        int got=sol.trap(h); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({0,1,0,2,1,0,1,3,2,1,2,1},6,1);
-    chk({4,2,0,3,2,5},9,2);
-    chk({3,3,3,3},0,3);
-    chk({3,0,3},3,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> h={0,1,0,2,1,0,1,3,2,1,2,1};p(sol.trap(h),6,1);}
+    else if(tc==2){vector<int> h={4,2,0,3,2,5};p(sol.trap(h),9,2);}
+    else if(tc==3){vector<int> h={3,3,3,3};p(sol.trap(h),0,3);}
+    else if(tc==4){vector<int> h={3,0,3};p(sol.trap(h),3,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const h = (customInput.trim()||'0 1 0 2 1 0 1 3 2 1 2 1').split(/\s+/).map(Number)
@@ -161,21 +156,16 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
     auto fmtV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,string exp,int n){
-        string got=fmtV(sol.asteroidCollision(a)); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk({5,10,-5},"5,10",1);
-    chk({8,-8},"",2);
-    chk({10,2,-5},"10",3);
-    chk({-2,-1,1,2},"-2,-1,1,2",4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> a={5,10,-5};ps(fmtV(sol.asteroidCollision(a)),"5,10",1);}
+    else if(tc==2){vector<int> a={8,-8};ps(fmtV(sol.asteroidCollision(a)),"",2);}
+    else if(tc==3){vector<int> a={10,2,-5};ps(fmtV(sol.asteroidCollision(a)),"10",3);}
+    else if(tc==4){vector<int> a={-2,-1,1,2};ps(fmtV(sol.asteroidCollision(a)),"-2,-1,1,2",4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const a = (customInput.trim()||'5 10 -5').split(/\s+/).map(Number)
@@ -271,20 +261,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<vector<int>> m,int exp,int n){
-        int got=sol.celebrity((int)m.size(),m); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({{0,0,1,0},{0,0,1,0},{0,0,0,0},{0,0,1,0}},2,1);
-    chk({{0,1},{0,0}},1,2);
-    chk({{0,1,0},{0,0,1},{1,0,0}},-1,3);
-    chk({{0,1,1},{0,0,1},{0,0,0}},2,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<vector<int>> m={{0,0,1,0},{0,0,1,0},{0,0,0,0},{0,0,1,0}};p(sol.celebrity((int)m.size(),m),2,1);}
+    else if(tc==2){vector<vector<int>> m={{0,1},{0,0}};p(sol.celebrity((int)m.size(),m),1,2);}
+    else if(tc==3){vector<vector<int>> m={{0,1,0},{0,0,1},{1,0,0}};p(sol.celebrity((int)m.size(),m),-1,3);}
+    else if(tc==4){vector<vector<int>> m={{0,1,1},{0,0,1},{0,0,0}};p(sol.celebrity((int)m.size(),m),2,4);}
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -387,19 +372,14 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
-    int passed=0,total=4; vector<string> res;
-    {LFUCache c(2); c.put(1,1);c.put(2,2); string g=to_string(c.get(1)); c.put(3,3); g+=","+to_string(c.get(2)); g+=","+to_string(c.get(3)); c.put(4,4); g+=","+to_string(c.get(1)); g+=","+to_string(c.get(3)); g+=","+to_string(c.get(4));
-     bool ok=g=="1,-1,3,1,3,4"; passed+=ok; res.push_back("TEST:1"+(ok?string(":PASS:"):string(":FAIL:"))+"1,-1,3,1,3,4:"+g);}
-    {LFUCache c(1); c.put(1,1); string g=to_string(c.get(1)); c.put(2,2); g+=","+to_string(c.get(1)); g+=","+to_string(c.get(2));
-     bool ok=g=="1,-1,2"; passed+=ok; res.push_back("TEST:2"+(ok?string(":PASS:"):string(":FAIL:"))+"1,-1,2:"+g);}
-    {LFUCache c(2); c.put(1,1); c.put(1,2); string g=to_string(c.get(1));
-     bool ok=g=="2"; passed+=ok; res.push_back("TEST:3"+(ok?string(":PASS:"):string(":FAIL:"))+"2:"+g);}
-    {LFUCache c(2); c.put(1,1);c.put(2,2); string g=to_string(c.get(1)); g+=","+to_string(c.get(2)); c.put(3,3); g+=","+to_string(c.get(1)); g+=","+to_string(c.get(2)); g+=","+to_string(c.get(3));
-     bool ok=g=="1,2,1,2,3"; passed+=ok; res.push_back("TEST:4"+(ok?string(":PASS:"):string(":FAIL:"))+"1,2,1,2,3:"+g);}
+    int tc; cin>>tc;
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":4\\n";
-    return passed==4?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){LFUCache c(2); c.put(1,1);c.put(2,2); string g=to_string(c.get(1)); c.put(3,3); g+=","+to_string(c.get(2)); g+=","+to_string(c.get(3)); c.put(4,4); g+=","+to_string(c.get(1)); g+=","+to_string(c.get(3)); g+=","+to_string(c.get(4)); ps(g,"1,-1,3,1,3,4",1);}
+    else if(tc==2){LFUCache c(1); c.put(1,1); string g=to_string(c.get(1)); c.put(2,2); g+=","+to_string(c.get(1)); g+=","+to_string(c.get(2)); ps(g,"1,-1,2",2);}
+    else if(tc==3){LFUCache c(2); c.put(1,1); c.put(1,2); ps(to_string(c.get(1)),"2",3);}
+    else if(tc==4){LFUCache c(2); c.put(1,1);c.put(2,2); string g=to_string(c.get(1)); g+=","+to_string(c.get(2)); c.put(3,3); g+=","+to_string(c.get(1)); g+=","+to_string(c.get(2)); g+=","+to_string(c.get(3)); ps(g,"1,2,1,2,3",4);}
+    return 0;
 }`
     if (mode === 'custom') return `int main(){cout<<"Use run/submit mode\\n";return 0;}`
   },
@@ -440,45 +420,59 @@ const stockSpan = {
   category: 'stacks-queues',
   askedBy: 'vjs',
   description: [
-    "The stock span of a stock on a given day is the maximum number of consecutive days (including today) for which the stock price was less than or equal to today's price.",
-    'Given an array of daily prices, return the span for each day.',
+    "The <strong>stock span</strong> of a stock on a given day is the maximum number of consecutive days (up to and including today) for which the stock price was less than or equal to today's price.",
+    'Design a class <code>StockSpanner</code> that collects daily prices and returns the span each time <code>next(price)</code> is called.',
   ],
   examples: [
-    { input: 'prices=[100,80,60,70,60,75,85]', output: '[1,1,1,2,1,4,6]' },
-    { input: 'prices=[10,4,5,90,120,80]',       output: '[1,1,2,4,5,1]'  },
+    {
+      input: 'next(100)→1, next(80)→1, next(60)→1, next(70)→2, next(60)→1, next(75)→4, next(85)→6',
+      output: '[1,1,1,2,1,4,6]',
+      explanation: 'next(75)→4 because the last 4 prices [75,60,70,60] are all ≤ 75.',
+    },
+    { input: 'next(10)→1, next(4)→1, next(5)→2, next(90)→4, next(120)→5, next(80)→1', output: '[1,1,2,4,5,1]' },
   ],
-  constraints: ['1 ≤ prices.length ≤ 10⁵', '1 ≤ prices[i] ≤ 10⁵'],
+  constraints: ['1 ≤ price ≤ 10⁵', 'At most 10⁴ calls to next'],
   hints: [
-    'Use a monotonic stack of (price, span) pairs.',
-    'For each price, pop all smaller/equal prices from the stack and accumulate their spans.',
-    'Push current (price, accumulated_span) onto the stack.',
+    'Use a monotonic stack of (price, accumulated_span) pairs.',
+    'For each price, pop all smaller/equal entries and add their spans to a running counter.',
+    'Push (price, counter + 1) — the +1 counts today itself.',
+    'This is O(n) amortised: each element is pushed and popped at most once.',
   ],
-  inputFormat: 'Line 1: space-separated prices',
+  submitTimeLimitMs: 100,
+  submitTestCount: 6,
+  inputFormat: 'Line 1: space-separated prices (fed to next() in order)',
   defaultCustomInput: '100 80 60 70 60 75 85',
   testCases: [
-    { label: 'Example 1', input: 'prices=[100,80,60,70,60,75,85]', expected: '1,1,1,2,1,4,6' },
-    { label: 'Example 2', input: 'prices=[10,4,5,90,120,80]',       expected: '1,1,2,4,5,1'  },
-    { label: 'Increasing',input: 'prices=[1,2,3,4,5]',              expected: '1,2,3,4,5'    },
-    { label: 'Decreasing',input: 'prices=[5,4,3,2,1]',              expected: '1,1,1,1,1'    },
+    { label: 'LeetCode Ex 1', input: 'prices=[100,80,60,70,60,75,85]', expected: '1,1,1,2,1,4,6' },
+    { label: 'LeetCode Ex 2', input: 'prices=[10,4,5,90,120,80]',      expected: '1,1,2,4,5,1'  },
+    { label: 'Increasing',    input: 'prices=[1,2,3,4,5]',             expected: '1,2,3,4,5'    },
+    { label: 'Decreasing',    input: 'prices=[5,4,3,2,1]',             expected: '1,1,1,1,1'    },
   ],
-  cppStarter: `class Solution {
+  cppStarter: `class StockSpanner {
 public:
-    vector<int> calculateSpan(vector<int>& prices) {
+    StockSpanner() {
+
+    }
+
+    int next(int price) {
 
     }
 };`,
-  pythonStarter: `from typing import List
+  pythonStarter: `class StockSpanner:
+    def __init__(self):
 
-class Solution:
-    def calculateSpan(self, prices: List[int]) -> List[int]:
+
+    def next(self, price: int) -> int:
         `,
   buildCppHarness(mode, customInput = '') {
-    const fmtV = `auto fmtV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};`
+    // 136 run-length-encoded runs from a real 10k-call LeetCode test case
+    const runsLit = `{{1,98},{2,88},{3,107},{4,87},{5,120},{6,110},{7,105},{8,105},{9,95},{10,97},{11,105},{12,102},{13,110},{14,115},{15,87},{72,1},{15,30},{16,101},{17,97},{18,108},{19,93},{20,103},{21,96},{22,109},{23,124},{24,102},{25,87},{26,79},{27,88},{28,91},{29,88},{30,85},{31,105},{32,86},{33,108},{34,118},{35,109},{36,95},{37,92},{38,72},{50,1},{38,35},{39,98},{40,95},{41,85},{42,87},{43,101},{44,102},{45,101},{46,89},{47,70},{91,1},{47,37},{48,87},{49,109},{50,32},{38,1},{50,72},{51,106},{52,95},{53,106},{54,87},{55,100},{56,88},{57,120},{58,114},{59,106},{60,65},{82,1},{60,27},{61,111},{62,10},{73,1},{62,89},{63,106},{64,93},{65,100},{66,96},{67,102},{68,107},{69,113},{70,30},{76,1},{70,58},{71,53},{94,1},{71,41},{72,72},{15,1},{72,32},{73,54},{62,1},{73,53},{74,93},{75,91},{76,77},{70,1},{76,29},{77,65},{94,1},{77,25},{78,82},{79,109},{80,101},{81,107},{82,14},{60,1},{82,80},{83,106},{84,85},{85,100},{86,108},{87,5},{100,1},{87,92},{88,106},{89,88},{90,102},{91,94},{47,1},{91,23},{92,99},{93,101},{94,59},{71,1},{94,26},{77,1},{94,2},{95,108},{96,87},{97,96},{98,86},{99,98},{100,92},{87,1},{100,15}}`
     if (mode === 'run') return `
 int main() {
-    Solution sol; ${fmtV}
+    StockSpanner obj;
     vector<int> p={100,80,60,70,60,75,85};
-    string got=fmtV(sol.calculateSpan(p)), exp="1,1,1,2,1,4,6";
+    string got="", exp="1,1,1,2,1,4,6";
+    for(int i=0;i<(int)p.size();i++){if(i) got+=","; got+=to_string(obj.next(p[i]));}
     cout<<"\\n---RESULT---\\n";
     if(got==exp) cout<<"RESULT:PASS:"<<exp<<":"<<got<<"\\n";
     else         cout<<"RESULT:FAIL:"<<exp<<":"<<got<<"\\n";
@@ -486,55 +480,74 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
-    Solution sol;
-    auto fmtV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> p,string exp,int n){
-        string got=fmtV(sol.calculateSpan(p)); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk({100,80,60,70,60,75,85},"1,1,1,2,1,4,6",1);
-    chk({10,4,5,90,120,80},"1,1,2,4,5,1",2);
-    chk({1,2,3,4,5},"1,2,3,4,5",3);
-    chk({5,4,3,2,1},"1,1,1,1,1",4);
+    int tc; cin>>tc;
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){StockSpanner obj; string g=""; for(int v:{100,80,60,70,60,75,85}){if(g.size())g+=",";g+=to_string(obj.next(v));} ps(g,"1,1,1,2,1,4,6",1);}
+    else if(tc==2){StockSpanner obj; string g=""; for(int v:{10,4,5,90,120,80}){if(g.size())g+=",";g+=to_string(obj.next(v));} ps(g,"1,1,2,4,5,1",2);}
+    else if(tc==3){StockSpanner obj; string g=""; for(int v:{1,2,3,4,5}){if(g.size())g+=",";g+=to_string(obj.next(v));} ps(g,"1,2,3,4,5",3);}
+    else if(tc==4){StockSpanner obj; string g=""; for(int v:{5,4,3,2,1}){if(g.size())g+=",";g+=to_string(obj.next(v));} ps(g,"1,1,1,1,1",4);}
+    else if(tc==5){
+        vector<pair<int,int>> runs=${runsLit};
+        StockSpanner obj; long long s=0;
+        for(auto& r:runs) for(int i=0;i<r.second;i++) s+=obj.next(r.first);
+        bool ok=(s==7874520LL); cout<<"TEST:5:"<<(ok?"PASS:":"FAIL:")<<"7874520:"<<s<<"\\n";
+    }
+    else if(tc==6){
+        StockSpanner obj; long long s=0;
+        for(int i=1;i<=10000;i++) s+=obj.next(i);
+        bool ok=(s==50005000LL); cout<<"TEST:6:"<<(ok?"PASS:":"FAIL:")<<"50005000:"<<s<<"\\n";
+    }
+    return 0;
 }`
     if (mode === 'custom') {
       const p = (customInput.trim()||'100 80 60 70 60 75 85').split(/\s+/).map(Number)
       return `
 int main() {
-    Solution sol;
-    vector<int> p={${join(p)}};
-    auto r=sol.calculateSpan(p);
-    for(int i=0;i<(int)r.size();i++){if(i)cout<<",";cout<<r[i];}cout<<"\\n";
+    StockSpanner obj;
+    vector<int> p={${p.join(',')}};
+    for(int i=0;i<(int)p.size();i++){if(i)cout<<",";cout<<obj.next(p[i]);}cout<<"\\n";
     return 0;
 }`
     }
   },
   buildPythonHarness(mode, customInput = '') {
+    const runsLit = `[(1,98),(2,88),(3,107),(4,87),(5,120),(6,110),(7,105),(8,105),(9,95),(10,97),(11,105),(12,102),(13,110),(14,115),(15,87),(72,1),(15,30),(16,101),(17,97),(18,108),(19,93),(20,103),(21,96),(22,109),(23,124),(24,102),(25,87),(26,79),(27,88),(28,91),(29,88),(30,85),(31,105),(32,86),(33,108),(34,118),(35,109),(36,95),(37,92),(38,72),(50,1),(38,35),(39,98),(40,95),(41,85),(42,87),(43,101),(44,102),(45,101),(46,89),(47,70),(91,1),(47,37),(48,87),(49,109),(50,32),(38,1),(50,72),(51,106),(52,95),(53,106),(54,87),(55,100),(56,88),(57,120),(58,114),(59,106),(60,65),(82,1),(60,27),(61,111),(62,10),(73,1),(62,89),(63,106),(64,93),(65,100),(66,96),(67,102),(68,107),(69,113),(70,30),(76,1),(70,58),(71,53),(94,1),(71,41),(72,72),(15,1),(72,32),(73,54),(62,1),(73,53),(74,93),(75,91),(76,77),(70,1),(76,29),(77,65),(94,1),(77,25),(78,82),(79,109),(80,101),(81,107),(82,14),(60,1),(82,80),(83,106),(84,85),(85,100),(86,108),(87,5),(100,1),(87,92),(88,106),(89,88),(90,102),(91,94),(47,1),(91,23),(92,99),(93,101),(94,59),(71,1),(94,26),(77,1),(94,2),(95,108),(96,87),(97,96),(98,86),(99,98),(100,92),(87,1),(100,15)]`
     if (mode === 'run') return `
-sol = Solution()
-got=",".join(map(str,sol.calculateSpan([100,80,60,70,60,75,85]))); exp="1,1,1,2,1,4,6"
+obj = StockSpanner()
+prices=[100,80,60,70,60,75,85]
+got=",".join(str(obj.next(p)) for p in prices); exp="1,1,1,2,1,4,6"
 print("\\n---RESULT---")
 print(f"RESULT:{'PASS' if got==exp else 'FAIL'}:{exp}:{got}")`
     if (mode === 'submit') return `
-sol = Solution()
-cases=[([100,80,60,70,60,75,85],"1,1,1,2,1,4,6"),([10,4,5,90,120,80],"1,1,2,4,5,1"),([1,2,3,4,5],"1,2,3,4,5"),([5,4,3,2,1],"1,1,1,1,1")]
 passed=0; res=[]
-for i,(p,exp) in enumerate(cases,1):
-    got=",".join(map(str,sol.calculateSpan(list(p)))); ok=got==exp; passed+=ok
-    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+def chk(n, prices, exp):
+    global passed
+    obj=StockSpanner(); got=",".join(str(obj.next(p)) for p in prices)
+    ok=got==exp; passed+=ok
+    res.append(f"TEST:{n}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+chk(1,[100,80,60,70,60,75,85],"1,1,1,2,1,4,6")
+chk(2,[10,4,5,90,120,80],"1,1,2,4,5,1")
+chk(3,[1,2,3,4,5],"1,2,3,4,5")
+chk(4,[5,4,3,2,1],"1,1,1,1,1")
+# hidden: 10k prices (real LeetCode test), verify sum of spans = 7874520
+runs=${runsLit}
+obj=StockSpanner(); s=sum(obj.next(v) for v,c in runs for _ in range(c))
+ok=(s==7874520); passed+=ok
+res.append(f"TEST:5:{'PASS' if ok else 'FAIL'}:7874520:{s}")
+# TLE sense: 10k strictly increasing prices — O(n^2) naive will time out
+obj=StockSpanner(); s=sum(obj.next(i) for i in range(1,10001))
+ok=(s==50005000); passed+=ok
+res.append(f"TEST:6:{'PASS' if ok else 'FAIL'}:50005000:{s}")
 print("\\n---RESULT---")
 for r in res: print(r)
-print(f"SUMMARY:{passed}:{len(cases)}")`
+print(f"SUMMARY:{passed}:6")`
     if (mode === 'custom') {
       const p = (customInput.trim()||'100 80 60 70 60 75 85').split(/\s+/).map(Number)
       return `
-sol = Solution()
-print(",".join(map(str,sol.calculateSpan([${p.join(',')}]))))`
+obj = StockSpanner()
+prices=[${p.join(',')}]
+print(",".join(str(obj.next(x)) for x in prices))`
     }
   },
 }
@@ -591,20 +604,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> h,int exp,int n){
-        int got=sol.largestRectangleArea(h); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({2,1,5,6,2,3},10,1);
-    chk({2,4},4,2);
-    chk({5},5,3);
-    chk({3,3,3,3},12,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> h={2,1,5,6,2,3};p(sol.largestRectangleArea(h),10,1);}
+    else if(tc==2){vector<int> h={2,4};p(sol.largestRectangleArea(h),4,2);}
+    else if(tc==3){vector<int> h={5};p(sol.largestRectangleArea(h),5,3);}
+    else if(tc==4){vector<int> h={3,3,3,3};p(sol.largestRectangleArea(h),12,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const h = (customInput.trim()||'2 1 5 6 2 3').split(/\s+/).map(Number)
@@ -694,20 +702,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> a,int exp,int n){
-        int got=sol.sumSubarrayMins(a); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({3,1,2,4},17,1);
-    chk({11,81,94,43,3},444,2);
-    chk({5},5,3);
-    chk({1,1,1},6,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> a={3,1,2,4};p(sol.sumSubarrayMins(a),17,1);}
+    else if(tc==2){vector<int> a={11,81,94,43,3};p(sol.sumSubarrayMins(a),444,2);}
+    else if(tc==3){vector<int> a={5};p(sol.sumSubarrayMins(a),5,3);}
+    else if(tc==4){vector<int> a={1,1,1};p(sol.sumSubarrayMins(a),6,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const a = (customInput.trim()||'3 1 2 4').split(/\s+/).map(Number)
@@ -797,20 +800,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<vector<char>> m,int exp,int n){
-        int got=sol.maximalRectangle(m); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({{'1','0','1','0','0'},{'1','0','1','1','1'},{'1','1','1','1','1'},{'1','0','0','1','0'}},6,1);
-    chk({{'0'}},0,2);
-    chk({{'1','1'},{'1','1'}},4,3);
-    chk({{'1','0','1','1','1'}},3,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<vector<char>> m={{'1','0','1','0','0'},{'1','0','1','1','1'},{'1','1','1','1','1'},{'1','0','0','1','0'}};p(sol.maximalRectangle(m),6,1);}
+    else if(tc==2){vector<vector<char>> m={{'0'}};p(sol.maximalRectangle(m),0,2);}
+    else if(tc==3){vector<vector<char>> m={{'1','1'},{'1','1'}};p(sol.maximalRectangle(m),4,3);}
+    else if(tc==4){vector<vector<char>> m={{'1','0','1','1','1'}};p(sol.maximalRectangle(m),3,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const rows = customInput.trim().split('\n').map(l => l.trim().split(/\s+/).map(c => c === '1' ? "'1'" : "'0'"))

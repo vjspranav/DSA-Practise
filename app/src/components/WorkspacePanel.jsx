@@ -215,17 +215,26 @@ export default function WorkspacePanel({
                           <span className="tr-case-num">Test {r.n}</span>
                         )}
                         <span className="tr-status">{r.passed ? 'PASS' : 'FAIL'}</span>
-                        <span className="tr-comparison">
-                          <span className="tr-field">
-                            <span className="tr-field-label">Expected</span>
-                            <code className="tr-value">{r.expected}</code>
+                        {r.expected === 'TLE' ? (
+                          <span className="tr-comparison">
+                            <span className="tr-field">
+                              <span className="tr-field-label">Time Limit Exceeded</span>
+                              <code className="tr-value wrong">{r.got}</code>
+                            </span>
                           </span>
-                          <span className="tr-sep">·</span>
-                          <span className="tr-field">
-                            <span className="tr-field-label">Got</span>
-                            <code className={`tr-value${!r.passed ? ' wrong' : ''}`}>{r.got}</code>
+                        ) : (
+                          <span className="tr-comparison">
+                            <span className="tr-field">
+                              <span className="tr-field-label">Expected</span>
+                              <code className="tr-value">{r.expected}</code>
+                            </span>
+                            <span className="tr-sep">·</span>
+                            <span className="tr-field">
+                              <span className="tr-field-label">Got</span>
+                              <code className={`tr-value${!r.passed ? ' wrong' : ''}`}>{r.got}</code>
+                            </span>
                           </span>
-                        </span>
+                        )}
                       </div>
                     ))}
                   </div>

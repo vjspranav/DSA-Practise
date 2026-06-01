@@ -91,23 +91,15 @@ int main() {
 }`;
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed = 0, total = 4;
-    vector<string> res;
-    auto chk = [&](vector<int> nums, int goal, int expected, int n) {
-        int got = sol.numSubarraysWithSum(nums, goal);
-        bool ok = got == expected;
-        passed += ok;
-        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + to_string(expected) + ":" + to_string(got));
-    };
-    chk({1,0,1,0,1}, 2, 4,  1);
-    chk({0,0,0,0,0}, 0, 15, 2);
-    chk({1,1,1,1},   2, 3,  3);
-    chk({1,0,0,1,1}, 2, 4,  4);
-    cout << "\\n---RESULT---\\n";
-    for (auto& s : res) cout << s << "\\n";
-    cout << "SUMMARY:" << passed << ":" << total << "\\n";
-    return passed == total ? 0 : 1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> v={1,0,1,0,1};p(sol.numSubarraysWithSum(v,2),4,1);}
+    else if(tc==2){vector<int> v={0,0,0,0,0};p(sol.numSubarraysWithSum(v,0),15,2);}
+    else if(tc==3){vector<int> v={1,1,1,1};p(sol.numSubarraysWithSum(v,2),3,3);}
+    else if(tc==4){vector<int> v={1,0,0,1,1};p(sol.numSubarraysWithSum(v,2),4,4);}
+    return 0;
 }`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -227,23 +219,15 @@ int main() {
 }`;
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed = 0, total = 4;
-    vector<string> res;
-    auto chk = [&](vector<int> pts, int k, int expected, int n) {
-        int got = sol.maxScore(pts, k);
-        bool ok = got == expected;
-        passed += ok;
-        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + to_string(expected) + ":" + to_string(got));
-    };
-    chk({1,2,3,4,5,6,1}, 3, 12, 1);
-    chk({2,2,2},          2, 4,  2);
-    chk({9,7,7,9,7,7,9},  7, 55, 3);
-    chk({1,1000,1},        1, 1,  4);
-    cout << "\\n---RESULT---\\n";
-    for (auto& s : res) cout << s << "\\n";
-    cout << "SUMMARY:" << passed << ":" << total << "\\n";
-    return passed == total ? 0 : 1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> v={1,2,3,4,5,6,1};p(sol.maxScore(v,3),12,1);}
+    else if(tc==2){vector<int> v={2,2,2};p(sol.maxScore(v,2),4,2);}
+    else if(tc==3){vector<int> v={9,7,7,9,7,7,9};p(sol.maxScore(v,7),55,3);}
+    else if(tc==4){vector<int> v={1,1000,1};p(sol.maxScore(v,1),1,4);}
+    return 0;
 }`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -353,23 +337,15 @@ int main() {
 }`;
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed = 0, total = 4;
-    vector<string> res;
-    auto chk = [&](vector<int> nums, int k, int expected, int n) {
-        int got = sol.subarraysWithKDistinct(nums, k);
-        bool ok = got == expected;
-        passed += ok;
-        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + to_string(expected) + ":" + to_string(got));
-    };
-    chk({1,2,1,2,3},   2, 7,  1);
-    chk({1,2,1,3,4},   3, 3,  2);
-    chk({1},           1, 1,  3);
-    chk({1,1,1,1,1},   1, 15, 4);
-    cout << "\\n---RESULT---\\n";
-    for (auto& s : res) cout << s << "\\n";
-    cout << "SUMMARY:" << passed << ":" << total << "\\n";
-    return passed == total ? 0 : 1;
+    cout<<"\\n---RESULT---\\n";
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> v={1,2,1,2,3};p(sol.subarraysWithKDistinct(v,2),7,1);}
+    else if(tc==2){vector<int> v={1,2,1,3,4};p(sol.subarraysWithKDistinct(v,3),3,2);}
+    else if(tc==3){vector<int> v={1};p(sol.subarraysWithKDistinct(v,1),1,3);}
+    else if(tc==4){vector<int> v={1,1,1,1,1};p(sol.subarraysWithKDistinct(v,1),15,4);}
+    return 0;
 }`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -483,23 +459,15 @@ int main() {
 }`;
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed = 0, total = 4;
-    vector<string> res;
-    auto chk = [&](string s, string t, string expected, int n) {
-        string got = sol.minWindow(s, t);
-        bool ok = got == expected;
-        passed += ok;
-        res.push_back(string("TEST:") + to_string(n) + (ok ? ":PASS:" : ":FAIL:") + expected + ":" + got);
-    };
-    chk("abcdebdde",                  "bde",  "bcde",       1);
-    chk("xyzabc",                     "abc",  "abc",        2);
-    chk("aa",                         "aa",   "aa",         3);
-    chk("fgrqsqsnodwmxzkzxwqegkndaa", "kzed", "kzxwqegknd", 4);
-    cout << "\\n---RESULT---\\n";
-    for (auto& s : res) cout << s << "\\n";
-    cout << "SUMMARY:" << passed << ":" << total << "\\n";
-    return passed == total ? 0 : 1;
+    cout<<"\\n---RESULT---\\n";
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1) ps(sol.minWindow("abcdebdde","bde"),"bcde",1);
+    else if(tc==2) ps(sol.minWindow("xyzabc","abc"),"abc",2);
+    else if(tc==3) ps(sol.minWindow("aa","aa"),"aa",3);
+    else if(tc==4) ps(sol.minWindow("fgrqsqsnodwmxzkzxwqegkndaa","kzed"),"kzxwqegknd",4);
+    return 0;
 }`;
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n');
@@ -508,7 +476,7 @@ int main() {
       return `
 int main() {
     Solution sol;
-    cout << "\\"" << sol.minWindow("${s}", "${t}") << "\\"\\n";
+    cout << sol.minWindow("${s}", "${t}") << "\\n";
     return 0;
 }`;
     }
@@ -596,20 +564,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> f,int exp,int n){
-        int got=sol.totalFruit(f); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({1,2,1},3,1);
-    chk({0,1,2,2},3,2);
-    chk({1,1,1,1},4,3);
-    chk({1,2,3,2,2},4,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> f={1,2,1};p(sol.totalFruit(f),3,1);}
+    else if(tc==2){vector<int> f={0,1,2,2};p(sol.totalFruit(f),3,2);}
+    else if(tc==3){vector<int> f={1,1,1,1};p(sol.totalFruit(f),4,3);}
+    else if(tc==4){vector<int> f={1,2,3,2,2};p(sol.totalFruit(f),4,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const f = (customInput.trim()||'1 2 1').split(/\s+/).map(Number)
@@ -700,20 +663,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](vector<int> n,int k,int exp,int t){
-        int got=sol.numberOfSubarrays(n,k); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(t)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk({1,1,2,1,1},3,2,1);
-    chk({2,4,6},1,0,2);
-    chk({1,2,3,4,5},1,8,3);
-    chk({1,1,1,1,1},2,4,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> n={1,1,2,1,1};p(sol.numberOfSubarrays(n,3),2,1);}
+    else if(tc==2){vector<int> n={2,4,6};p(sol.numberOfSubarrays(n,1),0,2);}
+    else if(tc==3){vector<int> n={1,2,3,4,5};p(sol.numberOfSubarrays(n,1),8,3);}
+    else if(tc==4){vector<int> n={1,1,1,1,1};p(sol.numberOfSubarrays(n,2),4,4);}
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')
@@ -804,20 +762,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](string s,int exp,int n){
-        int got=sol.numberOfSubstrings(s); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+to_string(exp)+":"+to_string(got));
-    };
-    chk("abcabc",10,1);
-    chk("aaacb",3,2);
-    chk("abc",1,3);
-    chk("aabbcc",4,4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto p=[&](int g,int e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1) p(sol.numberOfSubstrings("abcabc"),10,1);
+    else if(tc==2) p(sol.numberOfSubstrings("aaacb"),3,2);
+    else if(tc==3) p(sol.numberOfSubstrings("abc"),1,3);
+    else if(tc==4) p(sol.numberOfSubstrings("aabbcc"),4,4);
+    return 0;
 }`
     if (mode === 'custom') {
       const s = customInput.trim() || 'abcabc'
@@ -905,20 +858,15 @@ int main() {
 }`
     if (mode === 'submit') return `
 int main() {
+    int tc; cin>>tc;
     Solution sol;
-    int passed=0,total=4; vector<string> res;
-    auto chk=[&](string s,string t,string exp,int n){
-        string got=sol.minWindow(s,t); bool ok=got==exp; passed+=ok;
-        res.push_back("TEST:"+to_string(n)+(ok?":PASS:":":FAIL:")+exp+":"+got);
-    };
-    chk("ADOBECODEBANC","ABC","BANC",1);
-    chk("a","a","a",2);
-    chk("a","aa","",3);
-    chk("abc","abc","abc",4);
     cout<<"\\n---RESULT---\\n";
-    for(auto& s:res) cout<<s<<"\\n";
-    cout<<"SUMMARY:"<<passed<<":"<<total<<"\\n";
-    return passed==total?0:1;
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1) ps(sol.minWindow("ADOBECODEBANC","ABC"),"BANC",1);
+    else if(tc==2) ps(sol.minWindow("a","a"),"a",2);
+    else if(tc==3) ps(sol.minWindow("a","aa"),"",3);
+    else if(tc==4) ps(sol.minWindow("abc","abc"),"abc",4);
+    return 0;
 }`
     if (mode === 'custom') {
       const lines = customInput.trim().split('\n')

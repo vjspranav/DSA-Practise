@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import _ from 'lodash'
 import { PROBLEMS, CATEGORIES } from './data/problems'
-import { buildCode } from './runtime/executor'
+import { buildCode, compileLinkOnly, runWasm } from './runtime/executor'
 import { usePracticeStore } from './hooks/usePracticeStore'
 import Sidebar from './components/Sidebar'
 import ProblemPanel from './components/ProblemPanel'
@@ -15,7 +15,10 @@ window._ = _
 const initStatuses = { pyodide: 'loading', 'wasm-clang': 'loading' }
 
 export default function App() {
-  const [selectedProblem, setSelectedProblem] = useState(PROBLEMS[0])
+  const [selectedProblem, setSelectedProblem] = useState(() => {
+    const lastId = localStorage.getItem('dsa-last-problem')
+    return PROBLEMS.find(p => p.id === lastId) ?? PROBLEMS[0]
+  })
   const [language, setLanguage]               = useState('cpp')
   const [running, setRunning]                 = useState(false)
   const [runMode, setRunMode]                 = useState(null)
@@ -52,7 +55,7 @@ export default function App() {
     const state = { port: port1, handlers: {}, onWrite: null }
     port1.onmessage = ({ data: { id, responseId, data } }) => {
       if (id === 'write') state.onWrite?.(data)
-      else if (id === 'compileLinkRunDone') {
+      else if (id === 'compileLinkRunDone' || id === 'compileLinkOnlyDone' || id === 'runWasmDone') {
         const resolve = state.handlers[responseId]
         if (resolve) { resolve(data); delete state.handlers[responseId] }
       }
@@ -74,10 +77,60 @@ export default function App() {
 
     const lines = []
     const push = (text, cls = 'stdout') => lines.push({ text, cls })
+    const t0 = performance.now()
 
     try {
-      if (language === 'python') await runPython(full, push)
-      else                       await runWasmClang(full, push, mode)
+      if (language === 'python') {
+        await runPython(full, push)
+        if (mode === 'submit') {
+          const elapsed = performance.now() - t0
+          console.group(`[submit] ${selectedProblem.id} — ${elapsed.toFixed(0)}ms (python, batch)`)
+          for (const { text } of lines) {
+            const m = text.trim().match(/^TEST:(\d+):(PASS|FAIL):(.+):(.+)$/)
+            if (m) console.log(`  test ${m[1]} ${m[2] === 'PASS' ? '✓' : '✗'}  expected=${m[3]}  got=${m[4]}`)
+          }
+          console.groupEnd()
+        }
+      } else if (mode === 'submit') {
+        // C++ submit: compile once, run each test case separately with per-test timing
+        const testCount = selectedProblem.submitTestCount ?? selectedProblem.testCases.length
+        const timeLimitMs = selectedProblem.submitTimeLimitMs
+
+        const compiled = await compileLinkOnly(wasmClangRef.current, wasmClangMsgId, full, push)
+        if (compiled) {
+          const testLines = []
+          let totalPassed = 0
+
+          console.group(`[submit] ${selectedProblem.id}${timeLimitMs ? ` (TLE limit ${timeLimitMs}ms/test)` : ''}`)
+          for (let tc = 1; tc <= testCount; tc++) {
+            const t0tc = performance.now()
+            const tcLines = []
+            const tcPush = (text, cls = 'stdout') => tcLines.push({ text, cls })
+            await runWasm(wasmClangRef.current, wasmClangMsgId, `${tc}\n`, tcPush)
+            const elapsed = performance.now() - t0tc
+
+            const testLine = tcLines.find(l => l.text.trim().startsWith(`TEST:${tc}:`))
+            if (testLine) {
+              if (timeLimitMs && elapsed > timeLimitMs) {
+                testLines.push({ ...testLine, text: `TEST:${tc}:FAIL:TLE:${Math.round(elapsed)}ms\n` })
+                console.log(`  test ${tc} ✗ TLE  ${Math.round(elapsed)}ms`)
+              } else {
+                if (testLine.text.includes(':PASS:')) totalPassed++
+                testLines.push(testLine)
+                const m = testLine.text.trim().match(/^TEST:(\d+):(PASS|FAIL):(.+):(.+)$/)
+                if (m) console.log(`  test ${tc} ${m[2] === 'PASS' ? '✓' : '✗'}  ${elapsed.toFixed(0)}ms  expected=${m[3]}  got=${m[4]}`)
+              }
+            }
+          }
+          console.groupEnd()
+
+          push('\n---RESULT---\n')
+          for (const l of testLines) lines.push(l)
+          push(`SUMMARY:${totalPassed}:${testCount}\n`)
+        }
+      } else {
+        await runWasmClang(full, push, mode)
+      }
     } catch (err) {
       push('[Error] ' + err.message + '\n', 'stderr')
     }
@@ -129,6 +182,7 @@ export default function App() {
 
   // ── Problem / language switch ──────────────────────────────────────────────
   function handleProblemSelect(problem) {
+    localStorage.setItem('dsa-last-problem', problem.id)
     setSelectedProblem(problem)
     setResults(null)
   }
