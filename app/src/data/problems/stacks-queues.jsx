@@ -858,7 +858,7 @@ const nextSmallerElement = {
   title: 'Next Smaller Element',
   difficulty: 'Medium',
   category: 'stacks-queues',
-  askedBy: 'vjs',
+  askedBy: 'bonus',
   description: [
     'Given an array of integers, for each element find the nearest element to its <strong>right</strong> that is strictly smaller than it.',
     'Return an array where <code>result[i]</code> is the next smaller element of <code>arr[i]</code>, or <code>-1</code> if none exists.',

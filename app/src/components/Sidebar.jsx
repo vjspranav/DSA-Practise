@@ -49,7 +49,7 @@ export default function Sidebar({
                         <span className="problem-item-title">{p.title}</span>
                         <span className="problem-item-meta">
                           <span className={`asked-pill ${p.askedBy}`}>
-                            {p.askedBy === 'himali' ? 'H' : 'V'}
+                            {p.askedBy === 'himali' ? 'H' : p.askedBy === 'vjs' ? 'V' : '★'}
                           </span>
                           <span className={`status-badge ${status || 'none'}`}>
                             {status === 'complete' ? '✓' : status === 'revise' ? '↩' : '○'}
