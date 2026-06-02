@@ -852,7 +852,112 @@ print(sol.maximalRectangle(m))`
   },
 }
 
-export const PROBLEMS = [trappingRainWater, asteroidCollision, celebrityProblem, lfuCache, stockSpan, largestRectangle, subarrayMins, maxRectangle]
+// ── 9. Next Smaller Element ──────────────────────────────────────────────
+const nextSmallerElement = {
+  id: 'next-smaller-element',
+  title: 'Next Smaller Element',
+  difficulty: 'Medium',
+  category: 'stacks-queues',
+  askedBy: 'vjs',
+  description: [
+    'Given an array of integers, for each element find the nearest element to its <strong>right</strong> that is strictly smaller than it.',
+    'Return an array where <code>result[i]</code> is the next smaller element of <code>arr[i]</code>, or <code>-1</code> if none exists.',
+    '<em>This is the core building block behind Stock Span, Largest Rectangle, and Sum of Subarray Minimums.</em>',
+  ],
+  examples: [
+    { input: 'arr=[4,8,5,2,6,3]', output: '[2,5,2,-1,3,-1]', explanation: 'NSE of 4 is 2, NSE of 8 is 5, NSE of 2 is -1 (nothing smaller to its right).' },
+    { input: 'arr=[5,4,3,2,1]',   output: '[4,3,2,1,-1]',    explanation: 'Each element\'s NSE is the next one, except the last.' },
+  ],
+  constraints: ['1 ≤ arr.length ≤ 10⁵', '0 ≤ arr[i] ≤ 10⁶'],
+  hints: [
+    'Brute force: for each element scan right until finding a smaller one — O(n²).',
+    'Optimal: maintain a monotonic stack of indices whose NSE hasn\'t been found yet.',
+    'Iterate left → right. For each element, pop all stack indices where arr[index] > arr[i] — arr[i] is their NSE.',
+    'After the loop, anything remaining on the stack has NSE = -1.',
+    'Each element is pushed and popped at most once → O(n) total.',
+  ],
+  inputFormat: 'Line 1: space-separated integers',
+  defaultCustomInput: '4 8 5 2 6 3',
+  testCases: [
+    { label: 'Mixed',       input: 'arr=[4,8,5,2,6,3]',  expected: '2,5,2,-1,3,-1'    },
+    { label: 'Decreasing',  input: 'arr=[5,4,3,2,1]',    expected: '4,3,2,1,-1'        },
+    { label: 'Increasing',  input: 'arr=[1,2,3,4,5]',    expected: '-1,-1,-1,-1,-1'    },
+    { label: 'With zeros',  input: 'arr=[3,1,2,4,0]',    expected: '1,0,0,0,-1'        },
+  ],
+  cppStarter: `class Solution {
+public:
+    vector<int> nextSmallerElement(vector<int>& arr) {
+
+    }
+};`,
+  pythonStarter: `from typing import List
+
+class Solution:
+    def nextSmallerElement(self, arr: List[int]) -> List[int]:
+        `,
+  buildCppHarness(mode, customInput = '') {
+    const fmtV = `auto fmtV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};`
+    if (mode === 'run') return `
+int main() {
+    Solution sol; ${fmtV}
+    vector<int> a={4,8,5,2,6,3};
+    string got=fmtV(sol.nextSmallerElement(a)), exp="2,5,2,-1,3,-1";
+    cout<<"\\n---RESULT---\\n";
+    if(got==exp) cout<<"RESULT:PASS:"<<exp<<":"<<got<<"\\n";
+    else         cout<<"RESULT:FAIL:"<<exp<<":"<<got<<"\\n";
+    return 0;
+}`
+    if (mode === 'submit') return `
+int main() {
+    int tc; cin>>tc;
+    Solution sol;
+    auto fmtV=[](vector<int> v){string s;for(int i=0;i<(int)v.size();i++){if(i)s+=",";s+=to_string(v[i]);}return s;};
+    cout<<"\\n---RESULT---\\n";
+    auto ps=[&](string g,string e,int n){bool ok=g==e;cout<<"TEST:"<<n<<":"<<(ok?"PASS:":"FAIL:")<<e<<":"<<g<<"\\n";};
+    if(tc==1){vector<int> a={4,8,5,2,6,3};ps(fmtV(sol.nextSmallerElement(a)),"2,5,2,-1,3,-1",1);}
+    else if(tc==2){vector<int> a={5,4,3,2,1};ps(fmtV(sol.nextSmallerElement(a)),"4,3,2,1,-1",2);}
+    else if(tc==3){vector<int> a={1,2,3,4,5};ps(fmtV(sol.nextSmallerElement(a)),"-1,-1,-1,-1,-1",3);}
+    else if(tc==4){vector<int> a={3,1,2,4,0};ps(fmtV(sol.nextSmallerElement(a)),"1,0,0,0,-1",4);}
+    return 0;
+}`
+    if (mode === 'custom') {
+      const a = (customInput.trim()||'4 8 5 2 6 3').split(/\s+/).map(Number)
+      return `
+int main() {
+    Solution sol;
+    vector<int> a={${join(a)}};
+    auto r=sol.nextSmallerElement(a);
+    for(int i=0;i<(int)r.size();i++){if(i)cout<<",";cout<<r[i];}cout<<"\\n";
+    return 0;
+}`
+    }
+  },
+  buildPythonHarness(mode, customInput = '') {
+    if (mode === 'run') return `
+sol = Solution()
+got=",".join(map(str,sol.nextSmallerElement([4,8,5,2,6,3]))); exp="2,5,2,-1,3,-1"
+print("\\n---RESULT---")
+print(f"RESULT:{'PASS' if got==exp else 'FAIL'}:{exp}:{got}")`
+    if (mode === 'submit') return `
+sol = Solution()
+cases=[([4,8,5,2,6,3],"2,5,2,-1,3,-1"),([5,4,3,2,1],"4,3,2,1,-1"),([1,2,3,4,5],"-1,-1,-1,-1,-1"),([3,1,2,4,0],"1,0,0,0,-1")]
+passed=0; res=[]
+for i,(a,exp) in enumerate(cases,1):
+    got=",".join(map(str,sol.nextSmallerElement(list(a)))); ok=got==exp; passed+=ok
+    res.append(f"TEST:{i}:{'PASS' if ok else 'FAIL'}:{exp}:{got}")
+print("\\n---RESULT---")
+for r in res: print(r)
+print(f"SUMMARY:{passed}:{len(cases)}")`
+    if (mode === 'custom') {
+      const a = (customInput.trim()||'4 8 5 2 6 3').split(/\s+/).map(Number)
+      return `
+sol = Solution()
+print(",".join(map(str,sol.nextSmallerElement([${a.join(',')}]))))`
+    }
+  },
+}
+
+export const PROBLEMS = [trappingRainWater, asteroidCollision, celebrityProblem, lfuCache, stockSpan, largestRectangle, subarrayMins, maxRectangle, nextSmallerElement]
 
 function TrappingRainWaterViz() {
   return <HistogramViz heights={[0,1,0,2,1,0,1,3,2,1,2,1]} waterFill={true} label="Blue bars = water trapped above each column" />
@@ -936,8 +1041,48 @@ function MaxRectangleViz() {
   )
 }
 
+function NextSmallerViz() {
+  const arr = [4, 8, 5, 2, 6, 3]
+  const nse = [2, 5, 2, -1, 3, -1]
+  const bs = 18, bg = 3, cg = 10
+  const colW = bs + cg, rowH = bs + bg
+  const maxH = Math.max(...arr)
+  const svgW = arr.length * colW - cg
+  const svgH = maxH * rowH + 22
+
+  return (
+    <div className="viz-label-wrap">
+      <div className="viz-label">[4,8,5,2,6,3] → NSE: [2,5,2,–1,3,–1]</div>
+      <svg viewBox={`0 0 ${svgW} ${svgH}`} width={svgW} height={svgH}>
+        {arr.map((h, col) => (
+          <g key={col}>
+            {Array.from({ length: h }, (_, row) => {
+              const isNseRow = nse[col] !== -1 && row === 0
+              return (
+                <rect key={row}
+                  x={col * colW} y={(maxH - 1 - row) * rowH}
+                  width={bs} height={bs}
+                  fill={isNseRow ? 'var(--warn)' : 'var(--accent)'}
+                  opacity={isNseRow ? 0.9 : 0.4}
+                  rx={3}
+                />
+              )
+            })}
+            <text x={col * colW + bs / 2} y={svgH - 4} textAnchor="middle"
+              fontSize={10} fill={nse[col] === -1 ? 'var(--error)' : 'var(--success)'}
+              fontFamily="monospace" fontWeight="bold">
+              {nse[col] === -1 ? '–1' : nse[col]}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  )
+}
+
 export const VIZ = {
   'trapping-rain-water': () => <TrappingRainWaterViz />,
   'largest-rectangle-histogram': () => <LargestRectangleViz />,
   'maximum-rectangle': () => <MaxRectangleViz />,
+  'next-smaller-element': () => <NextSmallerViz />,
 }

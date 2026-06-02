@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Next Smaller Element — Monotonic Stack</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:       #1e1e2e;
+  --surface:  #313244;
+  --surface2: #45475a;
+  --accent:   #89b4fa;
+  --success:  #a6e3a1;
+  --warn:     #fab387;
+  --error:    #f38ba8;
+  --text:     #cdd6f4;
+  --muted:    #9399b2;
+  --dim:      #6c7086;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px;
+}
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 720px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+.section { margin-bottom: 24px; }
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 10px;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 12px; height: 12px; border-radius: 3px;
+}
+
+/* Array & Result rows */
+.boxes {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.cell-idx { font-size: 11px; font-family: monospace; color: var(--dim); }
+
+.box {
+  width: 56px; height: 52px;
+  border-radius: 10px;
+  border: 2px solid var(--surface2);
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; font-family: monospace;
+  color: var(--muted);
+  transition: background .25s, border-color .25s, color .25s, box-shadow .25s;
+}
+.box.current {
+  border-color: var(--warn);
+  background: rgba(250,179,135,.1);
+  color: var(--warn);
+  box-shadow: 0 0 14px rgba(250,179,135,.35);
+}
+.box.on-stack {
+  border-color: var(--accent);
+  background: rgba(137,180,250,.08);
+  color: var(--accent);
+}
+.box.popped {
+  border-color: var(--error);
+  background: rgba(243,139,168,.15);
+  color: var(--error);
+  box-shadow: 0 0 14px rgba(243,139,168,.35);
+}
+.box.done {
+  border-color: var(--success);
+  background: rgba(166,227,161,.07);
+  color: var(--success);
+}
+.box.just-done {
+  border-color: var(--success);
+  background: rgba(166,227,161,.2);
+  color: var(--success);
+  box-shadow: 0 0 14px rgba(166,227,161,.35);
+}
+
+/* Stack */
+.stack-wrap {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+}
+.stack-empty { font-size: 13px; color: var(--dim); font-style: italic; }
+.stack-row { display: flex; align-items: center; gap: 0; }
+.stack-item { display: flex; align-items: center; }
+.stack-box {
+  width: 58px; height: 56px;
+  border-radius: 10px;
+  border: 2px solid var(--accent);
+  background: rgba(137,180,250,.08);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+  transition: all .2s;
+}
+.stack-box.stack-top {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(137,180,250,.3);
+}
+.stack-val { font-size: 18px; font-weight: 700; font-family: monospace; color: var(--accent); }
+.stack-sub { font-size: 10px; color: var(--muted); font-family: monospace; }
+.stack-sep {
+  font-size: 13px;
+  color: var(--dim);
+  padding: 0 5px;
+  padding-bottom: 2px;
+}
+
+/* Result box variant */
+.rbox {
+  width: 56px; height: 44px;
+  border-radius: 10px;
+  border: 2px solid var(--surface2);
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; font-family: monospace;
+  color: var(--dim);
+  transition: all .25s;
+}
+.rbox.rfilled { border-color: var(--success); color: var(--success); background: rgba(166,227,161,.07); }
+.rbox.rjust   { border-color: var(--success); color: var(--success); background: rgba(166,227,161,.22); box-shadow: 0 0 12px rgba(166,227,161,.3); }
+
+/* Action */
+.action {
+  background: var(--bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+  min-height: 60px;
+  margin-bottom: 24px;
+  transition: border-color .3s;
+}
+.action.pop-action  { border-color: var(--error); }
+.action.push-action { border-color: var(--success); }
+.action.end-action  { border-color: var(--dim); }
+
+/* Controls */
+.controls { display: flex; align-items: center; gap: 14px; }
+.btn {
+  padding: 10px 22px; border-radius: 8px; border: none;
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.btn-prev { background: var(--surface2); color: var(--text); }
+.btn-prev:hover:not(:disabled) { background: #585b70; }
+.btn-next { background: var(--accent); color: #1e1e2e; }
+.btn-next:hover:not(:disabled) { background: #b4d0ff; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.step-info { flex: 1; text-align: center; }
+.progress { display: flex; gap: 4px; justify-content: center; margin-bottom: 5px; flex-wrap: wrap; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--surface2); transition: background .2s; }
+.dot.past   { background: var(--dim); }
+.dot.active { background: var(--accent); }
+.step-count { font-size: 12px; color: var(--muted); }
+
+.hint { font-size: 11px; color: var(--dim); text-align: center; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Next Smaller Element</h1>
+  <p class="subtitle">For each element, find the first smaller element to its right — using a monotonic stack.</p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div> processing now</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> waiting on stack</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--error)"></div> NSE just found (popped)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div> result known</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Array</div>
+    <div class="boxes" id="arr-boxes"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Stack <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--dim)"> — bottom → top</span></div>
+    <div class="stack-wrap">
+      <div class="stack-row" id="stack-row"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Result (NSE)</div>
+    <div class="boxes" id="result-boxes"></div>
+  </div>
+
+  <div class="action" id="action"></div>
+
+  <div class="controls">
+    <button class="btn btn-prev" id="btn-prev" onclick="move(-1)">← Prev</button>
+    <div class="step-info">
+      <div class="progress" id="progress"></div>
+      <div class="step-count" id="step-count"></div>
+    </div>
+    <button class="btn btn-next" id="btn-next" onclick="move(1)">Next →</button>
+  </div>
+  <p class="hint">← → arrow keys also work</p>
+</div>
+
+<script>
+const arr = [4, 8, 5, 2, 6, 3];
+
+// ── Build steps ──────────────────────────────────────────────────────
+const steps = [];
+
+function addStep({ current = -1, stack, result, action, type = '', popped = null, pushed = null }) {
+  steps.push({ current, stack: [...stack], result: [...result], action, type, popped, pushed });
+}
+
+(function build() {
+  const result = new Array(arr.length).fill(null);
+  const stack  = [];  // indices
+
+  addStep({ stack, result, type: 'start',
+    action: `Initial state. Stack is empty. We'll scan left → right and use the stack to track elements whose NSE we haven't found yet.`
+  });
+
+  for (let i = 0; i < arr.length; i++) {
+    let firstForThisI = true;
+
+    // Pop phase — resolve elements whose NSE is arr[i]
+    while (stack.length && arr[stack.at(-1)] > arr[i]) {
+      const top = stack.pop();
+      result[top] = arr[i];
+      addStep({ current: i, stack, result, type: 'pop', popped: top,
+        action: `i=${i}, val=${arr[i]}. Top of stack is index ${top} (val=${arr[top]}). ` +
+                `${arr[top]} > ${arr[i]}, so NSE of ${arr[top]} is ${arr[i]}. ` +
+                `Pop index ${top} → result[${top}] = ${arr[i]}.`
+      });
+      firstForThisI = false;
+    }
+
+    // Push phase
+    const stopReason = !firstForThisI
+      ? (stack.length
+          ? `arr[${stack.at(-1)}]=${arr[stack.at(-1)]} ≤ ${arr[i]}, stop popping. `
+          : `Stack now empty. `)
+      : '';
+    stack.push(i);
+    addStep({ current: i, stack, result, type: 'push', pushed: i,
+      action: firstForThisI
+        ? `i=${i}, val=${arr[i]}. ` +
+          (stack.length === 1
+            ? `Stack was empty. Push index ${i} onto stack.`
+            : `arr[${stack.at(-2)}]=${arr[stack.at(-2)]} ≤ ${arr[i]}, no pop needed. Push index ${i} onto stack.`)
+        : `${stopReason}Push index ${i} onto stack.`
+    });
+  }
+
+  // Finalize — remaining stack items have no NSE
+  const leftover = [...stack];
+  addStep({ stack: [], result, type: 'end',
+    action: `End of array. Indices [${leftover.join(', ')}] remain in the stack — no element to their right is smaller. Their NSE = –1. ` +
+            `Final: [${result.map(v => v ?? '–1').join(', ')}].`
+  });
+})();
+
+// ── Render ───────────────────────────────────────────────────────────
+let idx = 0;
+
+function render() {
+  const s = steps[idx];
+  const stackSet = new Set(s.stack);
+
+  // Array boxes
+  const arrEl = document.getElementById('arr-boxes');
+  arrEl.innerHTML = arr.map((v, i) => {
+    let cls = '';
+    if (i === s.popped)                  cls = 'popped';
+    else if (i === s.current)            cls = 'current';
+    else if (stackSet.has(i))            cls = 'on-stack';
+    else if (s.result[i] !== null)       cls = 'done';
+    return `<div class="cell">
+      <div class="box ${cls}">${v}</div>
+      <div class="cell-idx">[${i}]</div>
+    </div>`;
+  }).join('');
+
+  // Stack
+  const stackEl = document.getElementById('stack-row');
+  if (!s.stack.length) {
+    stackEl.innerHTML = '<span class="stack-empty">empty</span>';
+  } else {
+    stackEl.innerHTML = s.stack.map((si, pos) => {
+      const isTop = pos === s.stack.length - 1;
+      return `
+        ${pos > 0 ? '<span class="stack-sep">→</span>' : ''}
+        <div class="stack-item">
+          <div class="stack-box ${isTop ? 'stack-top' : ''}">
+            <span class="stack-val">${arr[si]}</span>
+            <span class="stack-sub">i=${si}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // Result boxes
+  const resEl = document.getElementById('result-boxes');
+  resEl.innerHTML = arr.map((_, i) => {
+    const v = s.result[i];
+    let cls = '', display = '?';
+    if (v !== null) {
+      display = v === -1 ? '–1' : v;
+      cls = i === s.popped ? 'rjust' : 'rfilled';
+    }
+    return `<div class="rbox ${cls}">${display}</div>`;
+  }).join('');
+
+  // Action
+  const actionEl = document.getElementById('action');
+  actionEl.textContent = s.action;
+  actionEl.className = 'action ' +
+    (s.type === 'pop'  ? 'pop-action'  :
+     s.type === 'push' ? 'push-action' :
+     s.type === 'end'  ? 'end-action'  : '');
+
+  // Progress
+  document.getElementById('progress').innerHTML =
+    steps.map((_, i) =>
+      `<div class="dot ${i < idx ? 'past' : i === idx ? 'active' : ''}"></div>`
+    ).join('');
+  document.getElementById('step-count').textContent = `Step ${idx + 1} of ${steps.length}`;
+
+  // Buttons
+  document.getElementById('btn-prev').disabled = idx === 0;
+  document.getElementById('btn-next').disabled = idx === steps.length - 1;
+}
+
+function move(d) {
+  idx = Math.max(0, Math.min(steps.length - 1, idx + d));
+  render();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   move(-1);
+});
+
+render();
+</script>
+</body>
+</html>
