@@ -1,0 +1,227 @@
+import { useEffect, useRef, useState } from 'react'
+import CodeEditor from './CodeEditor'
+import HelpPanel from './HelpPanel'
+import { ResultsBody } from './Results'
+import { assembleSource, forbiddenHit, judge, splitOutput } from './grade'
+import { compile, exclusive, limitFor, runTest } from './runner'
+import { vt } from './motion'
+import { STAGES } from '../data/foundations/index.js'
+
+const KIND = { program: 'Write the whole program', implement: 'Write the function', drill: 'Quick drill', bugfix: 'Find the bug' }
+const KIND_ICON = { program: 'terminal', implement: 'function', drill: 'bolt', bugfix: 'bug_report' }
+const TABS = [['refresher', 'menu_book', 'Refresher'], ['hints', 'lightbulb', 'Hints'], ['answer', 'lock', 'Answer']]
+
+const initUi = key => ({
+  key, res: null, sel: null, tab: null, panelTab: null, nudge: false,
+  hintsShown: 1, lastHint: 0, busy: null, justUnlocked: false,
+})
+
+// Compiler errors refer to the assembled source; point them at the learner's own lines.
+function mapErrors(lesson, text) {
+  if (lesson.kind === 'program') return text
+  const MARK = '\u0001'
+  const before = assembleSource(lesson, MARK).split(MARK)[0]
+  const offset = before.split('\n').length - 1
+  return text.replace(/(^|\n)[^\s:]*?:(\d+):(\d+):/g, (m, nl, line, col) => {
+    const n = Number(line) - offset
+    return n >= 1 ? `${nl}line ${n}, col ${col}:` : m
+  })
+}
+
+export default function Workbench({ lesson, next, redoMode, rec, theme, store, onPick, onPassed }) {
+  const key = `${lesson.id}:${redoMode ? 'redo' : 'main'}`
+  const [ui, setUi] = useState(() => initUi(key))
+  const [cursor, setCursor] = useState([1, 1])
+  const u = ui.key === key ? ui : initUi(key)
+  if (ui.key !== key) setUi(u)
+
+  const patch = (k, p) => setUi(s => (s.key === k ? { ...s, ...(typeof p === 'function' ? p(s) : p) } : s))
+
+  const starter = lesson.starter ?? ''
+  const code = redoMode ? (rec.redoCode ?? starter) : (rec.code ?? starter)
+  const tries = redoMode ? rec.redoMisses : rec.misses
+  const passed = redoMode ? rec.redoPassed : !!rec.passedAt
+  const unlocked = passed || tries >= 3
+
+  const live = useRef({})
+
+  useEffect(() => { live.current = { code, u, check: () => run('check') } })
+
+  useEffect(() => {
+    const onKey = e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); live.current.check?.() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  async function run(mode) {
+    const cur = live.current.u
+    if (cur.busy || cur.key !== key) return
+    const src = live.current.code
+    const msg = forbiddenHit(lesson, src)
+    if (msg) { patch(key, { res: { kind: 'forbidden', msg }, sel: null }); return }
+    patch(key, { busy: mode, nudge: false, sel: null })
+
+    const tests = mode === 'run' ? lesson.tests.slice(0, 1) : lesson.tests
+    const outcome = await exclusive(async () => {
+      const c = await compile(assembleSource(lesson, src))
+      if (!c.ok) return { compileError: mapErrors(lesson, c.error) }
+      const results = []
+      let dead = false
+      for (const t of tests) {
+        const base = {
+          name: t.name, expected: t.expected,
+          input: (t.input ?? (lesson.kind === 'program' ? t.stdin : undefined))?.replace(/\n+$/, ''),
+        }
+        if (dead) { results.push({ ...base, status: 'skipped' }); continue }
+        const r = await runTest(t.stdin ?? '', limitFor(lesson))
+        if (r.status === 'tle') { dead = true; results.push({ ...base, status: 'tle' }) }
+        else if (r.status === 'error') results.push({ ...base, status: 'error', message: r.message })
+        else {
+          const j = judge(lesson, t, r.stdout)
+          const raw = lesson.kind === 'program' ? r.stdout : splitOutput(lesson, r.stdout).printed
+          results.push({ ...base, status: j.pass ? 'ok' : 'fail', got: j.got, printed: j.printed, raw: raw.trim() })
+        }
+      }
+      return { results }
+    })
+
+    if (outcome.compileError != null) {
+      patch(key, { busy: null, res: { kind: 'compile', text: outcome.compileError } })
+      return
+    }
+    const results = outcome.results
+    if (mode === 'run') {
+      patch(key, { busy: null, res: { kind: 'run', test: results[0], raw: results[0].raw ?? results[0].message ?? '' } })
+      return
+    }
+    const win = results.every(t => t.status === 'ok')
+    const hadSide = !!live.current.u.tab
+    if (win) {
+      store.recordPass(lesson.id, redoMode)
+      onPassed(lesson.id, redoMode ? !rec.redoPassed : !rec.passedAt)
+      const p = { busy: null, res: { kind: 'check', tests: results, win }, nudge: false, justUnlocked: true, tab: 'answer', panelTab: 'answer' }
+      if (hadSide) vt(() => patch(key, p)); else patch(key, p)
+      setTimeout(() => patch(key, { justUnlocked: false }), 1200)
+    } else {
+      store.recordMiss(lesson.id, redoMode)
+      patch(key, { busy: null, res: { kind: 'check', tests: results, win }, justUnlocked: tries + 1 === 3 })
+      setTimeout(() => patch(key, s => ({ nudge: s.tab !== 'hints' && s.tab !== 'answer' })), 700)
+      if (tries + 1 === 3) setTimeout(() => patch(key, { justUnlocked: false }), 1200)
+    }
+  }
+
+  function toggleTab(t) {
+    const was = u.tab, nextTab = was === t ? null : t
+    const base = { lastHint: 0, ...(nextTab === 'hints' || nextTab === 'answer' ? { nudge: false } : {}) }
+    if (was && nextTab) vt(() => patch(key, { ...base, tab: nextTab, panelTab: nextTab }))
+    else if (nextTab) patch(key, { ...base, tab: nextTab, panelTab: nextTab })
+    else {
+      patch(key, { ...base, tab: null })
+      setTimeout(() => patch(key, s => (s.tab === null ? { panelTab: null } : {})), 450)
+    }
+  }
+  const showTab = t => { if (u.tab !== t) toggleTab(t); else patch(key, { nudge: false }) }
+  const moreHint = () => vt(() => patch(key, s => ({ lastHint: s.hintsShown, hintsShown: s.hintsShown + 1 })))
+
+  const res = u.res
+  // Once a lesson is passed, always offer the way forward with the stage's progress.
+  const showNext = !!res?.win || (!redoMode && passed)
+  const stage = STAGES.find(st => st.lessons.includes(lesson)) ?? { name: '', lessons: [lesson] }
+  const stageDone = stage.lessons.filter(l => store.rec(l.id).passedAt).length
+  const kindLabel = redoMode ? 'Write it again from scratch' : KIND[lesson.kind]
+  const kindIcon = redoMode ? 'replay' : KIND_ICON[lesson.kind]
+  const panelName = u.panelTab && TABS.find(t => t[0] === u.panelTab)[2]
+
+  return (
+    <>
+      <div className="work">
+        <section className="card task">
+          <div className="txt">
+            <h2>{lesson.title}</h2>
+            <p dangerouslySetInnerHTML={{ __html: lesson.task }} />
+          </div>
+          <span className="kd"><span className="ms">{kindIcon}</span>{kindLabel}</span>
+        </section>
+
+        <section className="card editor">
+          <div className="ed-h-wrap">
+            <div className="ed-h">
+              <span className="sp" />
+              <button className={`btn text${u.busy ? ' busy' : ''}`} onClick={() => run('run')}><span className="ms fill">play_arrow</span>Run</button>
+              <button className={`btn fill${u.busy ? ' busy' : ''}`} onClick={() => run('check')} title="Ctrl or Cmd + Enter">
+                Check my code<kbd>⌘↵</kbd>
+              </button>
+            </div>
+          </div>
+          <div className={`busyline${u.busy ? ' on' : ''}`}><i /></div>
+          <div className="code-wrap">
+            <div className="cm">
+              <CodeEditor
+                path={key} value={code} theme={theme}
+                onChange={v => store.setCode(lesson.id, v, redoMode)}
+                onCursor={(l, c) => setCursor([l, c])}
+                onCheck={() => live.current.check?.()}
+              />
+            </div>
+            <div className={`nudge${u.nudge ? ' on' : ''}`}>
+              <span className="bulb"><span className="ms">{unlocked ? 'lock_open' : 'lightbulb'}</span></span>
+              <span>{unlocked ? 'Three misses. The answer is open.' : 'Stuck? A hint is ready.'}</span>
+              <button className="btn text" onClick={() => showTab(unlocked ? 'answer' : 'hints')}>Show me</button>
+              <button className="iconbtn" onClick={() => patch(key, { nudge: false })} aria-label="Dismiss"><span className="ms">close</span></button>
+            </div>
+          </div>
+          <div className={`fold${res ? ' open' : ''}`}>
+            <div>
+              <div className="res">
+                <div className="pad">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <ResultsBody res={res} sel={u.sel} onSel={i => patch(key, { sel: i })} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {showNext && (
+            <div className="onward">
+              <span className="ms fill">check_circle</span>
+              <div className="where">
+                <b>{stageDone === stage.lessons.length ? `${stage.name} complete` : `${stageDone} of ${stage.lessons.length} done in ${stage.name}`}</b>
+                <div className="bar-track"><i style={{ width: `${stageDone / stage.lessons.length * 100}%` }} /></div>
+              </div>
+              {next
+                ? <button className="btn fill big" onClick={() => onPick(next.id)}>Next: {next.title}<span className="ms">arrow_forward</span></button>
+                : <b>That was the last lesson.</b>}
+            </div>
+          )}
+          <div className="status"><span>Ln {cursor[0]}, Col {cursor[1]}</span><span className="sp" /><span>C++14</span></div>
+        </section>
+      </div>
+
+      <div className={`card side${u.tab ? ' open' : ''}`}>
+        <div className="side-in">
+          <div className="side-h">
+            <span>{panelName || ''}</span>
+            <button className="iconbtn" onClick={() => u.tab && toggleTab(u.tab)} aria-label="Close"><span className="ms">close</span></button>
+          </div>
+          <div className="side-b">
+            {u.panelTab && (
+              <HelpPanel tab={u.panelTab} lesson={lesson} hintsShown={u.hintsShown} lastHint={u.lastHint}
+                onMoreHint={moreHint} unlocked={unlocked} passed={passed} tries={tries} />
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="rail">
+        {TABS.map(([t, icon, name]) => (
+          <button key={t} className={`rip${u.tab === t ? ' on' : ''}${t === 'answer' && u.justUnlocked ? ' unlocked' : ''}`} onClick={() => toggleTab(t)}>
+            <span className="ms">{t === 'answer' && unlocked ? 'lock_open' : icon}</span>{name}
+            {t === 'hints' && u.nudge && !unlocked && <i className="badge" />}
+          </button>
+        ))}
+      </div>
+    </>
+  )
+}

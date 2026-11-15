@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · Stage cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+:root{--font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --bg:#f2f3fa;--card:#fff;--card2:#eceefa;--text:#1b1c2b;--sub:#5d5f77;--line:#e1e3f0;
+  --pri:#4a55d6;--on-pri:#fff;--pri-c:#e0e3ff;--on-pri-c:#1c2390;--pri-shadow:rgba(74,85,214,.35);
+  --ok:#1b7f51;--ok-c:#d9f4e6;--bad:#bf2f4a;--bad-c:#ffe1e6;--inverse:#2c2d42;--on-inverse:#fff;
+  --elev:0 1px 2px rgba(27,28,43,.05),0 6px 22px rgba(27,28,43,.06);
+  --ed-bg:#1c1d31;--ed-text:#e4e5f7;--ed-num:#5b5d85;--ed-new:rgba(127,224,200,.1);--ed-flash:rgba(127,224,200,.4);--c-k:#aab1ff;--c-t:#7fe0c8;--c-s:#ffc48a}
+html[data-theme=dark]{--bg:#111220;--card:#1b1c2e;--card2:#26283d;--text:#e7e8f6;--sub:#a2a4c0;--line:#2f3149;
+  --pri:#b7bcff;--on-pri:#171c70;--pri-c:#333a96;--on-pri-c:#e2e4ff;--pri-shadow:rgba(0,0,0,.5);
+  --ok:#7fdcaa;--ok-c:#143b29;--bad:#ff9aab;--bad-c:#4a1622;--inverse:#e7e8f6;--on-inverse:#1b1c2b;
+  --elev:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25);--ed-bg:#0d0e19}
+body{min-height:100vh}
+.top{display:flex;align-items:center;gap:8px;max-width:1180px;margin:0 auto;padding:18px 24px 6px}
+.top h1{font-size:18px;font-weight:700;flex:1}
+.wrap{max-width:1180px;margin:0 auto;padding:14px 24px 60px}
+
+/* home */
+.resume{display:flex;align-items:center;gap:24px;padding:26px 28px;cursor:pointer}
+.resume .txt{flex:1;min-width:0}
+.resume small{color:var(--sub);font-size:13.5px}
+.resume h2{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:4px 0 6px}
+.resume p{color:var(--sub);font-size:14.5px}
+.again{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:18px 2px 0;color:var(--sub);font-size:14px}
+.chip{position:relative;overflow:hidden;display:inline-flex;gap:6px;align-items:center;height:34px;padding:0 14px 0 10px;border-radius:17px;background:var(--card);box-shadow:var(--elev);font-size:13.5px;font-weight:500;color:var(--text);transition:transform .25s var(--ease)}
+.chip:hover{transform:translateY(-2px)}
+.chip .ms{font-size:18px;color:var(--pri)}
+h3.sec{font-size:15px;font-weight:600;margin:34px 2px 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.stage{padding:22px;cursor:pointer;display:flex;flex-direction:column;gap:14px;transition:transform .3s var(--ease),box-shadow .3s}
+.stage:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(27,28,43,.06),0 16px 36px rgba(27,28,43,.12)}
+.art{width:64px;height:40px;color:var(--pri)}
+.stage h4{font-size:18px;font-weight:700;line-height:1.25}
+.stage p{color:var(--sub);font-size:13.5px;margin-top:4px}
+.prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sub);margin-top:auto}
+.prog .bar-track{flex:1}
+
+/* stage page */
+.stage-head{display:flex;align-items:center;gap:22px;padding:26px 28px}
+.stage-head .art{width:96px;height:60px}
+.stage-head h2{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.stage-head .prog{margin-top:10px;max-width:320px}
+.rows{margin-top:16px;padding:8px}
+.row{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;width:100%;padding:13px 16px;border-radius:14px;transition:background .2s}
+.row:hover{background:var(--card2)}
+.row .state{color:var(--line)}
+.row.done .state{color:var(--ok)}
+.row.next{background:var(--pri-c);color:var(--on-pri-c)}
+.row.next .state{color:var(--pri)}
+.row .ttl{font-weight:600;font-size:15px;flex:1}
+.row .kd{font-size:13px;color:var(--sub);display:flex;gap:6px;align-items:center}
+.row.next .kd{color:inherit;opacity:.8}
+.row .kd .ms{font-size:17px}
+.row .tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:10px;background:var(--pri);color:var(--on-pri)}
+
+/* lesson */
+.lesson{display:grid;grid-template-columns:minmax(300px,400px) 1fr;gap:16px;align-items:start}
+.task{padding:24px}
+.task .kd{display:flex;gap:6px;align-items:center;color:var(--sub);font-size:13.5px}
+.task h2{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:6px 0 14px}
+.task p{font-size:15.5px;line-height:1.6}
+.help{margin-top:16px;padding:8px 8px 20px}
+.tabs{position:relative;display:flex;padding:0 4px}
+.tabs button{flex:1;text-align:center;padding:12px 0;font-weight:600;font-size:14px;color:var(--sub);transition:color .25s;display:flex;justify-content:center;gap:6px;align-items:center}
+.tabs button.on{color:var(--pri)}
+.tabs .ms{font-size:18px}
+.tabs .ind{position:absolute;bottom:0;left:0;height:3px;border-radius:3px 3px 0 0;background:var(--pri);transition:transform .4s var(--ease),width .4s var(--ease)}
+.tabline{height:1px;background:var(--line);margin:0 4px 18px}
+.helpbody{padding:0 14px;view-transition-name:helpbody}
+.desk{overflow:hidden;display:flex;flex-direction:column;position:sticky;top:16px}
+.desk-h{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 20px}
+.file{font-family:var(--mono);font-size:13px;color:var(--sub);flex:1}
+.desk .codeview{min-height:430px;max-height:60vh}
+.res{padding:0 20px}
+.res .pad{padding:16px 0 18px}
+.nextbar{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 12px 12px 16px;border-radius:14px;background:var(--ok-c);color:var(--ok);font-weight:600;font-size:14.5px;animation:pop .6s var(--ease) .5s backwards}
+.nextbar span:not(.ms){flex:1}
+@media (max-width:860px){.lesson{grid-template-columns:1fr}.desk{position:static}.resume{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="snack" id="snack"></div>
+<script src="shared.js"></script>
+<script>
+const app = $('app')
+let V = { view: 'home', stage: null, lesson: null, tab: 'refresher', st: null, res: null }
+
+const topBar = (title, back) => `<header class="top">${back ? `<button class="iconbtn" data-act="back" aria-label="Back"><span class="ms">arrow_back</span></button>` : ''}<h1>${title}</h1>${THEME_BTN}</header>`
+const pct = s => Math.round(stageDone(s) / s.lessons.length * 100)
+
+function home() {
+  const n = nextLesson()
+  return topBar('Foundations') + `<main class="wrap">
+    <section class="card resume rip" data-act="lesson" data-id="${n.id}">
+      <div class="txt"><small>Next up in ${STAGES[n.s].name}</small><h2>${n.title}</h2><p>${KIND[n.kind]} · ${totalDone()} of ${ALL.length} lessons done</p></div>
+      <button class="btn fill"><span class="ms fill">play_arrow</span>Continue</button>
+    </section>
+    <div class="again">Ready to write again from scratch:${redoList().map(l => `<button class="chip rip" data-act="lesson" data-id="${l.id}"><span class="ms">replay</span>${l.title}</button>`).join('')}</div>
+    <h3 class="sec">Stages</h3>
+    <div class="grid">${STAGES.map(s => `<article class="card stage rip" data-act="stage" data-s="${s.i}" tabindex="0">
+      <div class="art">${ART[s.i]}</div><div><h4>${s.name}</h4><p>${s.blurb}</p></div>
+      <div class="prog"><div class="bar-track"><i style="width:${pct(s)}%"></i></div>${stageDone(s)} of ${s.lessons.length}</div></article>`).join('')}</div>
+  </main>`
+}
+function stagePage() {
+  const s = STAGES[V.stage], n = nextLesson()
+  return topBar('Foundations', true) + `<main class="wrap">
+    <section class="card stage-head" id="stageHead"><div class="art">${ART[s.i]}</div><div style="flex:1"><h2>${s.name}</h2><div class="prog"><div class="bar-track"><i style="width:${pct(s)}%"></i></div>${stageDone(s)} of ${s.lessons.length}</div></div></section>
+    <section class="card rows">${s.lessons.map(l => `<button class="row rip${l.done ? ' done' : ''}${l === n ? ' next' : ''}" data-act="lesson" data-id="${l.id}">
+      <span class="ms state${l.done ? ' fill' : ''}">${l.done ? 'check_circle' : l === n ? 'play_circle' : 'circle'}</span>
+      <span class="ttl">${l.title}</span>${l.redo ? '<span class="kd"><span class="ms">replay</span>Write again</span>' : `<span class="kd"><span class="ms">${KIND_ICON[l.kind]}</span>${KIND[l.kind]}</span>`}
+      ${l === n ? '<span class="tag">Next</span>' : ''}</button>`).join('')}</section>
+  </main>`
+}
+function lessonPage() {
+  const l = V.lesson, L = content(l), nx = lessonAfter(l)
+  return topBar(STAGES[l.s].name, true) + `<main class="wrap lesson">
+    <div>
+      <section class="card task" id="taskCard"><div class="kd"><span class="ms">${KIND_ICON[l.kind]}</span>${l.redo ? 'Write it again from scratch' : KIND[l.kind]}</div><h2>${l.title}</h2><p>${L.task}</p></section>
+      <section class="card help">
+        <div class="tabs" id="tabs"><span class="ind"></span>${[['refresher', 'menu_book', 'Refresher'], ['hints', 'lightbulb', 'Hints'], ['answer', answerOpen(V.st) ? 'lock_open' : 'lock', 'Answer']].map(([t, ic, nm]) => `<button data-act="tab" data-t="${t}" class="${V.tab === t ? 'on' : ''}"><span class="ms">${ic}</span>${nm}</button>`).join('')}</div>
+        <div class="tabline"></div>
+        <div class="helpbody">${helpHTML(L, V.tab, V.st)}</div>
+      </section>
+    </div>
+    <section class="card desk">
+      <div class="desk-h"><span class="file">merge_sort.cpp</span><button class="btn text"><span class="ms fill">play_arrow</span>Run</button><button class="btn fill" data-act="check" id="check">Check my code</button></div>
+      <div class="codeview">${codeHTML(L, V.st.passed)}</div>
+      <div class="fold${V.res ? ' open' : ''}"><div><div class="res"><div class="pad">${resultsHTML(V.res)}
+        ${V.st.passed && nx ? `<div class="nextbar"><span class="ms fill">check_circle</span><span>Done. Next is ${nx.title}.</span><button class="btn fill" data-act="lesson" data-id="${nx.id}">Next lesson</button></div>` : ''}</div></div></div></div>
+    </section>
+  </main>`
+}
+function render() { app.innerHTML = V.view === 'home' ? home() : V.view === 'stage' ? stagePage() : lessonPage(); slideInd() }
+function slideInd() { const on = document.querySelector('#tabs button.on'), ind = document.querySelector('#tabs .ind'); if (on && ind) { ind.style.width = on.offsetWidth * .6 + 'px'; ind.style.transform = `translateX(${on.offsetLeft + on.offsetWidth * .2}px)` } }
+addEventListener('resize', slideInd)
+
+function openLesson(id, fromEl) { const l = byId(id); V = { ...V, view: 'lesson', lesson: l, stage: l.s, tab: 'refresher', st: newState(), res: null }; return morph(fromEl, render, '#taskCard').then(() => scrollTo(0, 0)) }
+
+app.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return
+  const act = el.dataset.act
+  if (act === 'theme') toggleTheme()
+  if (act === 'stage') { V.view = 'stage'; V.stage = +el.dataset.s; morph(el, render, '#stageHead') }
+  if (act === 'lesson') openLesson(el.dataset.id, el.closest('.row,.resume,.chip'))
+  if (act === 'back') {
+    if (V.view === 'lesson') { V.view = 'stage'; morph($('taskCard'), render, `.row[data-id="${V.lesson.id}"]`) }
+    else { const s = V.stage; V.view = 'home'; morph($('stageHead'), render, `.stage[data-s="${s}"]`) }
+  }
+  if (act === 'tab') { V.tab = el.dataset.t; V.st.lastHint = 0; vt(render) }
+  if (act === 'hint') { V.st.lastHint = V.st.hints; V.st.hints++; vt(render) }
+  if (act === 'test') toggleDetail(V.res, +el.dataset.i, el)
+  if (act === 'check') {
+    el.classList.add('busy'); el.textContent = 'Checking…'
+    setTimeout(() => {
+      V.res = simulate(content(V.lesson), V.st)
+      if (V.res.win) { V.lesson.done = true; V.lesson.redo = false; V.tab = 'answer'; snack('<span class="ms fill">check_circle</span>Passed. The answer is unlocked.') }
+      render()
+    }, 650)
+  }
+})
+app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('.stage')) e.target.click() })
+render()
+document.fonts.ready.then(slideInd)
+if (location.hash.includes('demo')) openLesson('2.4').then(() => setTimeout(() => $('check').click(), 300))
+if (location.hash.includes('stage')) { V.view = 'stage'; V.stage = 1; render() }
+</script>
+</body>
+</html>

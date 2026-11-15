@@ -1,0 +1,108 @@
+import Editor from '@monaco-editor/react'
+
+const THEMES = {
+  'fnd-light': { base: 'vs', k: '7b3fc4', s: 'b25a00', c: '8f9bb3', bg: '#ffffff', fg: '#1c2230', num: '#a7b1c4', cur: '#f1f5fc', accent: '#1a56c4', sel: '#1a56c433' },
+  'fnd-dark': { base: 'vs-dark', k: 'cfa8ff', s: 'ffc078', c: '5e6a85', bg: '#12151d', fg: '#dce2ef', num: '#4b556b', cur: '#1a1f2b', accent: '#a9c6fb', sel: '#a9c6fb35' },
+}
+
+const WORDS = `auto bool break case char class const continue default delete do double else enum false float for if
+int long namespace new nullptr private public return short signed sizeof static struct switch template this true typedef
+unsigned using void while include iostream vector string map set unordered_map unordered_set queue stack deque
+priority_queue pair tuple algorithm numeric cin cout endl getline std size_t push_back pop_back emplace_back push pop
+top front back begin end rbegin rend size empty clear insert erase find count first second sort reverse swap min max
+lower_bound upper_bound accumulate min_element max_element unique next_permutation make_pair greater less substr
+to_string stoi length resize reserve assign`.split(/\s+/)
+
+let completionReady = false
+function defineCompletion(monaco) {
+  if (completionReady) return
+  completionReady = true
+  monaco.languages.registerCompletionItemProvider('cpp', {
+    provideCompletionItems(model, position) {
+      const w = model.getWordUntilPosition(position)
+      const range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber, startColumn: w.startColumn, endColumn: w.endColumn }
+      return { suggestions: WORDS.map(label => ({ label, insertText: label, kind: monaco.languages.CompletionItemKind.Keyword, range })) }
+    },
+  })
+}
+
+function defineThemes(monaco) {
+  defineCompletion(monaco)
+  for (const [name, t] of Object.entries(THEMES)) {
+    monaco.editor.defineTheme(name, {
+      base: t.base, inherit: true,
+      rules: [
+        { token: 'keyword', foreground: t.k },
+        { token: 'string', foreground: t.s },
+        { token: 'number', foreground: t.s },
+        { token: 'comment', foreground: t.c, fontStyle: 'italic' },
+      ],
+      colors: {
+        'editor.background': t.bg,
+        'editor.foreground': t.fg,
+        'editorLineNumber.foreground': t.num,
+        'editorLineNumber.activeForeground': t.fg,
+        'editor.lineHighlightBackground': t.cur,
+        'editor.lineHighlightBorder': '#00000000',
+        'editorCursor.foreground': t.accent,
+        'editor.selectionBackground': t.sel,
+        'editorWidget.background': t.bg,
+        'scrollbarSlider.background': t.num + '55',
+      },
+    })
+  }
+}
+
+const OPTIONS = {
+  fontSize: 13.5,
+  lineHeight: 24,
+  fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+  minimap: { enabled: false },
+  scrollBeyondLastLine: false,
+  tabSize: 4,
+  lineNumbers: 'on',
+  lineNumbersMinChars: 3,
+  lineDecorationsWidth: 12,
+  glyphMargin: false,
+  folding: false,
+  renderLineHighlight: 'none',
+  overviewRulerLanes: 0,
+  hideCursorInOverviewRuler: true,
+  padding: { top: 16, bottom: 80 },
+  automaticLayout: true,
+  fixedOverflowWidgets: true,   // popups may extend past the editor card instead of being clipped
+  // Simple completion only: words already in the file plus C++ keywords and common STL names.
+  // No snippets, signatures or hovers: the typing is still the learner's.
+  quickSuggestions: { other: true, comments: false, strings: false },
+  suggestOnTriggerCharacters: false,
+  acceptSuggestionOnEnter: 'off',   // Enter always makes a new line; Tab accepts a suggestion
+  tabCompletion: 'on',
+  wordBasedSuggestions: 'currentDocument',
+  parameterHints: { enabled: false },
+  inlineSuggest: { enabled: false },
+  hover: { enabled: false },
+  snippetSuggestions: 'none',
+  suggest: { showWords: true, showSnippets: false, showIcons: false, preview: false },
+}
+
+export default function CodeEditor({ path, value, theme, onChange, onCursor, onCheck }) {
+  return (
+    <Editor
+      height="100%"
+      language="cpp"
+      path={path}
+      value={value}
+      theme={theme === 'dark' ? 'fnd-dark' : 'fnd-light'}
+      options={OPTIONS}
+      beforeMount={defineThemes}
+      onChange={v => onChange(v ?? '')}
+      onMount={(editor, monaco) => {
+        // Override Monaco's own Ctrl/Cmd+Enter (insert line below).
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => onCheck())
+        editor.onDidChangeCursorPosition(e => onCursor(e.position.lineNumber, e.position.column))
+        const p = editor.getPosition()
+        if (p) onCursor(p.lineNumber, p.column)
+      }}
+    />
+  )
+}

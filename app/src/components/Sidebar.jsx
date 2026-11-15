@@ -3,7 +3,7 @@ import { useState } from 'react'
 export default function Sidebar({
   categories, problems, selectedId,
   onSelect, getStatus, onStatusChange,
-  collapsed, onToggle,
+  collapsed, onToggle, onSwitchMode,
 }) {
   const [openMenu, setOpenMenu] = useState(null)
 
@@ -23,6 +23,12 @@ export default function Sidebar({
           {collapsed ? '›' : '‹'}
         </button>
       </div>
+
+      {onSwitchMode && (
+        <button className="mode-link" onClick={onSwitchMode} title="Back to the Foundations track">
+          <span aria-hidden>←</span>{!collapsed && ' Foundations'}
+        </button>
+      )}
 
       <nav className="problem-list">
         {grouped.map(cat => (

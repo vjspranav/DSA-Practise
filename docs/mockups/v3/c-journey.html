@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C · Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+:root{--font:'DM Sans',system-ui,sans-serif;--r:28px;
+  --bg:#f8f2f6;--card:#fff;--card2:#f3e8f1;--text:#231a22;--sub:#6b5a68;--line:#eadbe6;
+  --pri:#8a3f7d;--on-pri:#fff;--pri-c:#ffd7f3;--on-pri-c:#39002f;--pri-shadow:rgba(138,63,125,.35);
+  --ok:#2a7a46;--ok-c:#dbf3e0;--bad:#b5303f;--bad-c:#ffe0e2;--inverse:#352a33;--on-inverse:#fff;
+  --elev:0 1px 2px rgba(35,26,34,.05),0 10px 30px rgba(35,26,34,.07);
+  --ed-bg:#241b24;--ed-text:#f0e4ee;--ed-num:#6f5d6c;--ed-new:rgba(255,183,232,.09);--ed-flash:rgba(255,183,232,.4);--c-k:#ffaee6;--c-t:#9fe3c2;--c-s:#ffd08a}
+html[data-theme=dark]{--bg:#161116;--card:#211a21;--card2:#2e252d;--text:#f0e4ee;--sub:#b5a2b1;--line:#3a2f39;
+  --pri:#ffaee6;--on-pri:#52104a;--pri-c:#6e2863;--on-pri-c:#ffd7f3;--pri-shadow:rgba(0,0,0,.5);
+  --ok:#8fd9a5;--ok-c:#173a22;--bad:#ffb2b7;--bad-c:#52161c;--inverse:#f0e4ee;--on-inverse:#231a22;
+  --elev:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.3);--ed-bg:#0f0b0f}
+body{min-height:100vh}
+
+/* journey */
+.col{max-width:720px;margin:0 auto;padding:20px 20px 120px}
+.top{display:flex;align-items:center;gap:8px}
+.top b{flex:1;font-size:16px;font-weight:700}
+.hello{margin:26px 0 8px}
+.hello h1{font-size:clamp(32px,6vw,44px);font-weight:700;letter-spacing:-.03em;line-height:1.05}
+.hello p{color:var(--sub);margin-top:10px;font-size:15.5px}
+.again{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{position:relative;overflow:hidden;display:inline-flex;gap:6px;align-items:center;height:34px;padding:0 14px 0 10px;border-radius:17px;background:var(--pri-c);color:var(--on-pri-c);font-size:13.5px;font-weight:600}
+.chip .ms{font-size:18px}
+.stg{margin-top:34px}
+.stg-h{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:14px;padding:12px 4px;background:var(--bg)}
+.stg-h .art{width:48px;height:30px;color:var(--pri)}
+.stg-h h2{font-size:19px;font-weight:700;flex:1}
+.stg-h small{color:var(--sub);font-size:13.5px}
+.steps{position:relative;margin-left:27px;padding-left:30px;border-left:2px solid var(--line)}
+.step{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:9px 12px;border-radius:14px;font-size:15px;color:var(--sub);overflow:hidden;transition:background .2s,color .2s}
+.step:hover{background:var(--card2);color:var(--text)}
+.dotwrap{position:absolute;left:-41px;width:20px;height:20px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.steps>div{position:relative;display:flex;align-items:center}
+.dotwrap .ms{font-size:20px;color:var(--line)}
+.done .dotwrap .ms{color:var(--ok)}
+.step .t{flex:1}
+.step .kd{font-size:13px;opacity:.75;display:flex;align-items:center;gap:5px}
+.step .kd .ms{font-size:16px}
+.collapsed{color:var(--sub);font-size:14px;padding:9px 12px;border-radius:14px;display:flex;gap:8px;align-items:center;width:100%}
+.collapsed:hover{background:var(--card2)}
+.now{margin:10px 0 12px -6px;padding:22px 24px;display:block;width:calc(100% + 6px)}
+.now small{display:flex;gap:6px;align-items:center;color:var(--sub);font-size:13.5px}
+.now h3{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:4px 0 8px}
+.now p{font-size:15px;color:var(--text);max-width:48ch}
+.now .acts{display:flex;gap:10px;margin-top:18px}
+.nowdot .dotwrap{top:26px}
+.nowdot .dotwrap .ms{color:var(--pri);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.25)}}
+
+/* lesson, full screen */
+.lesson{position:fixed;inset:0;z-index:10;background:var(--bg);display:flex;flex-direction:column;padding:12px;gap:12px}
+.strip{display:flex;align-items:center;gap:14px;padding:12px 14px 12px 8px;border-radius:24px}
+.strip .txt{flex:1;min-width:0}
+.strip h2{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.strip p{font-size:14.5px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage-ed{flex:1;min-height:0;position:relative;border-radius:24px;overflow:hidden;background:var(--ed-bg);box-shadow:var(--elev);display:flex;flex-direction:column}
+.stage-ed .codeview{flex:1;min-height:0;padding:22px 0 90px;font-size:14px}
+.resbar{background:var(--card);padding:0 22px}
+.resbar .pad{padding:14px 0 16px}
+.fab{position:absolute;right:22px;bottom:22px;z-index:3;height:56px;padding:0 22px 0 18px;border-radius:18px;background:var(--pri-c);color:var(--on-pri-c);font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 18px rgba(0,0,0,.3);overflow:hidden;transition:transform .35s var(--ease),bottom .45s var(--ease)}
+.fab:hover{transform:translateY(-2px)}
+.fab .ms{font-size:24px}
+.fab.wiggle{animation:wiggle .9s var(--ease) 2}
+@keyframes wiggle{20%{transform:rotate(-5deg) scale(1.06)}50%{transform:rotate(4deg) scale(1.06)}80%{transform:rotate(-2deg)}}
+.scrim{position:absolute;inset:0;z-index:4;background:rgba(20,10,18,.45);opacity:0;pointer-events:none;transition:opacity .35s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:50%;bottom:0;z-index:5;width:min(680px,100%);transform:translate(-50%,105%);background:var(--card);border-radius:28px 28px 0 0;padding:10px 24px 26px;box-shadow:0 -10px 40px rgba(0,0,0,.3);transition:transform .55s var(--ease);max-height:78%;overflow-y:auto}
+.sheet.on{transform:translate(-50%,0)}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+.seg{position:relative;display:flex;background:var(--card2);border-radius:22px;padding:4px;margin-bottom:20px}
+.seg button{flex:1;position:relative;z-index:1;height:36px;border-radius:18px;text-align:center;font-weight:600;font-size:14px;color:var(--sub);transition:color .3s}
+.seg button.on{color:var(--on-pri)}
+.seg .pill{position:absolute;top:4px;bottom:4px;left:0;border-radius:18px;background:var(--pri);transition:transform .45s var(--ease),width .45s var(--ease)}
+.sheetbody{view-transition-name:sheetbody;min-height:120px}
+.win{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:rgba(20,10,18,.5);animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+.win .card{padding:34px 34px 26px;text-align:center;width:min(380px,90%);animation:rise .6s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(30px) scale(.94)}}
+.win .big{width:76px;height:76px;border-radius:50%;background:var(--ok-c);color:var(--ok);display:grid;place-items:center;margin:0 auto 16px;animation:rise .7s var(--ease) .15s backwards}
+.win .big .ms{font-size:44px}
+.win h3{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.win p{color:var(--sub);margin:6px 0 22px;font-size:15px}
+.win .acts{display:grid;gap:8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="over"></div>
+<div class="snack" id="snack"></div>
+<script src="shared.js"></script>
+<script>
+let V = { lesson: null, showAll: {}, tab: 'refresher', sheet: false, st: null, res: null, won: false }
+
+function journey() {
+  const n = nextLesson(), L = content(n)
+  $('app').innerHTML = `<div class="col">
+    <div class="top"><b>Foundations</b>${THEME_BTN}</div>
+    <div class="hello"><h1>${totalDone()} down, ${ALL.length - totalDone()} to go.</h1><p>One lesson at a time. The next one is open below.</p>
+      <div class="again">${redoList().map(l => `<button class="chip rip" data-act="open" data-id="${l.id}"><span class="ms">replay</span>Write again: ${l.title}</button>`).join('')}</div></div>
+    ${STAGES.map(s => {
+      const d = stageDone(s), full = V.showAll[s.i], doneLs = s.lessons.filter(l => l.done), rest = s.lessons.filter(l => !l.done)
+      const row = l => `<div class="${l.done ? 'done' : ''}"><span class="dotwrap"><span class="ms${l.done ? ' fill' : ''}">${l.done ? 'check_circle' : 'circle'}</span></span>
+        <button class="step rip" data-act="open" data-id="${l.id}"><span class="t">${l.title}</span><span class="kd"><span class="ms">${KIND_ICON[l.kind]}</span>${KIND[l.kind]}</span></button></div>`
+      const nowCard = `<div class="nowdot" style="align-items:flex-start"><span class="dotwrap"><span class="ms fill">play_circle</span></span>
+        <section class="card now" id="now"><small><span class="ms">${KIND_ICON[n.kind]}</span>${KIND[n.kind]}</small><h3>${n.title}</h3><p>${L.task}</p>
+        <div class="acts"><button class="btn fill" data-act="open" data-id="${n.id}"><span class="ms fill">play_arrow</span>Start coding</button></div></section></div>`
+      const doneHTML = doneLs.length > 3 && !full
+        ? `<div class="done"><span class="dotwrap"><span class="ms fill">check_circle</span></span><button class="collapsed rip" data-act="all" data-s="${s.i}">${doneLs.length} finished<span class="ms">expand_more</span></button></div>`
+        : doneLs.map(row).join('')
+      return `<section class="stg"><div class="stg-h"><div class="art">${ART[s.i]}</div><h2>${s.name}</h2><small>${d} of ${s.lessons.length}</small></div>
+        <div class="steps">${doneHTML}${rest.map(l => l === n ? nowCard : row(l)).join('')}</div></section>`
+    }).join('')}</div>`
+}
+function lessonView() {
+  const l = V.lesson; if (!l) { $('over').innerHTML = ''; return }
+  const L = content(l), nx = lessonAfter(l), open = answerOpen(V.st)
+  $('over').innerHTML = `<div class="lesson">
+    <section class="card strip" id="strip"><button class="iconbtn" data-act="close" aria-label="Back to the path"><span class="ms">arrow_back</span></button>
+      <div class="txt"><h2>${l.title}</h2><p>${L.task.replace(/<[^>]+>/g, '')}</p></div>
+      <button class="btn text"><span class="ms fill">play_arrow</span>Run</button><button class="btn fill" data-act="check" id="check">Check my code</button></section>
+    <div class="stage-ed">
+      <div class="codeview">${codeHTML(L, V.st.passed)}</div>
+      <div class="fold${V.res ? ' open' : ''}"><div><div class="resbar"><div class="pad">${resultsHTML(V.res)}</div></div></div></div>
+      <button class="fab rip${V.res && !V.res.win ? ' wiggle' : ''}" data-act="sheet" style="${V.res ? 'bottom:96px' : ''}"><span class="ms">${open ? 'lock_open' : 'lightbulb'}</span>${open ? 'See the answer' : V.st.attempts ? 'Want a hint?' : 'Help'}</button>
+      <div class="scrim${V.sheet ? ' on' : ''}" data-act="sheet"></div>
+      <div class="sheet${V.sheet ? ' on' : ''}"><div class="grab"></div>
+        <div class="seg" id="seg"><span class="pill"></span>${[['refresher', 'Refresher'], ['hints', 'Hints'], ['answer', 'Answer']].map(([t, nm]) => `<button data-act="tab" data-t="${t}" class="${V.tab === t ? 'on' : ''}">${nm}</button>`).join('')}</div>
+        <div class="sheetbody">${helpHTML(L, V.tab, V.st)}</div></div>
+      ${V.won ? `<div class="win"><div class="card"><div class="big"><span class="ms fill">check</span></div><h3>${l.title}, done.</h3><p>You'll be asked to write it again in 3 days.</p>
+        <div class="acts">${nx ? `<button class="btn fill" data-act="open" data-id="${nx.id}">Next: ${nx.title}</button>` : ''}<button class="btn text" data-act="answer">Compare with the answer</button><button class="btn text" data-act="close">Back to the path</button></div></div></div>` : ''}
+    </div></div>`
+  slidePill()
+}
+function slidePill() { const on = document.querySelector('#seg button.on'), p = document.querySelector('#seg .pill'); if (on && p) { p.style.width = on.offsetWidth + 'px'; p.style.transform = `translateX(${on.offsetLeft - 4}px)` } }
+addEventListener('resize', slidePill)
+
+function open(id, fromEl) { const l = byId(id); V = { ...V, lesson: l, tab: 'refresher', sheet: false, st: newState(), res: null, won: false }; return morph(fromEl, lessonView, '#strip') }
+function setSheet(on) { V.sheet = on; document.querySelector('.sheet').classList.toggle('on', on); document.querySelector('.scrim').classList.toggle('on', on); if (on) slidePill() }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return
+  const act = el.dataset.act
+  if (act === 'theme') toggleTheme()
+  if (act === 'all') { V.showAll[el.dataset.s] = true; vt(journey) }
+  if (act === 'open') { const from = el.closest('.now') || el.closest('.step') || el; if (V.lesson) { V.lesson = null; journey() } open(el.dataset.id, V.lesson ? null : from) }
+  if (act === 'close') { const id = V.lesson.id; V.lesson = null; journey(); morph($('strip'), lessonView, `#now, .step[data-id="${id}"]`); const t = $('now') || document.querySelector(`.step[data-id="${id}"]`); t && t.scrollIntoView({ block: 'center' }) }
+  if (act === 'sheet') { if (!V.sheet && V.st.attempts && V.tab === 'refresher') { V.tab = answerOpen(V.st) ? 'answer' : 'hints'; lessonView(); requestAnimationFrame(() => requestAnimationFrame(() => setSheet(true))) } else setSheet(!V.sheet) }
+  if (act === 'tab') { V.tab = el.dataset.t; V.st.lastHint = 0; vt(lessonView) }
+  if (act === 'hint') { V.st.lastHint = V.st.hints; V.st.hints++; vt(lessonView) }
+  if (act === 'answer') { V.won = false; V.tab = 'answer'; V.sheet = false; lessonView(); requestAnimationFrame(() => requestAnimationFrame(() => setSheet(true))) }
+  if (act === 'test') toggleDetail(V.res, +el.dataset.i, el)
+  if (act === 'check') {
+    el.classList.add('busy'); el.textContent = 'Checking…'
+    setTimeout(() => {
+      V.res = simulate(content(V.lesson), V.st); V.sheet = false
+      if (V.res.win) { V.lesson.done = true; V.lesson.redo = false; lessonView(); setTimeout(() => { V.won = true; lessonView() }, 1100) }
+      else lessonView()
+    }, 650)
+  }
+})
+journey()
+if (location.hash.includes('demo')) open('2.4').then(() => setTimeout(() => $('check').click(), 300))
+</script>
+</body>
+</html>

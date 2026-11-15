@@ -1295,3 +1295,20 @@ body {
 .viz-histogram-wrap { overflow-x: auto; margin: 8px 0; }
 .viz-histogram { display: block; }
 .viz-section { margin: 16px 0 8px; }
+
+/* Link back to the Foundations track (top of the sidebar) */
+.mode-link {
+  flex-shrink: 0;
+  margin: 8px 10px 0;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.mode-link:hover { color: var(--accent); border-color: var(--accent); }
+.sidebar.collapsed .mode-link { text-align: center; padding: 6px 0; }

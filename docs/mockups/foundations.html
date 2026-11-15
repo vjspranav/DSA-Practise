@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundations track mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1e1e2e; --surface:#181825; --surface-3:#313244; --border:#313244; --border-bright:#45475a;
+  --accent:#89b4fa; --accent-dim:rgba(137,180,250,.12);
+  --success:#a6e3a1; --success-dim:rgba(166,227,161,.14);
+  --error:#f38ba8; --error-dim:rgba(243,139,168,.14);
+  --warn:#fab387; --warn-dim:rgba(250,179,135,.14);
+  --medium:#f9e2af; --mauve:#cba6f7; --mauve-dim:rgba(203,166,247,.14);
+  --text:#cdd6f4; --text-dim:#6c7086; --text-muted:#9399b2; --text-code:#a6adc8;
+  --font-ui:'Outfit',system-ui,sans-serif; --font-mono:'JetBrains Mono','Fira Code',ui-monospace,monospace;
+  --radius:6px; --radius-sm:4px; --header-h:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+button{font-family:inherit;color:inherit}
+code,pre{font-family:var(--font-mono)}
+
+.mock-bar{flex-shrink:0;background:#11111b;border-bottom:1px solid var(--border);padding:7px 16px;font-size:12px;color:var(--text-muted);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.mock-bar b{color:var(--medium);font-weight:600}
+.mock-bar .jump{background:var(--surface-3);border:1px solid var(--border-bright);border-radius:99px;padding:3px 10px;font-size:11.5px;cursor:pointer;color:var(--text)}
+.mock-bar .jump:hover{border-color:var(--accent)}
+
+.app{flex:1;min-height:0;display:grid;grid-template-columns:262px 1fr 1.25fr}
+
+/* sidebar */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.side-head{height:var(--header-h);padding:0 14px;display:flex;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0}
+.mode{display:flex;background:var(--surface-3);border-radius:var(--radius);padding:3px;width:100%}
+.mode button{flex:1;border:none;background:transparent;padding:6px 0;border-radius:4px;font-size:12.5px;font-weight:600;color:var(--text-muted);cursor:pointer}
+.mode button.on{background:var(--bg);color:var(--text)}
+.side-scroll{flex:1;overflow-y:auto;padding-bottom:10px}
+.overall{padding:14px 16px 4px}
+.overall .row{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:6px}
+.bar{height:4px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--success);border-radius:2px}
+.redo-box{margin:12px 12px 4px;border:1px solid rgba(203,166,247,.3);background:var(--mauve-dim);border-radius:var(--radius);padding:9px 10px}
+.redo-box h4{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mauve);font-weight:600;margin-bottom:6px}
+.redo-box button{display:flex;width:100%;justify-content:space-between;gap:8px;border:none;background:transparent;padding:4px 2px;font-size:12.5px;cursor:pointer;text-align:left;border-radius:3px}
+.redo-box button:hover{background:rgba(203,166,247,.12)}
+.redo-box button span:last-child{color:var(--text-dim);font-size:11px;white-space:nowrap}
+.stage{margin-top:12px}
+.stage-head{display:flex;align-items:center;gap:8px;padding:6px 16px;cursor:pointer;width:100%;border:none;background:transparent;text-align:left}
+.stage-head .n{font-family:var(--font-mono);font-size:10px;color:var(--text-dim)}
+.stage-head .t{font-size:10.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);flex:1}
+.stage-head .c{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim)}
+.stage-head .c.full{color:var(--success)}
+.stage .bar{margin:2px 16px 4px;height:2px}
+.lesson{width:100%;display:flex;align-items:center;gap:9px;padding:7px 16px;border:none;border-left:2px solid transparent;background:transparent;cursor:pointer;text-align:left}
+.lesson:hover{background:var(--surface-3)}
+.lesson.active{background:var(--accent-dim);border-left-color:var(--accent)}
+.lesson .num{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);width:24px;flex-shrink:0}
+.lesson .ttl{font-size:13px;color:var(--text-muted);flex:1;min-width:0;line-height:1.3}
+.lesson.active .ttl{color:var(--text)}
+.lesson.done .ttl{color:var(--text-dim)}
+.lesson .st{font-size:12px;width:14px;text-align:center;color:var(--text-dim)}
+.lesson.done .st{color:var(--success)}
+.next-tag{font-size:9.5px;font-weight:700;letter-spacing:.08em;color:var(--bg);background:var(--accent);border-radius:3px;padding:1px 5px}
+.kind{font-family:var(--font-mono);font-size:9px;font-weight:500;letter-spacing:.04em;padding:1px 4px;border-radius:3px;flex-shrink:0}
+.kind.program{color:var(--warn);background:var(--warn-dim)}
+.kind.implement{color:var(--accent);background:var(--accent-dim)}
+.kind.drill{color:var(--medium);background:rgba(249,226,175,.14)}
+.kind.bugfix{color:var(--error);background:var(--error-dim)}
+.kind.redo{color:var(--mauve);background:var(--mauve-dim)}
+.side-foot{padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim);display:flex;gap:8px;align-items:center;flex-shrink:0}
+.side-foot i{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+
+/* lesson panel */
+.panel{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;min-width:0}
+.p-head{padding:20px 26px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.crumb{font-size:11px;color:var(--text-dim);margin-bottom:6px;font-family:var(--font-mono)}
+.p-title{font-size:17px;font-weight:700;line-height:1.4;margin-bottom:10px}
+.p-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.p-meta .kind{font-size:10px;padding:2px 7px}
+.tag{font-size:11px;color:var(--text-muted);background:var(--surface-3);padding:2px 8px;border-radius:3px}
+.p-body{flex:1;overflow-y:auto;padding:20px 26px 40px}
+.label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin:24px 0 10px;display:flex;gap:8px;align-items:center}
+.label:first-child{margin-top:0}
+.label small{font-weight:500;letter-spacing:0;text-transform:none;color:var(--text-dim);font-size:11px}
+.refresher{background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--medium);border-radius:var(--radius);padding:14px 16px}
+.refresher li{margin:0 0 7px 16px;font-size:13.5px;line-height:1.6;color:var(--text-muted)}
+.refresher li:last-child{margin-bottom:0}
+.refresher pre{margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;line-height:1.6;color:var(--text-code);overflow-x:auto}
+.p-body p{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:10px}
+.p-body p code,.refresher code,.hint code,.banner code{font-size:12px;background:var(--surface-3);color:var(--text-code);padding:1px 5px;border-radius:3px}
+.io{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:64px 1fr;gap:6px 10px;font-size:12.5px}
+.io span{color:var(--text-dim);font-size:11px;padding-top:2px}
+.io pre{color:var(--text-code);white-space:pre-wrap}
+.viz{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.viz svg{display:block;width:100%;height:auto}
+.hint{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;font-size:13.5px;line-height:1.7;color:var(--text-muted)}
+.hint.open{border-left:2px solid var(--accent);padding:11px 14px}
+.hint button{width:100%;border:none;background:var(--accent-dim);color:var(--accent);padding:10px 14px;text-align:left;font-size:13px;font-weight:500;cursor:pointer}
+.hint.locked{padding:10px 14px;color:var(--text-dim);font-size:12.5px}
+.sol{border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+.sol.locked{padding:14px 16px;display:flex;gap:12px;align-items:center}
+.sol.locked .lock{font-size:18px}
+.sol.locked b{display:block;font-size:13px;font-weight:600;margin-bottom:3px}
+.sol.locked span{font-size:12.5px;color:var(--text-muted)}
+.pips{display:flex;gap:4px;margin-left:auto}
+.pips i{width:9px;height:9px;border-radius:50%;border:1px solid var(--border-bright)}
+.pips i.x{background:var(--error);border-color:var(--error)}
+.sol-head{padding:9px 14px;font-size:12px;color:var(--success);background:var(--success-dim);border-bottom:1px solid var(--border)}
+.sol pre{padding:12px 14px;font-size:12px;line-height:1.6;color:var(--text-code);overflow-x:auto}
+.banner{border-radius:var(--radius);padding:11px 14px;font-size:13px;line-height:1.6;margin-bottom:18px}
+.banner.redo{background:var(--mauve-dim);border:1px solid rgba(203,166,247,.3);color:var(--text)}
+.banner.pass{background:var(--success-dim);border:1px solid rgba(166,227,161,.3)}
+.banner b{font-weight:600}
+
+/* workspace */
+.work{display:flex;flex-direction:column;min-height:0;min-width:0}
+.w-head{height:var(--header-h);flex-shrink:0;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+.pill{font-size:11.5px;font-weight:600;background:var(--surface-3);border-radius:var(--radius);padding:5px 10px;color:var(--text-muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:1px solid transparent;font-size:13px;font-weight:600;cursor:pointer}
+.btn.run{background:var(--success-dim);border-color:rgba(166,227,161,.25);color:var(--success)}
+.btn.submit{background:var(--accent-dim);border-color:rgba(137,180,250,.25);color:var(--accent)}
+.btn.ghost{background:transparent;border-color:var(--border);color:var(--text-muted)}
+.w-head .right{margin-left:auto;font-size:11.5px;color:var(--text-dim);display:flex;gap:12px;align-items:center}
+.editor{flex:1;min-height:0;overflow:auto;background:#1e1e1e;padding:14px 0;font-family:var(--font-mono);font-size:13px;line-height:1.6}
+.editor .ln{display:grid;grid-template-columns:44px 1fr;white-space:pre}
+.editor .ln>span:first-child{text-align:right;padding-right:14px;color:#585b70;user-select:none}
+.editor .ln>span:last-child{color:#d4d4d4;padding-right:16px}
+.k{color:#569cd6}.t{color:#4ec9b0}.s{color:#ce9178}.c{color:#6a9955}.n{color:#b5cea8}
+.cursor{display:inline-block;width:2px;height:1.1em;background:#d4d4d4;vertical-align:text-bottom;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cursor{animation:none}}
+.results{flex-shrink:0;max-height:44%;overflow-y:auto;border-top:1px solid var(--border);background:var(--surface)}
+.r-head{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;position:sticky;top:0;background:var(--surface)}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px}
+.badge.ok{color:var(--success);background:var(--success-dim)}
+.badge.bad{color:var(--error);background:var(--error-dim)}
+.r-note{margin-left:auto;font-weight:500;color:var(--text-muted);font-size:11.5px}
+.tr{display:grid;grid-template-columns:60px 46px 1fr;gap:10px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:12.5px;align-items:start}
+.tr .nm{color:var(--text-dim)}
+.tr .v{font-weight:700;font-size:11px;letter-spacing:.05em}
+.tr.pass .v{color:var(--success)} .tr.fail .v{color:var(--error)}
+.tr .d{color:var(--text-muted);font-family:var(--font-mono);font-size:12px;white-space:pre-wrap;line-height:1.55}
+.tr .d em{font-style:normal;color:var(--text-dim);font-family:var(--font-ui);font-size:11px}
+.tr .d .bad{color:var(--error)}
+.cerr{padding:12px 16px;font-family:var(--font-mono);font-size:12px;line-height:1.6;color:var(--error);white-space:pre-wrap}
+
+@media (max-width:980px){
+  html,body{overflow:auto;height:auto}
+  .app{display:block}
+  .sidebar,.panel,.work{min-height:60vh;border-right:none;border-bottom:1px solid var(--border)}
+  .editor{min-height:300px}
+}
+</style>
+</head>
+<body>
+<div class="mock-bar">
+  <span><b>Mockup</b> · nothing here runs code. Click lessons on the left, or jump to a state:</span>
+  <span id="jumps"></span>
+</div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-head">
+      <div class="mode"><button class="on">Foundations</button><button>Problems</button></div>
+    </div>
+    <div class="side-scroll" id="side"></div>
+    <div class="side-foot"><i></i>Runs locally · no data leaves device</div>
+  </aside>
+  <section class="panel" id="panel"></section>
+  <section class="work" id="work"></section>
+</div>
+
+<script>
+const KIND = { program:'PROG', implement:'IMPL', drill:'DRILL', bugfix:'BUG', redo:'REDO' }
+const KIND_LONG = { program:'Full program', implement:'Implement it', drill:'STL drill', bugfix:'Fix the bug' }
+
+const STAGES = [
+  { n:1, t:'C++ warm-up', done:11, total:12, lessons:[
+    ['1.1','Sum of N numbers','program','done','prog'],
+    ['1.2','Read until end of input','program','done'],
+    ['1.3','Swap: value vs reference','implement','done'],
+    ['1.4','Fix: the average is always 0','bugfix','done'],
+    ['…','8 more','',''],
+  ]},
+  { n:2, t:'Sort & search by hand', done:3, total:10, lessons:[
+    ['2.1','Bubble sort','implement','done'],
+    ['2.2','Selection sort','implement','done'],
+    ['2.3','Insertion sort','implement','done'],
+    ['2.4','Merge sort','implement','next','impl'],
+    ['2.5','Quick sort (partition)','implement',''],
+    ['2.6','Counting sort','implement',''],
+    ['2.7','Binary search','implement',''],
+    ['2.8','Lower / upper bound','implement',''],
+    ['2.9','Fix: binary search never ends','bugfix','','bug'],
+    ['2.10','Sort student records','program',''],
+  ]},
+  { n:3, t:'Build it yourself', done:1, total:12, lessons:[
+    ['3.1','Dynamic array','implement',''],
+    ['3.2','Singly linked list','implement',''],
+    ['3.5','Min-heap','implement','done','passed'],
+    ['…','9 more','',''],
+  ]},
+  { n:4, t:'STL', done:0, total:22, lessons:[
+    ['4.6','sort with a lambda','drill',''],
+    ['4.7','priority_queue, custom order','drill','','drill'],
+    ['…','20 more','',''],
+  ]},
+  { n:5, t:'Algorithms', done:0, total:22, lessons:[ ['…','22 lessons','',''] ]},
+  { n:6, t:'Problems', done:14, total:54, lessons:[ ['…','your existing problem bank','',''] ]},
+]
+
+const hl = src => src
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+  .replace(/(\/\/.*)$/gm,'<span class="c">$1</span>')
+  .replace(/("(?:[^"\\]|\\.)*")(?![^<]*<\/span>)/g,'<span class="s">$1</span>')
+  .replace(/\b(int|long|void|bool|return|while|for|if|else|class|struct|public|private|using|namespace|const|auto|size_t|true|false|new|delete|nullptr)\b(?![^<]*<\/span>)/g,'<span class="k">$1</span>')
+  .replace(/\b(vector|string|priority_queue|pair|std|cin|cout|MinHeap|Task)\b(?![^<]*<\/span>)/g,'<span class="t">$1</span>')
+  .replace(/(#include)/g,'<span class="k">$1</span>')
+
+const SCREENS = {
+  prog: {
+    num:'1.1', stage:'Stage 1 · C++ warm-up', title:'Sum of N numbers', kind:'program', time:'~5 min',
+    jump:'Full program',
+    refresher:`<li>Every program needs its own <code>#include</code> lines and an <code>int main()</code>. Nothing is added for you here.</li>
+      <li><code>cin &gt;&gt; x</code> reads the next whitespace-separated value; <code>cout &lt;&lt; x &lt;&lt; "\\n"</code> prints it.</li>
+      <li>Sums of many ints can overflow <code>int</code> (about 2.1 billion). Use <code>long long</code>.</li>`,
+    task:`<p>Read an integer <code>n</code>, then <code>n</code> integers. Print their sum on one line.</p>
+      <div class="io"><span>stdin</span><pre>4\n10 20 30 40</pre><span>stdout</span><pre>100</pre></div>`,
+    hints:['open:Start with the skeleton: includes, <code>main</code>, <code>return 0</code>. Get it compiling before adding logic.','next','locked'],
+    sol:{locked:true,fails:1},
+    file:'main.cpp · blank file, you write everything',
+    code:`#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+        int x;
+        cin >> x;
+        sum += x;
+    }
+    cout << sum << "\\n";
+    return 0;
+}`,
+    results:{ title:'Test Results', badge:['2/3 passed','bad'], note:'Failed submits: 1 of 3',
+      rows:[
+        ['Test 1','pass','<em>stdin</em> 4 / 10 20 30 40   <em>expected</em> 100   <em>got</em> 100'],
+        ['Test 2','pass','<em>stdin</em> 1 / -7   <em>expected</em> -7   <em>got</em> -7'],
+        ['Test 3','fail','<em>stdin</em> 3 / 2000000000 2000000000 2000000000\n<em>expected</em> 6000000000\n<em>got</em>      <span class="bad">1705032704</span>'],
+      ]},
+  },
+  impl: {
+    num:'2.4', stage:'Stage 2 · Sort & search by hand', title:'Merge sort', kind:'implement', time:'~20 min',
+    jump:'Implement it',
+    refresher:`<li>Split the range in half, sort each half, then <b>merge</b> the two sorted halves.</li>
+      <li>Merge: two read pointers, always copy the smaller front element; copy what's left over at the end.</li>
+      <li>Base case: a range of 0 or 1 elements is already sorted. Time O(n log n), extra space O(n).</li>`,
+    task:`<p>Write <code>mergeSort</code> so the vector ends up sorted ascending. No <code>std::sort</code>; the grader rejects it.</p>`,
+    viz:true,
+    hints:['open:Write <code>merge(a, lo, mid, hi)</code> first and test it in your head on <code>[2 5 | 1 9]</code>.','open:Use half-open ranges <code>[lo, hi)</code> throughout. Mixing inclusive and exclusive ends is the classic bug here.','next'],
+    sol:{locked:true,fails:2},
+    file:'function stub · includes and main() are provided',
+    code:`void merge(vector<int>& a, int lo, int mid, int hi) {
+    vector<int> tmp;
+    int i = lo, j = mid;
+    while (i < mid && j < hi) {
+        if (a[i] <= a[j]) tmp.push_back(a[i++]);
+        else tmp.push_back(a[j++]);
+    }
+    // TODO: leftovers
+    for (int k = 0; k < (int)tmp.size(); k++) a[lo + k] = tmp[k];
+}
+
+void mergeSort(vector<int>& a, int lo, int hi) {
+    if (hi - lo <= 1) return;
+    int mid = lo + (hi - lo) / 2;
+    mergeSort(a, lo, mid);
+    mergeSort(a, mid, hi);
+    merge(a, lo, mid, hi);
+}`,
+    results:{ title:'Test Results', badge:['3/6 passed','bad'], note:'Failed submits: 2 of 3 · one more unlocks the solution',
+      rows:[
+        ['Test 1','pass','[] → []'],
+        ['Test 2','pass','[1] → [1]'],
+        ['Test 3','fail','<em>input</em>    [5 2 9 1]\n<em>expected</em> [1 2 5 9]\n<em>got</em>      <span class="bad">[1 2 9 1]</span>'],
+        ['Test 4','pass','[3 3 3] → [3 3 3]'],
+        ['Test 5','fail','<em>input</em>    [9 8 7 6 5]\n<em>expected</em> [5 6 7 8 9]\n<em>got</em>      <span class="bad">[5 6 7 6 5]</span>'],
+        ['Test 6','fail','100 000 random values: not sorted'],
+      ]},
+  },
+  passed: {
+    num:'3.5', stage:'Stage 3 · Build it yourself', title:'Min-heap', kind:'implement', time:'~25 min',
+    jump:'Passed + solution',
+    banner:['pass','<b>Passed, 6/6.</b> Marked complete. A blank-page redo is queued for <b>18 Nov</b> (3 days).'],
+    refresher:`<li>A heap is a complete binary tree stored in an array. Parent of <code>i</code> is <code>(i-1)/2</code>; children are <code>2i+1</code> and <code>2i+2</code>.</li>
+      <li><b>push</b>: append at the end, sift up while smaller than the parent.</li>
+      <li><b>pop</b>: move the last element to the root, sift down toward the smaller child.</li>`,
+    task:`<p>Implement <code>push</code>, <code>pop</code>, <code>top</code> and <code>size</code> for a min-heap of ints, using a <code>vector&lt;int&gt;</code> as storage.</p>`,
+    hints:['open:Sift up: <code>while (i &gt; 0 &amp;&amp; h[i] &lt; h[(i-1)/2])</code> swap and move to the parent.','open:Sift down: pick the smaller child first, then compare it with the current node.','open:In <code>pop</code>, handle the size-1 case before sifting.'],
+    sol:{locked:false, code:`void push(int x) {
+    h.push_back(x);
+    int i = h.size() - 1;
+    while (i > 0 && h[i] < h[(i - 1) / 2]) {
+        swap(h[i], h[(i - 1) / 2]);
+        i = (i - 1) / 2;
+    }
+}
+void pop() {
+    h[0] = h.back();
+    h.pop_back();
+    size_t i = 0;
+    while (true) {
+        size_t l = 2 * i + 1, r = l + 1, m = i;
+        if (l < h.size() && h[l] < h[m]) m = l;
+        if (r < h.size() && h[r] < h[m]) m = r;
+        if (m == i) break;
+        swap(h[i], h[m]);
+        i = m;
+    }
+}`},
+    file:'class stub · includes and main() are provided',
+    code:`class MinHeap {
+    vector<int> h;
+public:
+    void push(int x) {
+        h.push_back(x);
+        int i = (int)h.size() - 1;
+        while (i > 0) {
+            int p = (i - 1) / 2;
+            if (h[p] <= h[i]) break;
+            swap(h[p], h[i]);
+            i = p;
+        }
+    }
+    void pop() {
+        h[0] = h.back();
+        h.pop_back();
+        int i = 0, n = (int)h.size();
+        while (2 * i + 1 < n) {
+            int c = 2 * i + 1;
+            if (c + 1 < n && h[c + 1] < h[c]) c++;
+            if (h[i] <= h[c]) break;
+            swap(h[i], h[c]);
+            i = c;
+        }
+    }
+    int top() const { return h[0]; }
+    int size() const { return (int)h.size(); }
+};`,
+    results:{ title:'Test Results', badge:['6/6 passed','ok'], note:'Solution unlocked',
+      rows:[
+        ['Test 1','pass','push 5 3 8, top → 3'],
+        ['Test 2','pass','push 5 3 8, pop, top → 5'],
+        ['Test 3','pass','duplicates: 2 2 1 1 → pops 1 1 2 2'],
+        ['Test 4','pass','single element push/pop, size → 0'],
+        ['Test 5','pass','descending 1000..1 → pops ascending'],
+        ['Test 6','pass','200 000 mixed operations · 41 ms'],
+      ]},
+  },
+  drill: {
+    num:'4.7', stage:'Stage 4 · STL', title:'priority_queue, custom order', kind:'drill', time:'~4 min',
+    jump:'STL drill',
+    refresher:`<li><code>priority_queue&lt;T&gt;</code> is a <b>max</b>-heap by default: <code>top()</code> is the largest.</li>
+      <li>The comparator answers "should <code>a</code> sit <b>below</b> <code>b</code>?", so it reads backwards compared with <code>sort</code>.</li>
+      <pre>priority_queue&lt;int, vector&lt;int&gt;, greater&lt;int&gt;&gt; minHeap;
+auto cmp = [](const T&amp; a, const T&amp; b) { return /* a below b */; };
+priority_queue&lt;T, vector&lt;T&gt;, decltype(cmp)&gt; pq(cmp);</pre>`,
+    task:`<p>Each <code>Task</code> has a <code>priority</code> and a <code>name</code>. Return the names in the order they should run: <b>lowest priority number first</b>; ties broken by name, alphabetically. Use a <code>priority_queue</code>.</p>
+      <div class="io"><span>input</span><pre>{2,"deploy"} {1,"test"} {2,"build"}</pre><span>output</span><pre>test build deploy</pre></div>`,
+    hints:['next','locked'],
+    sol:{locked:true,fails:0},
+    file:'function stub · includes and main() are provided',
+    code:`struct Task { int priority; string name; };
+
+vector<string> runOrder(vector<Task> tasks) {
+    auto cmp = [](const Task& a, const Task& b) {
+        ▮
+    };
+
+}`,
+    results:null,
+  },
+  bug: {
+    num:'2.9', stage:'Stage 2 · Sort & search by hand', title:'Fix: binary search never ends', kind:'bugfix', time:'~8 min',
+    jump:'Fix the bug',
+    refresher:`<li>Each loop step must shrink the range. If <code>lo</code> or <code>hi</code> can stay the same, the loop can spin forever.</li>
+      <li>With <code>while (lo &lt; hi)</code> and <code>mid = (lo + hi) / 2</code>, <code>mid</code> can equal <code>lo</code>, so <code>lo = mid</code> does not shrink anything.</li>`,
+    task:`<p>This function should return the index of <code>target</code> in a sorted vector, or <code>-1</code>. It hangs on some inputs and misses others. Change as little as you can to make every test pass.</p>
+      <p>The tests are hidden for this kind of task: finding the failing input is the exercise. Use <b>Custom</b> to try your own.</p>`,
+    hints:['next','locked','locked'],
+    sol:{locked:true,fails:0},
+    file:'broken code is pre-filled · includes and main() are provided',
+    code:`int search(const vector<int>& a, int target) {
+    int lo = 0, hi = a.size() - 1;
+    while (lo < hi) {
+        int mid = (lo + hi) / 2;
+        if (a[mid] == target) return mid;
+        if (a[mid] < target) lo = mid;
+        else hi = mid - 1;
+    }
+    return -1;
+}`,
+    results:{ title:'Test Results', badge:['2/7 passed','bad'], note:'Failed submits: 0 of 3 (first submit is free on bug tasks)',
+      rows:[
+        ['Test 1','pass','hidden'],
+        ['Test 2','fail','<span class="bad">Time limit exceeded</span> · 2000 ms'],
+        ['Test 3','fail','hidden · expected 0, got -1'],
+        ['Test 4','pass','hidden'],
+        ['…','','3 more failing'],
+      ]},
+  },
+  redo: {
+    num:'2.3', stage:'Redo · first passed 12 Nov', title:'Insertion sort', kind:'implement', redo:true, time:'aim for under 10 min',
+    jump:'Blank-page redo',
+    banner:['redo','<b>Blank-page redo.</b> You passed this 3 days ago. Write it again from an empty editor; your first solution is kept and shown after you pass. Next redo would be in 7 days.'],
+    refresher:null,
+    task:`<p>Write <code>insertionSort</code> so the vector ends up sorted ascending.</p><p style="color:var(--text-muted);font-size:13px">The refresher is folded away for redos. <u style="cursor:pointer">Show it anyway</u></p>`,
+    hints:['next','locked'],
+    sol:{locked:true,fails:0},
+    file:'function stub only',
+    code:`void insertionSort(vector<int>& a) {
+    ▮
+}`,
+    results:null,
+  },
+}
+
+let current = 'impl'
+
+function renderSide(){
+  const redo = `<div class="redo-box"><h4>Redo due · 2</h4>
+    <button data-s="redo"><span>2.3 Insertion sort</span><span>today</span></button>
+    <button><span>1.3 Swap: value vs reference</span><span>1 day late</span></button></div>`
+  const total = STAGES.slice(0,5).reduce((a,s)=>a+s.total,0), done = STAGES.slice(0,5).reduce((a,s)=>a+s.done,0)
+  const overall = `<div class="overall"><div class="row"><span>Foundations progress</span><span>${done} / ${total}</span></div><div class="bar"><i style="width:${done/total*100}%"></i></div></div>`
+  const stages = STAGES.map(s=>`<div class="stage">
+    <button class="stage-head"><span class="n">${s.n}</span><span class="t">${s.t}</span><span class="c${s.done===s.total?' full':''}">${s.done}/${s.total}</span></button>
+    <div class="bar"><i style="width:${s.done/s.total*100}%"></i></div>
+    ${s.lessons.map(([num,ttl,kind,state,screen])=>{
+      if(num==='…') return `<div class="lesson" style="cursor:default"><span class="num"></span><span class="ttl" style="color:var(--text-dim);font-size:12px">${ttl}</span></div>`
+      const active = screen===current
+      return `<button class="lesson${state==='done'?' done':''}${active?' active':''}" ${screen?`data-s="${screen}"`:''}>
+        <span class="num">${num}</span><span class="ttl">${ttl}</span>
+        ${state==='next'?'<span class="next-tag">NEXT</span>':''}
+        <span class="kind ${kind}">${KIND[kind]}</span>
+        <span class="st">${state==='done'?'✓':'○'}</span></button>`
+    }).join('')}</div>`).join('')
+  document.getElementById('side').innerHTML = overall + redo + stages
+}
+
+function renderPanel(s){
+  const hints = s.hints.map((h,i)=> h.startsWith('open:') ? `<div class="hint open">${h.slice(5)}</div>`
+    : h==='next' ? `<div class="hint"><button>Reveal Hint ${i+1}</button></div>`
+    : `<div class="hint locked">— Hint ${i+1} locked</div>`).join('')
+  const sol = s.sol.locked
+    ? `<div class="sol locked"><span class="lock">🔒</span><div><b>Reference solution locked</b><span>Unlocks when you pass, or after 3 failed submits.</span></div>
+        <div class="pips" title="failed submits">${[0,1,2].map(i=>`<i class="${i<s.sol.fails?'x':''}"></i>`).join('')}</div></div>`
+    : `<div class="sol"><div class="sol-head">✓ Unlocked · compare with yours, don't paste it</div><pre>${hl(s.sol.code)}</pre></div>`
+  const viz = s.viz ? `<div class="label">Picture it</div><div class="viz"><svg viewBox="0 0 420 150" role="img" aria-label="Merge sort splitting 5 2 9 1 into halves and merging back">
+      <g font-family="JetBrains Mono, monospace" font-size="12" text-anchor="middle">
+        ${[[150,8,['5','2','9','1'],'#89b4fa']].concat([[84,58,['5','2'],'#9399b2'],[216,58,['9','1'],'#9399b2']],[[150,110,['1','2','5','9'],'#a6e3a1']])
+          .map(([x,y,vals,col])=>vals.map((v,i)=>`<rect x="${x+i*30}" y="${y}" width="28" height="28" rx="4" fill="none" stroke="${col}"/><text x="${x+i*30+14}" y="${y+18}" fill="#cdd6f4">${v}</text>`).join('')).join('')}
+        <g stroke="#45475a" fill="none"><path d="M180 38 L115 56"/><path d="M240 38 L245 56"/><path d="M115 88 L180 108"/><path d="M245 88 L240 108"/></g>
+        <text x="345" y="27" fill="#6c7086" font-size="11" text-anchor="start">split</text>
+        <text x="345" y="77" fill="#6c7086" font-size="11" text-anchor="start">sort halves</text>
+        <text x="345" y="129" fill="#6c7086" font-size="11" text-anchor="start">merge</text>
+      </g></svg></div>` : ''
+  document.getElementById('panel').innerHTML = `
+    <div class="p-head">
+      <div class="crumb">${s.stage}</div>
+      <h1 class="p-title">${s.num} · ${s.title}</h1>
+      <div class="p-meta">
+        ${s.redo?'<span class="kind redo">REDO</span>':''}
+        <span class="kind ${s.kind}">${KIND_LONG[s.kind]}</span><span class="tag">${s.time}</span>
+      </div>
+    </div>
+    <div class="p-body">
+      ${s.banner?`<div class="banner ${s.banner[0]}">${s.banner[1]}</div>`:''}
+      ${s.refresher?`<div class="label">Refresher <small>30 seconds, then code</small></div><ul class="refresher" style="list-style:disc">${s.refresher}</ul>`:''}
+      <div class="label">Your task</div>${s.task}
+      ${viz}
+      <div class="label">Hints</div>${hints}
+      <div class="label">Solution</div>${sol}
+    </div>`
+}
+
+function renderWork(s){
+  const lines = s.code.split('\n').map((l,i)=>`<div class="ln"><span>${i+1}</span><span>${hl(l).replace('▮','<span class="cursor"></span>')}</span></div>`).join('')
+  const r = s.results
+  const results = r ? `<div class="results"><div class="r-head">${r.title}<span class="badge ${r.badge[1]}">${r.badge[0]}</span><span class="r-note">${r.note}</span></div>
+    ${r.rows.map(([n,v,d])=>`<div class="tr ${v}"><span class="nm">${n}</span><span class="v">${v.toUpperCase()}</span><span class="d">${d}</span></div>`).join('')}</div>` : ''
+  document.getElementById('work').innerHTML = `
+    <div class="w-head">
+      <span class="pill">C++</span>
+      <button class="btn run">▶ Run</button><button class="btn submit">Submit</button><button class="btn ghost">Custom</button>
+      <span class="right"><span>${s.file}</span><span>autocomplete off</span></span>
+    </div>
+    <div class="editor">${lines}</div>${results}`
+}
+
+function show(id){
+  current = id
+  renderSide(); renderPanel(SCREENS[id]); renderWork(SCREENS[id])
+  document.querySelectorAll('.jump').forEach(b=>b.style.borderColor = b.dataset.s===id ? 'var(--accent)' : '')
+}
+
+document.getElementById('jumps').innerHTML = Object.entries(SCREENS).map(([id,s])=>`<button class="jump" data-s="${id}">${s.jump}</button>`).join(' ')
+document.body.addEventListener('click', e=>{
+  const el = e.target.closest('[data-s]')
+  if(el) show(el.dataset.s)
+})
+show(current)
+</script>
+</body>
+</html>

@@ -21,6 +21,25 @@ export const CPP_DSA_PREAMBLE = `#include <iostream>
 using namespace std;
 `
 
+// The bundled wasm libc++ references a long-double comparison helper that the sysroot's
+// runtime library does not provide, so any program using std::sort on built-in types
+// (e.g. sort(v.begin(), v.end()) on ints) failed to link. Supplying it here fixes that.
+export const CPP_WASM_SHIM = `
+#ifdef __wasm__
+extern "C" int __lttf2(long double a, long double b) {
+    unsigned long long x[2], y[2];
+    __builtin_memcpy(x, &a, 16);
+    __builtin_memcpy(y, &b, 16);
+    bool zeroA = ((x[1] << 1) | x[0]) == 0, zeroB = ((y[1] << 1) | y[0]) == 0;
+    if (zeroA && zeroB) return 0;
+    bool negA = x[1] >> 63, negB = y[1] >> 63;
+    if (negA != negB) return negA ? -1 : 1;
+    int c = x[1] != y[1] ? (x[1] < y[1] ? -1 : 1) : (x[0] != y[0] ? (x[0] < y[0] ? -1 : 1) : 0);
+    return negA ? -c : c;
+}
+#endif
+`
+
 // Wraps user's Solution class with a test harness for execution.
 // Returns the full code string ready to send to Pyodide or wasm-clang.
 
@@ -38,7 +57,7 @@ function buildCpp(userCode, problem, mode, customInput) {
     .replace(/using\s+namespace\s+std\s*;\s*\n?/g, '')
     .trimStart()
   const harness = problem.buildCppHarness(mode, customInput) ?? ''
-  return CPP_DSA_PREAMBLE + '\n' + cleaned + '\n' + harness
+  return CPP_DSA_PREAMBLE + '\n' + cleaned + '\n' + harness + '\n' + CPP_WASM_SHIM
 }
 
 function buildPython(userCode, problem, mode, customInput) {

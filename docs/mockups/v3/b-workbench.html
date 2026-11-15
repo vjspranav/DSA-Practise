@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+:root{--font:'Roboto Flex',Roboto,system-ui,sans-serif;--r:16px;
+  --bg:#eef3f1;--card:#fff;--card2:#e8f0ed;--text:#16201d;--sub:#566660;--line:#d9e3df;
+  --pri:#00695c;--on-pri:#fff;--pri-c:#cdeee6;--on-pri-c:#003d35;--pri-shadow:rgba(0,105,92,.35);
+  --ok:#1b7f3b;--ok-c:#d8f3df;--bad:#b3261e;--bad-c:#fde2df;--inverse:#263330;--on-inverse:#fff;
+  --elev:0 1px 3px rgba(22,32,29,.08),0 1px 2px rgba(22,32,29,.05);
+  --ed-bg:#fff;--ed-text:#1d2a27;--ed-num:#a9b8b3;--ed-new:rgba(0,105,92,.07);--ed-flash:rgba(0,105,92,.28);--c-k:#7b3fc4;--c-t:#00695c;--c-s:#b25a00}
+html[data-theme=dark]{--bg:#0f1514;--card:#19211f;--card2:#232d2a;--text:#e0ebe7;--sub:#9bb0a9;--line:#2c3835;
+  --pri:#7fd8c6;--on-pri:#00382f;--pri-c:#0d4f45;--on-pri-c:#cdeee6;--pri-shadow:rgba(0,0,0,.5);
+  --ok:#86d99a;--ok-c:#143a20;--bad:#ffb4ab;--bad-c:#55150f;--inverse:#e0ebe7;--on-inverse:#16201d;
+  --elev:0 1px 3px rgba(0,0,0,.5);
+  --ed-bg:#141b19;--ed-text:#dbe7e3;--ed-num:#4c5c57;--ed-new:rgba(127,216,198,.08);--ed-flash:rgba(127,216,198,.35);--c-k:#cfa8ff;--c-t:#7fd8c6;--c-s:#ffc078}
+html,body{height:100%}
+body{display:grid;grid-template-columns:300px 1fr;overflow:hidden}
+
+/* drawer */
+.drawer{display:flex;flex-direction:column;min-height:0;padding:16px 12px 12px}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 12px 14px;font-weight:700;font-size:18px}
+.brand .ms{color:var(--pri);font-size:26px}
+.overall{padding:0 12px 14px;font-size:13px;color:var(--sub);display:grid;gap:8px}
+.nav{flex:1;overflow-y:auto;min-height:0;padding-right:4px}
+.grp-h{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border-radius:24px;font-weight:600;font-size:14px}
+.grp-h:hover{background:var(--card2)}
+.grp-h .n{flex:1}
+.grp-h small{color:var(--sub);font-weight:500;font-size:12.5px}
+.grp-h .chev{color:var(--sub);transition:transform .4s var(--ease)}
+.grp.open .chev{transform:rotate(180deg)}
+.item{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;width:100%;height:40px;padding:0 14px 0 16px;border-radius:20px;font-size:14px;color:var(--sub);transition:background .2s,color .2s}
+.item:hover{background:var(--card2)}
+.item .ms{font-size:18px;color:var(--line)}
+.item.done .ms{color:var(--ok)}
+.item span.t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.on{background:var(--pri-c);color:var(--on-pri-c);font-weight:600}
+.item.on .ms{color:var(--pri)}
+.item .again{font-size:16px;color:var(--pri)}
+
+/* main */
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;padding:12px 12px 12px 0}
+.sheet-wrap{flex:1;min-height:0;display:flex;gap:12px}
+.work{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;min-height:0}
+.task{display:flex;align-items:center;gap:18px;padding:16px 12px 16px 24px}
+.task .txt{flex:1;min-width:0}
+.task h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.task p{color:var(--sub);font-size:14.5px;margin-top:2px}
+.task .kd{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--on-pri-c);background:var(--pri-c);padding:4px 10px 4px 8px;border-radius:8px;white-space:nowrap}
+.task .kd .ms{font-size:16px}
+.editor{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.ed-h{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 20px;border-bottom:1px solid var(--line)}
+.file{font-family:var(--mono);font-size:13px;color:var(--sub);flex:1}
+.editor .codeview{flex:1;min-height:0}
+.nudge{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 18px;background:var(--pri-c);color:var(--on-pri-c);font-size:14px;font-weight:500}
+.nudge span:not(.ms){flex:1}
+.res{border-top:1px solid var(--line);padding:0 20px}
+.res .pad{padding:14px 0 16px}
+.rail{display:flex;flex-direction:column;gap:6px;padding:8px 6px;align-self:flex-start}
+.rail button{position:relative;overflow:hidden;width:64px;padding:8px 0 6px;border-radius:16px;display:grid;justify-items:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--sub);transition:background .25s,color .25s}
+.rail button .ms{font-size:22px;padding:4px 16px;border-radius:14px;transition:background .25s}
+.rail button.on{color:var(--on-pri-c)}
+.rail button.on .ms{background:var(--pri-c)}
+.rail button:hover .ms{background:var(--card2)}
+.rail .badge{position:absolute;top:8px;right:14px;width:9px;height:9px;border-radius:50%;background:var(--bad);animation:chip .4s var(--ease)}
+.side{width:0;opacity:0;overflow:hidden;transition:width .5s var(--ease),opacity .3s}
+.side.open{width:340px;opacity:1}
+.side-in{width:340px;height:100%;display:flex;flex-direction:column}
+.side-h{display:flex;align-items:center;padding:12px 8px 8px 20px;font-weight:700;font-size:16px}
+.side-h span{flex:1}
+.side-b{padding:8px 20px 20px;overflow-y:auto;view-transition-name:sideb}
+@media (max-width:900px){body{grid-template-columns:1fr;overflow:auto;height:auto}.drawer{max-height:40vh}.main{padding:12px}.side.open{width:100%}.sheet-wrap{flex-direction:column}.rail{flex-direction:row}}
+</style>
+</head>
+<body>
+<aside class="drawer" id="drawer"></aside>
+<div class="main" id="main"></div>
+<div class="snack" id="snack"></div>
+<script src="shared.js"></script>
+<script>
+let V = { lesson: nextLesson(), open: { [nextLesson().s]: true }, tab: null, st: newState(), res: null, nudge: false }
+
+function drawer() {
+  $('drawer').innerHTML = `<div class="brand"><span class="ms fill">school</span><span style="flex:1">Foundations</span>${THEME_BTN}</div>
+    <div class="overall"><span>${totalDone()} of ${ALL.length} lessons done</span><div class="bar-track"><i style="width:${totalDone() / ALL.length * 100}%"></i></div></div>
+    <nav class="nav">${STAGES.map(s => `<div class="grp${V.open[s.i] ? ' open' : ''}">
+      <button class="grp-h rip" data-act="grp" data-s="${s.i}"><span class="n">${s.name}</span><small>${stageDone(s)}/${s.lessons.length}</small><span class="ms chev">expand_more</span></button>
+      <div class="fold${V.open[s.i] ? ' open' : ''}"><div>${s.lessons.map(l => `<button class="item rip${l.done ? ' done' : ''}${l === V.lesson ? ' on' : ''}" data-act="lesson" data-id="${l.id}">
+        <span class="ms${l.done ? ' fill' : ''}">${l.done ? 'check_circle' : 'circle'}</span><span class="t">${l.title}</span>${l.redo ? '<span class="ms again" title="Ready to write again">replay</span>' : ''}</button>`).join('')}</div></div></div>`).join('')}</nav>`
+}
+const TABS = [['refresher', 'menu_book', 'Refresher'], ['hints', 'lightbulb', 'Hints'], ['answer', 'lock', 'Answer']]
+function main() {
+  const l = V.lesson, L = content(l), nx = lessonAfter(l), tabName = V.tab && TABS.find(t => t[0] === V.tab)[2]
+  $('main').innerHTML = `<div class="sheet-wrap">
+    <div class="work">
+      <section class="card task"><div class="txt"><h2>${l.title}</h2><p>${L.task}</p></div><span class="kd"><span class="ms">${KIND_ICON[l.kind]}</span>${l.redo ? 'Write it again' : KIND[l.kind]}</span></section>
+      <section class="card editor">
+        <div class="ed-h"><span class="file">merge_sort.cpp</span><button class="btn text"><span class="ms fill">play_arrow</span>Run</button><button class="btn fill" data-act="check" id="check">Check my code</button></div>
+        <div class="codeview">${codeHTML(L, V.st.passed)}</div>
+        <div class="fold${V.nudge ? ' open' : ''}"><div><div class="nudge"><span class="ms">lightbulb</span><span>${V.st.attempts >= 3 ? 'Three misses. The answer is open if you want it.' : 'Stuck? A hint is ready.'}</span><button class="btn text" data-act="tab" data-t="${V.st.attempts >= 3 ? 'answer' : 'hints'}">Show me</button><button class="iconbtn" data-act="nonudge" aria-label="Dismiss"><span class="ms">close</span></button></div></div></div>
+        <div class="fold${V.res ? ' open' : ''}"><div><div class="res"><div class="pad" style="display:flex;gap:16px;align-items:flex-start"><div style="flex:1;min-width:0">${resultsHTML(V.res)}</div>
+          ${V.st.passed && nx ? `<button class="btn tone" data-act="lesson" data-id="${nx.id}" style="animation:pop .5s var(--ease) .5s backwards">Next: ${nx.title}<span class="ms" style="margin:0 -6px 0 0">arrow_forward</span></button>` : ''}</div></div></div></div>
+      </section>
+    </div>
+    <div class="card side${V.tab ? ' open' : ''}"><div class="side-in"><div class="side-h"><span>${tabName || ''}</span><button class="iconbtn" data-act="tab" data-t="${V.tab}" aria-label="Close"><span class="ms">close</span></button></div>
+      <div class="side-b">${V.tab ? helpHTML(L, V.tab, V.st) : ''}</div></div></div>
+    <div class="rail">${TABS.map(([t, ic, nm]) => `<button class="rip${V.tab === t ? ' on' : ''}" data-act="tab" data-t="${t}"><span class="ms">${t === 'answer' && answerOpen(V.st) ? 'lock_open' : ic}</span>${nm}${t === 'hints' && V.nudge && V.tab !== 'hints' ? '<i class="badge"></i>' : ''}</button>`).join('')}</div>
+  </div>`
+}
+function render() { drawer(); main() }
+
+function pick(id) { const l = byId(id); V = { ...V, lesson: l, tab: null, st: newState(), res: null, nudge: false }; V.open[l.s] = true; vt(render) }
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return
+  const act = el.dataset.act
+  if (act === 'theme') toggleTheme()
+  if (act === 'grp') { const s = +el.dataset.s; V.open[s] = !V.open[s]; el.parentElement.classList.toggle('open', V.open[s]); el.nextElementSibling.classList.toggle('open', V.open[s]) }
+  if (act === 'lesson') pick(el.dataset.id)
+  if (act === 'tab') {
+    const t = el.dataset.t, was = V.tab
+    V.tab = was === t ? null : t; V.st.lastHint = 0; if (V.tab === 'hints' || V.tab === 'answer') V.nudge = false
+    if (was && V.tab) vt(main)                      // swap content
+    else { if (V.tab) { main(); const s = document.querySelector('.side'); s.classList.remove('open'); requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add('open'))) }
+      else { document.querySelector('.side').classList.remove('open'); setTimeout(main, 450) } }
+  }
+  if (act === 'hint') { V.st.lastHint = V.st.hints; V.st.hints++; vt(main) }
+  if (act === 'nonudge') { V.nudge = false; el.closest('.fold').classList.remove('open') }
+  if (act === 'test') toggleDetail(V.res, +el.dataset.i, el)
+  if (act === 'check') {
+    el.classList.add('busy'); el.textContent = 'Checking…'
+    setTimeout(() => {
+      V.res = simulate(content(V.lesson), V.st)
+      if (V.res.win) { V.lesson.done = true; V.lesson.redo = false; V.nudge = false; V.tab = 'answer'; snack('<span class="ms fill">check_circle</span>Passed. The answer is unlocked.') }
+      else V.nudge = V.tab !== 'hints'
+      render()
+    }, 650)
+  }
+})
+render()
+if (location.hash.includes('demo')) setTimeout(() => $('check').click(), 300)
+</script>
+</body>
+</html>

@@ -2,19 +2,26 @@ import { useEffect, useRef, useState } from 'react'
 import _ from 'lodash'
 import { PROBLEMS, CATEGORIES } from './data/problems'
 import { buildCode, compileLinkOnly, runWasm } from './runtime/executor'
+import { useWasmClang, wasmClang } from './runtime/useWasmClang'
 import { usePracticeStore } from './hooks/usePracticeStore'
 import Sidebar from './components/Sidebar'
 import ProblemPanel from './components/ProblemPanel'
 import WorkspacePanel from './components/WorkspacePanel'
+import Foundations from './foundations/Foundations'
 import './App.css'
 
 // JSCPP needs lodash as a global — expose it before any JSCPP import
 window._ = _
 
 // ── Runtime status ────────────────────────────────────────────────────────────
-const initStatuses = { pyodide: 'loading', 'wasm-clang': 'loading' }
+const initStatuses = { pyodide: 'loading' }
 
 export default function App() {
+  const [mode, setMode] = useState(() => localStorage.getItem('dsa-mode') === 'problems' ? 'problems' : 'foundations')
+  function switchMode(next) {
+    localStorage.setItem('dsa-mode', next)
+    setMode(next)
+  }
   const [selectedProblem, setSelectedProblem] = useState(() => {
     const lastId = localStorage.getItem('dsa-last-problem')
     return PROBLEMS.find(p => p.id === lastId) ?? PROBLEMS[0]
@@ -27,8 +34,9 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen]         = useState(true)
 
   const pyodideRef     = useRef(null)
-  const wasmClangRef   = useRef(null)   // { port, handlers, onWrite }
-  const wasmClangMsgId = useRef(0)
+  const clangError     = useWasmClang()
+  const wasmClangRef   = wasmClang.slot   // { port, handlers, onWrite }
+  const wasmClangMsgId = wasmClang.counter
 
   const setStatus = (lib, state) => setStatuses(p => ({ ...p, [lib]: state }))
 
@@ -38,33 +46,16 @@ export default function App() {
   const currentCode = getCode(selectedProblem.id, language)
 
   // ── Pyodide ───────────────────────────────────────────────────────────────
+  // Loaded lazily: Foundations mode never needs it.
   useEffect(() => {
+    if (mode !== 'problems' || pyodideRef.current) return
     import('pyodide').then(({ loadPyodide }) =>
       loadPyodide({ indexURL: '/node_modules/pyodide/' })
     ).then(py => {
       pyodideRef.current = py
       setStatus('pyodide', 'ok')
     }).catch(() => setStatus('pyodide', 'error'))
-  }, [])
-
-  // ── wasm-clang ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const worker = new Worker('/wasm-clang/worker.js')
-    const { port1, port2 } = new MessageChannel()
-    worker.postMessage({ id: 'constructor', data: port2 }, [port2])
-    const state = { port: port1, handlers: {}, onWrite: null }
-    port1.onmessage = ({ data: { id, responseId, data } }) => {
-      if (id === 'write') state.onWrite?.(data)
-      else if (id === 'compileLinkRunDone' || id === 'compileLinkOnlyDone' || id === 'runWasmDone') {
-        const resolve = state.handlers[responseId]
-        if (resolve) { resolve(data); delete state.handlers[responseId] }
-      }
-    }
-    worker.onerror = () => setStatus('wasm-clang', 'error')
-    wasmClangRef.current = state
-    setStatus('wasm-clang', 'ok')
-    return () => worker.terminate()
-  }, [])
+  }, [mode])
 
   // ── Run ───────────────────────────────────────────────────────────────────
   async function handleRun(mode, customInput = '') {
@@ -196,6 +187,10 @@ export default function App() {
     saveCode(selectedProblem.id, language, code)
   }
 
+  if (mode === 'foundations') {
+    return <Foundations onSwitch={() => switchMode('problems')} />
+  }
+
   return (
     <div className="app-root" style={{
       gridTemplateColumns: sidebarOpen
@@ -209,6 +204,7 @@ export default function App() {
         onSelect={handleProblemSelect}
         getStatus={getStatus}
         onStatusChange={setProblemStatus}
+        onSwitchMode={() => switchMode('foundations')}
         collapsed={!sidebarOpen}
         onToggle={() => setSidebarOpen(v => !v)}
       />
@@ -223,7 +219,7 @@ export default function App() {
         runMode={runMode}
         onRun={handleRun}
         results={results}
-        statuses={statuses}
+        statuses={{ ...statuses, 'wasm-clang': clangError ? 'error' : 'ok' }}
         problemStatus={getStatus(selectedProblem.id)}
         onStatusChange={(s) => setProblemStatus(selectedProblem.id, s)}
       />
