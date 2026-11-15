@@ -3,7 +3,7 @@
 // results land in window.__fndSelfTest. Driven by scripts/browser-selftest.mjs.
 import { LESSONS } from '../data/foundations/index.js'
 import { assembleSource, judge } from './grade.js'
-import { compile, runTest, limitFor, exclusive } from './runner.js'
+import { compile, runTest, limitFor, exclusive } from '../workbench/runner.js'
 import { wasmClang } from '../runtime/useWasmClang'
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))

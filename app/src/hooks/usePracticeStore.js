@@ -13,6 +13,7 @@ export function usePracticeStore() {
   const [statusMap, setStatusMap] = useState(() => readJSON(STATUS_KEY))
   const codeMapRef  = useRef(readJSON(CODE_KEY))
   const debounceRef = useRef({})
+  const [, rerender] = useState(0)   // code lives in a ref (saved debounced); bump so the editor's value prop follows it
 
   const getCode = useCallback((problemId, lang) => {
     const saved = codeMapRef.current[problemId]?.[lang]
@@ -26,6 +27,7 @@ export function usePracticeStore() {
       ...codeMapRef.current,
       [problemId]: { ...codeMapRef.current[problemId], [lang]: code },
     }
+    rerender(n => n + 1)
     clearTimeout(debounceRef.current[problemId])
     debounceRef.current[problemId] = setTimeout(() => {
       localStorage.setItem(CODE_KEY, JSON.stringify(codeMapRef.current))

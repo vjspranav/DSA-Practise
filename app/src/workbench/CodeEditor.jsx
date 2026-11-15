@@ -13,17 +13,28 @@ top front back begin end rbegin rend size empty clear insert erase find count fi
 lower_bound upper_bound accumulate min_element max_element unique next_permutation make_pair greater less substr
 to_string stoi length resize reserve assign`.split(/\s+/)
 
+const PY_WORDS = `and as assert break class continue def del elif else except False finally for from global if import in is
+lambda None nonlocal not or pass raise return self True try while with yield int str float bool list dict set tuple len range
+enumerate zip sorted reversed min max sum abs append pop extend insert remove index count sort reverse keys values items get
+heapq heappush heappop heapify deque appendleft popleft defaultdict Counter collections typing List Optional print input`.split(/\s+/)
+
 let completionReady = false
 function defineCompletion(monaco) {
   if (completionReady) return
   completionReady = true
-  monaco.languages.registerCompletionItemProvider('cpp', {
-    provideCompletionItems(model, position) {
-      const w = model.getWordUntilPosition(position)
-      const range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber, startColumn: w.startColumn, endColumn: w.endColumn }
-      return { suggestions: WORDS.map(label => ({ label, insertText: label, kind: monaco.languages.CompletionItemKind.Keyword, range })) }
-    },
-  })
+  for (const [lang, words] of [['cpp', WORDS], ['python', PY_WORDS]]) {
+    monaco.languages.registerCompletionItemProvider(lang, {
+      provideCompletionItems(model, position) {
+        const w = model.getWordUntilPosition(position)
+        const range = { startLineNumber: position.lineNumber, endLineNumber: position.lineNumber, startColumn: w.startColumn, endColumn: w.endColumn }
+        // Keywords, plus the other words already in the file (not the one being typed).
+        const inFile = new Set(model.getValue().match(/[A-Za-z_]\w{2,}/g) ?? [])
+        inFile.delete(w.word)
+        const labels = [...new Set([...words, ...inFile])]
+        return { suggestions: labels.map(label => ({ label, insertText: label, kind: monaco.languages.CompletionItemKind.Keyword, range })) }
+      },
+    })
+  }
 }
 
 function defineThemes(monaco) {
@@ -85,11 +96,11 @@ const OPTIONS = {
   suggest: { showWords: true, showSnippets: false, showIcons: false, preview: false },
 }
 
-export default function CodeEditor({ path, value, theme, onChange, onCursor, onCheck }) {
+export default function CodeEditor({ path, value, theme, language = 'cpp', onChange, onCursor, onCheck }) {
   return (
     <Editor
       height="100%"
-      language="cpp"
+      language={language}
       path={path}
       value={value}
       theme={theme === 'dark' ? 'fnd-dark' : 'fnd-light'}

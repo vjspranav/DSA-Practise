@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { STAGES, LESSONS } from '../data/foundations'
 import Drawer from './Drawer'
 import Workbench from './Workbench'
-import { useFoundationsStore, isDue } from './useFoundationsStore'
-import { ripple, vt } from './motion'
+import { isDue } from './useFoundationsStore'
+import Shell from '../workbench/Shell'
+import { vt } from '../workbench/motion'
 import './foundations.css'
 
 const byId = Object.fromEntries(LESSONS.map(l => [l.id, l]))
 const stageOf = id => STAGES.find(s => s.lessons.some(l => l.id === id))
 
-export default function Foundations({ onSwitch }) {
-  const store = useFoundationsStore()
+// `store` is the shared state from App: lessons, plus the theme / collapsed drawer / open groups both modes use.
+export default function Foundations({ store, onMode }) {
   const { state } = store
   const [justDone, setJustDone] = useState(null)
   const [snack, setSnack] = useState({ on: false, text: '' })
@@ -25,6 +26,8 @@ export default function Foundations({ onSwitch }) {
   const open = state.open
 
   useEffect(() => () => Object.values(timers.current).forEach(clearTimeout), [])
+  // Remember the lesson we landed on, so leaving for Problems and coming back returns to it.
+  useEffect(() => { if (!state.last && current) store.setLast(current.id) }, [])   // eslint-disable-line react-hooks/exhaustive-deps
 
   function pick(id, fromAgain = false) {
     vt(() => {
@@ -33,11 +36,6 @@ export default function Foundations({ onSwitch }) {
       const s = stageOf(id)
       if (s) store.setGroup(s.id, true)
     })
-  }
-
-  function toggleGroup(id) {
-    if (state.min) { store.setMin(false); store.setGroup(id, true); return }
-    store.setGroup(id, !open[id])
   }
 
   function passed(id, first) {
@@ -55,12 +53,12 @@ export default function Foundations({ onSwitch }) {
   const doneCount = LESSONS.filter(l => isDone(l.id)).length
 
   return (
-    <div className={`fnd${state.min ? ' min' : ''}`} data-theme={state.theme} onPointerDown={ripple}>
+    <Shell prefs={store}>
       <Drawer
         stages={STAGES} total={LESSONS.length} doneCount={doneCount} againList={againList}
         isDone={isDone} isDue={id => isDue(store.rec(id))} currentId={current?.id} inRedo={redoMode}
-        justDone={justDone} open={open} onToggleGroup={toggleGroup} onPick={pick}
-        onMin={store.toggleMin} onSwitch={onSwitch}
+        justDone={justDone} open={open} onToggleGroup={store.toggleGroup} onPick={pick}
+        onMin={store.toggleMin} onMode={onMode}
         onTheme={() => vt(() => store.setTheme(state.theme === 'dark' ? 'light' : 'dark'))}
       />
       <div className="main">
@@ -74,6 +72,6 @@ export default function Foundations({ onSwitch }) {
         )}
       </div>
       <div className={`snack${snack.on ? ' on' : ''}`}><span className="ms fill">check_circle</span>{snack.text}</div>
-    </div>
+    </Shell>
   )
 }

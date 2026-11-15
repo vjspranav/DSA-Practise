@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { STAGES, LESSONS } from '../data/foundations'
 import { DAY, now } from './time'
 
+// Besides lesson progress this holds the prefs both modes share: theme, collapsed drawer, open groups.
 const KEY = 'dsa-foundations'
 // Redo schedule: days after the first pass, then after each redo.
 export const REDO_DAYS = [3, 7, 21]
@@ -51,6 +52,10 @@ export function useFoundationsStore() {
     setTheme: theme => setState(s => ({ ...s, theme })),
     toggleMin: () => setState(s => ({ ...s, min: !s.min })),
     setMin: min => setState(s => ({ ...s, min })),
+    // A header click while the drawer is collapsed expands it and opens that group.
+    toggleGroup: key => setState(s => (s.min
+      ? { ...s, min: false, open: { ...s.open, [key]: true } }
+      : { ...s, open: { ...s.open, [key]: !s.open[key] } })),
     setGroup: (key, open) => setState(s => ({ ...s, open: { ...s.open, [key]: open } })),
     setLast: (id, redoing = null) => setState(s => ({ ...s, last: id, redoing })),
     setCode: (id, code, redo) => upd(id, r => (redo ? { ...r, redoCode: code } : { ...r, code })),

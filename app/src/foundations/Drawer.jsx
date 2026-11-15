@@ -1,8 +1,5 @@
 import { ART } from './art'
-
-function Bar({ pct }) {
-  return <div className="bar-track"><i style={{ width: `${pct}%` }} /></div>
-}
+import { Brand, Group, Overall } from '../workbench/DrawerParts'
 
 function Item({ lesson, done, current, again, due, justDone, onPick }) {
   const cls = ['item', 'rip', done && 'done', current && 'on', current && justDone && 'justdone'].filter(Boolean).join(' ')
@@ -15,29 +12,12 @@ function Item({ lesson, done, current, again, due, justDone, onPick }) {
   )
 }
 
-function Group({ id, open, art, name, count, onToggle, children }) {
-  return (
-    <div className={`grp${open ? ' open' : ''}`}>
-      <button className="grp-h rip" onClick={() => onToggle(id)} title={name}>
-        {art}<span className="n">{name}</span><small>{count}</small><span className="ms chev">expand_more</span>
-      </button>
-      <div className={`fold${open ? ' open' : ''}`}><div>{children}</div></div>
-    </div>
-  )
-}
-
-export default function Drawer({ stages, total, doneCount, againList, isDone, isDue, currentId, inRedo, justDone, open, onToggleGroup, onPick, onMin, onTheme, onSwitch }) {
+export default function Drawer({ stages, total, doneCount, againList, isDone, isDue, currentId, inRedo, justDone, open, onToggleGroup, onPick, onMin, onTheme, onMode }) {
   const inAgainNow = inRedo && againList.some(a => a.id === currentId)
   return (
     <aside className="drawer">
-      <div className="brand">
-        <button className="iconbtn" onClick={onMin} aria-label="Collapse or expand the lesson list"><span className="ms">menu</span></button>
-        <b>Foundations</b>
-        <button className="iconbtn theme" onClick={onTheme} aria-label="Switch theme">
-          <span className="ms to-dark">dark_mode</span><span className="ms to-light">light_mode</span>
-        </button>
-      </div>
-      <div className="overall"><span>{doneCount} of {total} lessons done</span><Bar pct={total ? doneCount / total * 100 : 0} /></div>
+      <Brand mode="foundations" onMode={onMode} onMin={onMin} onTheme={onTheme} />
+      <Overall text={`${doneCount} of ${total} lessons done`} pct={total ? doneCount / total * 100 : 0} />
       <nav className="nav">
         {againList.length > 0 && (
           <Group id="again" open={open.again} name="Write again" count={againList.length} onToggle={onToggleGroup}
@@ -60,12 +40,6 @@ export default function Drawer({ stages, total, doneCount, againList, isDone, is
           )
         })}
       </nav>
-      <div className="drawer-foot">
-        <button className="grp-h rip" onClick={onSwitch} title="Problem bank">
-          <span className="art ic"><span className="ms">checklist</span></span>
-          <span className="n">Problem bank</span><span className="ms chev go">arrow_forward</span>
-        </button>
-      </div>
     </aside>
   )
 }

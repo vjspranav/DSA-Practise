@@ -1,4 +1,4 @@
-import TreeViz from '../../components/viz/TreeViz'
+import TreeViz from '../../problems/viz/TreeViz'
 
 const treeBuilderCpp = `
 TreeNode* buildTree(vector<int> a) {

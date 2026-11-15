@@ -1,4 +1,4 @@
-import HistogramViz from '../../components/viz/HistogramViz'
+import HistogramViz from '../../problems/viz/HistogramViz'
 
 const join = arr => arr.join(', ')
 
@@ -1030,7 +1030,7 @@ function MaxRectangleViz() {
               />
               <text x={x + cellSize / 2} y={y + cellSize / 2 + 5} textAnchor="middle"
                 fontSize={14} fontFamily="monospace" fontWeight={isHL ? 'bold' : 'normal'}
-                fill={cell === '0' ? 'var(--text-bright)' : '#1e1e2e'}>
+                fill={cell === '0' ? 'var(--text-bright)' : 'var(--on-accent)'}>
                 {cell}
               </text>
             </g>

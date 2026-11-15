@@ -1,26 +1,9 @@
 // Per-problem static visualizations embedded in example explanations.
 // Each viz type renders differently based on the problem's structure.
 
-const C = {
-  teal:  { bg: 'rgba(148,226,213,.18)', color: '#94e2d5', border: 'rgba(148,226,213,.4)' },
-  blue:  { bg: 'rgba(137,180,250,.18)', color: '#89b4fa', border: 'rgba(137,180,250,.4)' },
-  mauve: { bg: 'rgba(203,166,247,.18)', color: '#cba6f7', border: 'rgba(203,166,247,.4)' },
-  peach: { bg: 'rgba(250,179,135,.18)', color: '#fab387', border: 'rgba(250,179,135,.4)' },
-  green: { bg: 'rgba(166,227,161,.18)', color: '#a6e3a1', border: 'rgba(166,227,161,.4)' },
-}
-
-const DIM = { bg: 'rgba(49,50,68,.6)', color: '#585b70', border: '#313244' }
-
+// Cell colours are classes (c-teal ...), styled in problems.css with theme tokens.
 function Cell({ value, color }) {
-  const s = color ? C[color] : DIM
-  return (
-    <span
-      className="viz-cell"
-      style={{ background: s.bg, color: s.color, borderColor: s.border }}
-    >
-      {value}
-    </span>
-  )
+  return <span className={`viz-cell${color ? ` c-${color}` : ''}`}>{value}</span>
 }
 
 // Stacked rows — each row shows the full array with one window lit up
@@ -92,7 +75,6 @@ function StringWindowViz({ s, t, window: win, matches, caption }) {
 }
 
 export default function ExampleViz({ viz }) {
-  if (!viz) return null
   if (viz.type === 'array-windows') return <ArrayWindowsViz {...viz} />
   if (viz.type === 'array-ends')   return <ArrayEndsViz {...viz} />
   if (viz.type === 'string-window') return <StringWindowViz {...viz} />

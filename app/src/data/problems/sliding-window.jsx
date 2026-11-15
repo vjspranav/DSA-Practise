@@ -1,4 +1,4 @@
-import HistogramViz from '../../components/viz/HistogramViz'
+import HistogramViz from '../../problems/viz/HistogramViz'
 
 // ── Problem definitions ─────────────────────────────────────────────────────
 //
@@ -930,7 +930,7 @@ function FruitBasketsViz() {
               stroke={c.inWindow ? 'var(--text)' : 'none'} strokeWidth={2}
             />
             <text x={4 + i*(cellW+4) + cellW/2} y={28} textAnchor="middle"
-              fontSize={13} fill="var(--text)" fontFamily="monospace">{c.val}</text>
+              fontSize={13} fill={c.inWindow && c.val <= 2 ? 'var(--on-accent)' : 'var(--text)'} fontFamily="monospace">{c.val}</text>
           </g>
         ))}
       </svg>
@@ -960,7 +960,7 @@ function MinWindowViz() {
                 stroke={inWin ? 'var(--text)' : 'none'} strokeWidth={1.5} rx={3}
               />
               <text x={2 + i*(cellW+2) + cellW/2} y={24} textAnchor="middle"
-                fontSize={12} fill="var(--text)" fontFamily="monospace">{ch}</text>
+                fontSize={12} fill={inWin && isTarget ? 'var(--on-accent)' : 'var(--text)'} fontFamily="monospace">{ch}</text>
             </g>
           )
         })}

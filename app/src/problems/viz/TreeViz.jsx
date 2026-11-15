@@ -57,7 +57,7 @@ export default function TreeViz({ nodes, root = 0, highlight = new Set(), highli
                 stroke={isHighlit ? highlightColor : 'var(--border-bright)'}
                 strokeWidth={2}
               />
-              <text x={x} y={y + 5} textAnchor="middle" fontSize={12} fill="var(--text)" fontFamily="monospace">
+              <text x={x} y={y + 5} textAnchor="middle" fontSize={12} fill={isHighlit ? 'var(--on-accent)' : 'var(--text)'} fontFamily="monospace">
                 {val}
               </text>
             </g>

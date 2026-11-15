@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import CodeEditor from './CodeEditor'
+import EditorCard from '../workbench/EditorCard'
+import Onward from '../workbench/Onward'
 import HelpPanel from './HelpPanel'
-import { ResultsBody } from './Results'
+import { ResultsBody } from '../workbench/Results'
 import { assembleSource, forbiddenHit, judge, splitOutput } from './grade'
-import { compile, exclusive, limitFor, runTest } from './runner'
-import { vt } from './motion'
+import { compile, exclusive, limitFor, runTest } from '../workbench/runner'
+import { vt } from '../workbench/motion'
 import { STAGES } from '../data/foundations/index.js'
 
 const KIND = { program: 'Write the whole program', implement: 'Write the function', drill: 'Quick drill', bugfix: 'Find the bug' }
@@ -31,8 +32,7 @@ function mapErrors(lesson, text) {
 export default function Workbench({ lesson, next, redoMode, rec, theme, store, onPick, onPassed }) {
   const key = `${lesson.id}:${redoMode ? 'redo' : 'main'}`
   const [ui, setUi] = useState(() => initUi(key))
-  const [cursor, setCursor] = useState([1, 1])
-  const u = ui.key === key ? ui : initUi(key)
+    const u = ui.key === key ? ui : initUi(key)
   if (ui.key !== key) setUi(u)
 
   const patch = (k, p) => setUi(s => (s.key === k ? { ...s, ...(typeof p === 'function' ? p(s) : p) } : s))
@@ -60,7 +60,7 @@ export default function Workbench({ lesson, next, redoMode, rec, theme, store, o
     if (cur.busy || cur.key !== key) return
     const src = live.current.code
     const msg = forbiddenHit(lesson, src)
-    if (msg) { patch(key, { res: { kind: 'forbidden', msg }, sel: null }); return }
+    if (msg) { patch(key, { res: { kind: 'forbidden', msg, note: 'Not counted as a miss.' }, sel: null }); return }
     patch(key, { busy: mode, nudge: false, sel: null })
 
     const tests = mode === 'run' ? lesson.tests.slice(0, 1) : lesson.tests
@@ -88,7 +88,7 @@ export default function Workbench({ lesson, next, redoMode, rec, theme, store, o
     })
 
     if (outcome.compileError != null) {
-      patch(key, { busy: null, res: { kind: 'compile', text: outcome.compileError } })
+      patch(key, { busy: null, res: { kind: 'compile', text: outcome.compileError, note: 'Not counted as a miss.' } })
       return
     }
     const results = outcome.results
@@ -145,58 +145,33 @@ export default function Workbench({ lesson, next, redoMode, rec, theme, store, o
           <span className="kd"><span className="ms">{kindIcon}</span>{kindLabel}</span>
         </section>
 
-        <section className="card editor">
-          <div className="ed-h-wrap">
-            <div className="ed-h">
-              <span className="sp" />
-              <button className={`btn text${u.busy ? ' busy' : ''}`} onClick={() => run('run')}><span className="ms fill">play_arrow</span>Run</button>
-              <button className={`btn fill${u.busy ? ' busy' : ''}`} onClick={() => run('check')} title="Ctrl or Cmd + Enter">
-                Check my code<kbd>⌘↵</kbd>
-              </button>
-            </div>
-          </div>
-          <div className={`busyline${u.busy ? ' on' : ''}`}><i /></div>
-          <div className="code-wrap">
-            <div className="cm">
-              <CodeEditor
-                path={key} value={code} theme={theme}
-                onChange={v => store.setCode(lesson.id, v, redoMode)}
-                onCursor={(l, c) => setCursor([l, c])}
-                onCheck={() => live.current.check?.()}
-              />
-            </div>
+        <EditorCard
+          busy={u.busy} language="C++14"
+          header={<>
+            <span className="sp" />
+            <button className={`btn text${u.busy ? ' busy' : ''}`} onClick={() => run('run')}><span className="ms fill">play_arrow</span>Run</button>
+            <button className={`btn fill${u.busy ? ' busy' : ''}`} onClick={() => run('check')} title="Ctrl or Cmd + Enter">
+              Check my code<kbd>⌘↵</kbd>
+            </button>
+          </>}
+          editor={{ path: key, value: code, theme, onChange: v => store.setCode(lesson.id, v, redoMode), onCheck: () => live.current.check?.() }}
+          overlay={
             <div className={`nudge${u.nudge ? ' on' : ''}`}>
               <span className="bulb"><span className="ms">{unlocked ? 'lock_open' : 'lightbulb'}</span></span>
               <span>{unlocked ? 'Three misses. The answer is open.' : 'Stuck? A hint is ready.'}</span>
               <button className="btn text" onClick={() => showTab(unlocked ? 'answer' : 'hints')}>Show me</button>
               <button className="iconbtn" onClick={() => patch(key, { nudge: false })} aria-label="Dismiss"><span className="ms">close</span></button>
             </div>
-          </div>
-          <div className={`fold${res ? ' open' : ''}`}>
-            <div>
-              <div className="res">
-                <div className="pad">
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <ResultsBody res={res} sel={u.sel} onSel={i => patch(key, { sel: i })} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {showNext && (
-            <div className="onward">
-              <span className="ms fill">check_circle</span>
-              <div className="where">
-                <b>{stageDone === stage.lessons.length ? `${stage.name} complete` : `${stageDone} of ${stage.lessons.length} done in ${stage.name}`}</b>
-                <div className="bar-track"><i style={{ width: `${stageDone / stage.lessons.length * 100}%` }} /></div>
-              </div>
-              {next
-                ? <button className="btn fill big" onClick={() => onPick(next.id)}>Next: {next.title}<span className="ms">arrow_forward</span></button>
-                : <b>That was the last lesson.</b>}
-            </div>
+          }
+          results={res ? <ResultsBody res={res} sel={u.sel} onSel={i => patch(key, { sel: i })} /> : null}
+          onward={showNext && (
+            <Onward
+              title={stageDone === stage.lessons.length ? `${stage.name} complete` : `${stageDone} of ${stage.lessons.length} done in ${stage.name}`}
+              pct={stageDone / stage.lessons.length * 100}
+              next={next?.title} onNext={() => onPick(next.id)} last="That was the last lesson."
+            />
           )}
-          <div className="status"><span>Ln {cursor[0]}, Col {cursor[1]}</span><span className="sp" /><span>C++14</span></div>
-        </section>
+        />
       </div>
 
       <div className={`card side${u.tab ? ' open' : ''}`}>

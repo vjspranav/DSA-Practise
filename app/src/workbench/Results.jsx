@@ -6,7 +6,7 @@ function Detail({ test, hideGot }) {
   return (
     <div className="detail">
       {test.input != null && <>{'input     '}<b>{ind(test.input)}</b>{'\n'}</>}
-      {test.status === 'tle' ? <u>Time limit exceeded</u> : (
+      {test.status === 'tle' ? <><u>Time limit exceeded</u>{test.note ? <b>{' ' + test.note}</b> : null}</> : (
         <>
           {test.expected != null && <>{'expected  '}<b>{ind(test.expected) || '(nothing)'}</b>{'\n'}</>}
           {!hideGot && <>{'got       '}<u>{gotText}</u></>}
@@ -24,13 +24,21 @@ function Output({ label, text }) {
 export function ResultsBody({ res, sel, onSel }) {
   if (!res) return null
   if (res.kind === 'forbidden') {
-    return <div className="notice"><span className="ms">block</span><span>{res.msg}<small> Not counted as a miss.</small></span></div>
+    return <div className="notice"><span className="ms">block</span><span>{res.msg}{res.note && <small> {res.note}</small>}</span></div>
   }
   if (res.kind === 'compile') {
     return (
       <div>
-        <div className="notice bad"><span className="ms">error</span><span>Compiler error<small> Not counted as a miss.</small></span></div>
-        <pre className="errtext">{res.text || 'The compiler reported an error but printed nothing.'}</pre>
+        <div className="notice bad"><span className="ms">error</span><span>{res.title ?? 'Compiler error'}{res.note && <small> {res.note}</small>}</span></div>
+        <pre className="errtext">{res.text || 'The error had no message.'}</pre>
+      </div>
+    )
+  }
+  if (res.kind === 'custom') {
+    return (
+      <div>
+        <div className="notice"><span className="ms">terminal</span><span>Custom input ran<small> Not graded.</small></span></div>
+        <Output label="Output" text={res.raw} />
       </div>
     )
   }
@@ -47,7 +55,7 @@ export function ResultsBody({ res, sel, onSel }) {
           </span>
         </div>
         {res.raw != null && <Output label="Your output" text={res.raw} />}
-        {t.status !== 'ok' && <Detail test={{ ...t, printed: '' }} hideGot={t.status === 'fail'} />}
+        {t.status !== 'ok' && <Detail test={{ ...t, printed: '' }} hideGot={t.status === 'fail' && !res.showGot} />}
       </div>
     )
   }

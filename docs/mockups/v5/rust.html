@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rust track (mockup v5)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" rel="stylesheet">
+<style>
+/* ===== copied from app/src/workbench/workbench.css and app/src/foundations/foundations.css ===== */
+/* Tokens, shell, drawer, buttons, editor card, results and onward bar shared by Foundations and Problems.
+   Everything is scoped under .fnd. Tokens and motion follow docs/mockups/v3/workbench-2.html. */
+.fnd {
+  --font: 'Roboto Flex', Roboto, system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --r: 8px;
+  --bg: #eef2f9; --card: #fff; --card2: #e5ecf8; --text: #161b26; --sub: #56607a; --line: #d7deec;
+  --pri: #1a56c4; --on-pri: #fff; --pri-c: #d5e3fd; --on-pri-c: #06255c; --pri-shadow: rgba(26, 86, 196, .35);
+  --ok: #1b7f3b; --ok-c: #d8f3df; --bad: #b3261e; --bad-c: #fde2df; --inverse: #262c3a; --on-inverse: #fff;
+  --elev: 0 1px 3px rgba(22, 27, 38, .08), 0 1px 2px rgba(22, 27, 38, .05);
+  --float: 0 4px 10px rgba(22, 27, 38, .1), 0 14px 34px rgba(22, 27, 38, .16);
+  --ed-bg: #fff; --ed-text: #1c2230; --ed-num: #a7b1c4; --ed-cur: #f1f5fc; --ed-new: rgba(26, 86, 196, .07);
+  --ed-flash: rgba(26, 86, 196, .26); --c-k: #7b3fc4; --c-t: #1a56c4; --c-s: #b25a00;
+
+  position: fixed; inset: 0; z-index: 1;
+  display: grid; grid-template-columns: 304px 1fr; overflow: hidden;
+  transition: grid-template-columns .5s var(--ease);
+  background: var(--bg); color: var(--text);
+  font-family: var(--font); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+.fnd[data-theme=dark] {
+  --bg: #0e1118; --card: #171b25; --card2: #212736; --text: #e2e7f2; --sub: #9aa5bd; --line: #2b3243;
+  --pri: #a9c6fb; --on-pri: #082d6b; --pri-c: #173f87; --on-pri-c: #d5e3fd; --pri-shadow: rgba(0, 0, 0, .5);
+  --ok: #86d99a; --ok-c: #143a20; --bad: #ffb4ab; --bad-c: #55150f; --inverse: #e2e7f2; --on-inverse: #161b26;
+  --elev: 0 1px 3px rgba(0, 0, 0, .5); --float: 0 6px 16px rgba(0, 0, 0, .5), 0 16px 40px rgba(0, 0, 0, .4);
+  --ed-bg: #12151d; --ed-text: #dce2ef; --ed-num: #4b556b; --ed-cur: #1a1f2b; --ed-new: rgba(169, 198, 251, .08);
+  --ed-flash: rgba(169, 198, 251, .35); --c-k: #cfa8ff; --c-t: #a9c6fb; --c-s: #ffc078;
+  color-scheme: dark;
+}
+.fnd.min { grid-template-columns: 76px 1fr; }
+/* Monaco is excluded: resetting its padding and box-sizing crops its popups (e.g. the completion list). */
+.fnd *:not(.monaco-editor, .monaco-editor *), .fnd *:not(.monaco-editor, .monaco-editor *)::before, .fnd *:not(.monaco-editor, .monaco-editor *)::after { box-sizing: border-box; margin: 0; padding: 0; }
+.fnd button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; text-align: inherit; }
+.fnd :focus-visible { outline: 2px solid var(--pri); outline-offset: 2px; }
+
+.fnd .ms { font-family: 'Material Symbols Rounded'; font-weight: 400; font-style: normal; font-size: 20px; line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; user-select: none; flex-shrink: 0; }
+.fnd .ms.fill { font-variation-settings: 'FILL' 1; }
+.fnd .card { background: var(--card); border-radius: var(--r); box-shadow: var(--elev); }
+
+.fnd .btn { position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 22px; border-radius: 8px; font-weight: 600; font-size: 14px; white-space: nowrap; transition: box-shadow .2s, transform .2s var(--ease), background .25s; }
+.fnd .btn .ms { font-size: 18px; margin-left: -4px; }
+.fnd .btn.fill { background: var(--pri); color: var(--on-pri); }
+.fnd .btn.fill:hover { box-shadow: 0 3px 10px var(--pri-shadow); }
+.fnd .btn.tone { background: var(--pri-c); color: var(--on-pri-c); }
+.fnd .btn.text { color: var(--pri); padding: 0 12px; }
+.fnd .btn::after, .fnd .iconbtn::after { content: ''; position: absolute; inset: 0; background: currentColor; opacity: 0; transition: opacity .2s; }
+.fnd .btn:hover::after, .fnd .iconbtn:hover::after { opacity: .08; }
+.fnd .btn:active { transform: scale(.97); }
+.fnd .btn.busy { opacity: .6; pointer-events: none; }
+.fnd .iconbtn { position: relative; overflow: hidden; width: 40px; height: 40px; border-radius: 50%; display: inline-grid; place-items: center; color: var(--sub); }
+.fnd .ink { position: absolute; border-radius: 50%; background: currentColor; opacity: .2; transform: scale(0); animation: fnd-ink .55s ease-out forwards; pointer-events: none; }
+@keyframes fnd-ink { to { transform: scale(1); opacity: 0; } }
+
+.fnd .theme .to-light { display: none; }
+.fnd[data-theme=dark] .theme .to-light { display: inline-block; }
+.fnd[data-theme=dark] .theme .to-dark { display: none; }
+
+.fnd .fold { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease); }
+.fnd .fold.open { grid-template-rows: 1fr; }
+.fnd .fold > div { overflow: hidden; min-height: 0; }
+
+.fnd code { font-family: var(--mono); font-size: .87em; background: var(--card2); padding: 1px 6px; border-radius: 6px; }
+.fnd kbd { font-family: var(--font); font-size: 11.5px; font-weight: 500; opacity: .75; margin-left: 2px; }
+
+/* example / hint blocks (help panels and the Problems description) */
+.fnd .example { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.fnd .example div { background: var(--card2); border-radius: 6px; padding: 8px 12px; min-width: 0; }
+.fnd .example span { font-size: 11.5px; font-weight: 600; color: var(--sub); }
+.fnd .example pre { font-family: var(--mono); font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fnd .hints { display: grid; gap: 10px; }
+.fnd .hint { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; background: var(--card2); border-radius: 8px; padding: 12px 14px; font-size: 14.5px; }
+.fnd .hint b { width: 24px; height: 24px; border-radius: 50%; background: var(--pri); color: var(--on-pri); display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+
+/* test results */
+.fnd .tests { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fnd .test { position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 8px; border-radius: 8px; font-size: 13px; font-weight: 600; animation: fnd-chip .45s var(--ease) backwards; }
+.fnd .test .ms { font-size: 18px; margin: 0; }
+.fnd .test.ok { background: var(--ok-c); color: var(--ok); cursor: default; }
+.fnd .test.bad { background: var(--bad-c); color: var(--bad); }
+.fnd .test.skip { background: var(--card2); color: var(--sub); cursor: default; }
+.fnd .test.bad.sel { box-shadow: 0 0 0 2px var(--bad); }
+@keyframes fnd-chip { from { opacity: 0; transform: scale(.6); } }
+.fnd .summary { font-size: 14px; color: var(--sub); margin-left: 6px; animation: fnd-chip .4s var(--ease) .5s backwards; }
+.fnd .summary.win { color: var(--ok); font-weight: 600; }
+.fnd .detail { font-family: var(--mono); font-size: 12.5px; line-height: 1.8; color: var(--sub); white-space: pre-wrap; padding: 12px 2px 2px; max-height: 240px; overflow: auto; }
+.fnd .detail b { color: var(--text); font-weight: 500; }
+.fnd .detail u { text-decoration: none; color: var(--bad); }
+.fnd .notice { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--text); animation: fnd-chip .4s var(--ease) backwards; }
+.fnd .notice .ms { color: var(--sub); }
+.fnd .notice.bad .ms { color: var(--bad); }
+.fnd .notice small { color: var(--sub); font-size: 13px; }
+.fnd .errtext, .fnd .outbox pre { font-family: var(--mono); font-size: 12.5px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 200px; overflow: auto; }
+.fnd .errtext { margin-top: 10px; color: var(--bad); }
+.fnd .outbox { margin-top: 10px; }
+.fnd .outbox .lbl { font-size: 11.5px; font-weight: 600; color: var(--sub); }
+.fnd .outbox pre { color: var(--text); }
+
+.fnd .snack { position: fixed; left: 50%; bottom: 24px; z-index: 50; transform: translate(-50%, 90px); background: var(--inverse); color: var(--on-inverse); padding: 13px 18px; border-radius: 6px; font-size: 14px; display: flex; gap: 10px; align-items: center; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); transition: transform .5s var(--ease); }
+.fnd .snack.on { transform: translate(-50%, 0); }
+.fnd .bar-track { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.fnd .bar-track i { display: block; height: 100%; border-radius: 3px; background: var(--pri); transition: width .8s var(--ease); }
+
+/* drawer */
+.fnd .drawer { display: flex; flex-direction: column; min-height: 0; min-width: 0; padding: 14px 12px 12px; overflow: hidden; }
+.fnd .brand { display: flex; align-items: center; gap: 6px; padding: 0 4px 10px; font-weight: 700; font-size: 18px; white-space: nowrap; }
+.fnd .seg2 { flex: 1; display: grid; grid-template-columns: 1fr 1fr; background: var(--card2); border-radius: 8px; padding: 3px; margin: 0 4px; min-width: 0; }
+.fnd .seg2 button { height: 32px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: 600; color: var(--sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fnd .seg2 button.on { background: var(--card); color: var(--pri); box-shadow: var(--elev); }
+.fnd .brand .swap { display: none; }
+.fnd .overall { padding: 0 12px 14px; font-size: 13px; color: var(--sub); display: grid; gap: 8px; white-space: nowrap; }
+.fnd .nav { flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; padding-right: 4px;  scrollbar-width: thin; }
+.fnd .grp-h { position: relative; overflow: hidden; display: flex; align-items: center; gap: 12px; width: 100%; height: 46px; padding: 0 12px; border-radius: 8px; font-weight: 600; font-size: 14px; white-space: nowrap; }
+.fnd .grp-h:hover { background: var(--card2); }
+.fnd .grp-h .art { width: 28px; height: 18px; color: var(--pri); flex-shrink: 0; }
+.fnd .grp-h .art svg { display: block; width: 100%; height: 100%; }
+.fnd .grp-h .art.ic { display: grid; place-items: center; }
+.fnd .grp-h .n { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.fnd .grp-h small { color: var(--sub); font-weight: 500; font-size: 12.5px; }
+.fnd .grp-h .chev { color: var(--sub); transition: transform .4s var(--ease); }
+.fnd .grp.open .chev { transform: rotate(180deg); }
+.fnd .item { position: relative; overflow: hidden; display: flex; align-items: center; gap: 10px; width: 100%; height: 40px; padding: 0 14px 0 16px; border-radius: 8px; font-size: 14px; color: var(--sub); white-space: nowrap; transition: background .2s, color .2s; }
+.fnd .item:hover { background: var(--card2); }
+.fnd .item .ms { font-size: 18px; color: var(--line); }
+.fnd .item.done .ms { color: var(--ok); }
+.fnd .item .ttl { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.fnd .item.on { background: var(--pri-c); color: var(--on-pri-c); font-weight: 600; }
+.fnd .item.on .ms { color: var(--pri); }
+.fnd .item .again { font-size: 16px; color: var(--pri); }
+.fnd .item.justdone .ms { animation: fnd-tick .7s var(--ease); }
+@keyframes fnd-tick { 0% { transform: scale(0) rotate(-90deg); } 60% { transform: scale(1.5); } }
+.fnd.min .seg2, .fnd.min .brand .theme, .fnd.min .overall, .fnd.min .grp-h .n, .fnd.min .grp-h small, .fnd.min .chev { display: none; }
+.fnd.min .fold { grid-template-rows: 0fr !important; }
+.fnd.min .grp-h { padding: 0 12px; justify-content: center; }
+.fnd.min .brand { flex-direction: column; padding-bottom: 8px; }
+.fnd.min .brand .swap { display: inline-grid; }
+
+/* main */
+.fnd > .main { display: flex; min-width: 0; min-height: 0; padding: 12px 12px 12px 0; gap: 12px; }
+.fnd .work { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.fnd .editor { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.fnd .ed-h { display: flex; align-items: center; gap: 8px; padding: 8px 10px 0 12px; min-height: 56px; }
+.fnd .ed-h .sp { flex: 1; }
+.fnd .ed-h .btn { margin-bottom: 8px; }
+.fnd .ed-h-wrap { background: var(--card2); }
+.fnd .busyline { height: 3px; background: var(--line); overflow: hidden; opacity: 0; transition: opacity .2s; }
+.fnd .busyline.on { opacity: 1; }
+.fnd .busyline i { display: block; height: 100%; width: 40%; background: var(--pri); border-radius: 2px; animation: fnd-slide 1s var(--ease) infinite; }
+@keyframes fnd-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.fnd .code-wrap { flex: 1; min-height: 0; position: relative; display: flex; background: var(--ed-bg); }
+.fnd .code-wrap .cm { flex: 1; min-width: 0; min-height: 0; }
+.fnd .status { display: flex; gap: 16px; padding: 6px 20px; font-size: 12px; color: var(--sub); border-top: 1px solid var(--line); }
+.fnd .status .sp { flex: 1; }
+.fnd .res { border-top: 1px solid var(--line); padding: 0 20px; }
+.fnd .onward { display: flex; align-items: center; gap: 14px; padding: 12px 12px 12px 20px; background: var(--pri-c); color: var(--on-pri-c); }
+.fnd .onward > .ms { font-size: 26px; color: var(--pri); }
+.fnd .onward .where { flex: 1; min-width: 0; display: grid; gap: 6px; font-size: 14.5px; }
+.fnd .onward .bar-track { max-width: 260px; background: var(--card); }
+.fnd .btn.big { height: 46px; padding: 0 22px 0 24px; font-size: 15px; }
+.fnd .btn.big .ms { margin: 0 -6px 0 2px; font-size: 20px; }
+.fnd .res .pad { padding: 14px 0 16px; display: flex; gap: 16px; align-items: flex-start; }
+
+/* help rail + side panel */
+.fnd .empty { padding: 32px; color: var(--sub); }
+
+
+@media (max-width: 900px) {
+  .fnd, .fnd.min { grid-template-columns: 1fr; overflow: auto; }
+  .fnd .drawer { max-height: 44vh; }
+  .fnd > .main { padding: 12px; flex-direction: column; }
+  .fnd .editor { min-height: 520px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fnd *, .fnd *::before, .fnd *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+/* Foundations only: lesson header, answer code view, refresher, rail, side panel, nudge.
+   Shared styles live in ../workbench/workbench.css. */
+/* code (answer panel) */
+.fnd .codeview { font-family: var(--mono); font-size: 13.5px; line-height: 1.75; padding: 16px 0; overflow: auto; background: var(--ed-bg); }
+.fnd .ln { display: grid; grid-template-columns: 48px 1fr; white-space: pre; }
+.fnd .ln > span:first-child { text-align: right; padding-right: 16px; color: var(--ed-num); user-select: none; }
+.fnd .ln > span:last-child { color: var(--ed-text); padding-right: 20px; }
+.fnd .ln .k { color: var(--c-k); } .fnd .ln .t { color: var(--c-t); } .fnd .ln .s { color: var(--c-s); } .fnd .ln .c { color: var(--ed-num); font-style: italic; }
+.fnd .ln code { all: unset; }
+
+
+.fnd .refresher { list-style: none; display: grid; gap: 10px; }
+.fnd .refresher li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; color: var(--text); font-size: 14.5px; }
+.fnd .refresher li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--pri); margin: 8px 0 0 6px; }
+
+.fnd .hint.fresh { animation: fnd-pop .5s var(--ease); }
+@keyframes fnd-pop { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+
+.fnd .lockrow { display: flex; gap: 14px; align-items: center; color: var(--sub); font-size: 14px; }
+.fnd .lockrow .ms { font-size: 24px; }
+.fnd .tries { display: flex; gap: 6px; margin-left: auto; }
+.fnd .tries i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .3s, transform .4s var(--ease); }
+.fnd .tries i.used { background: var(--bad); transform: scale(1.15); }
+.fnd .answer { border-radius: 8px; overflow: hidden; animation: fnd-pop .6s var(--ease); }
+.fnd .answer-h { display: flex; gap: 8px; align-items: center; padding: 10px 14px; background: var(--ok-c); color: var(--ok); font-weight: 600; font-size: 13.5px; }
+.fnd .answer .codeview { font-size: 12.5px; padding: 12px 0; scrollbar-width: thin; }
+
+.fnd .task { display: flex; align-items: center; gap: 18px; padding: 16px 16px 16px 24px; }
+.fnd .task .txt { flex: 1; min-width: 0; }
+.fnd .task h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; width: fit-content; }
+.fnd .task p { color: var(--sub); font-size: 14.5px; margin-top: 2px; }
+.fnd .task .kd { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--on-pri-c); background: var(--pri-c); padding: 5px 11px 5px 8px; border-radius: 6px; white-space: nowrap; }
+.fnd .task .kd .ms { font-size: 16px; }
+
+.fnd .nudge { position: absolute; right: 18px; bottom: 18px; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 12px 8px 12px 16px; border-radius: 8px; background: var(--card); box-shadow: var(--float); font-size: 14.5px; font-weight: 500; transform: translateY(24px) scale(.94); opacity: 0; pointer-events: none; transition: transform .55s var(--ease), opacity .3s; }
+.fnd .nudge.on { transform: none; opacity: 1; pointer-events: auto; }
+.fnd .nudge .bulb { width: 36px; height: 36px; border-radius: 50%; background: var(--pri-c); color: var(--on-pri-c); display: grid; place-items: center; }
+.fnd .nudge.on .bulb { animation: fnd-tick .8s var(--ease) .2s backwards; }
+
+.fnd .rail { display: flex; flex-direction: column; gap: 6px; padding: 8px 2px; align-self: flex-start; }
+.fnd .rail button { position: relative; overflow: hidden; width: 68px; padding: 8px 0 6px; border-radius: 8px; display: grid; justify-items: center; gap: 2px; font-size: 11.5px; font-weight: 600; color: var(--sub); transition: color .25s; }
+.fnd .rail button .ms { font-size: 22px; padding: 4px 18px; border-radius: 8px; transition: background .3s, color .3s; }
+.fnd .rail button.on { color: var(--on-pri-c); }
+.fnd .rail button.on .ms { background: var(--pri-c); }
+.fnd .rail button:hover .ms { background: var(--card2); }
+.fnd .rail button.unlocked .ms { color: var(--ok); animation: fnd-tick .8s var(--ease); }
+.fnd .rail .badge { position: absolute; top: 8px; right: 14px; width: 9px; height: 9px; border-radius: 50%; background: var(--bad); animation: fnd-chip .4s var(--ease); }
+.fnd .side { width: 0; opacity: 0; overflow: hidden; transition: width .5s var(--ease), opacity .3s; }
+.fnd .side.open { width: 340px; opacity: 1; }
+.fnd .side-in { width: 340px; height: 100%; display: flex; flex-direction: column; }
+.fnd .side-h { display: flex; align-items: center; padding: 12px 8px 8px 20px; font-weight: 700; font-size: 16px; }
+.fnd .side-h span { flex: 1; }
+.fnd .side-b { padding: 8px 20px 20px; overflow-y: auto; }
+
+@media (max-width: 900px) {
+  .fnd .side.open, .fnd .side-in { width: 100%; }
+  .fnd .rail { flex-direction: row; }
+}
+
+
+/* ===== additions for the Rust track (same tokens, same component vocabulary) ===== */
+html, body { margin: 0; height: 100%; background: #0e1118; }
+.fnd { inset: 40px 0 0 0; }
+.fnd .src .k { color: var(--c-k); } .fnd .src .t { color: var(--c-t); } .fnd .src .s { color: var(--c-s); } .fnd .src .c { color: var(--ed-num); font-style: italic; }
+.fnd .gutter { padding: 16px 12px 16px 0; width: 52px; text-align: right; color: var(--ed-num); font: 13.5px/1.75 var(--mono); user-select: none; white-space: pre; flex-shrink: 0; }
+.fnd .src { flex: 1; min-width: 0; padding: 16px 20px 16px 0; font: 13.5px/1.75 var(--mono); color: var(--ed-text); white-space: pre; outline: none; overflow-x: auto; tab-size: 4; caret-color: var(--pri); }
+.fnd .src[contenteditable=false] { cursor: default; }
+.fnd .ln .k { color: var(--c-k); } .fnd .ln .t { color: var(--c-t); } .fnd .ln .s { color: var(--c-s); } .fnd .ln .c { color: var(--ed-num); font-style: italic; }
+
+/* mock bar */
+.mockbar { position: fixed; top: 0; left: 0; right: 0; height: 40px; z-index: 100; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: #262c3a; color: #e2e7f2; font: 500 12.5px/1 'Roboto Flex', system-ui, sans-serif; white-space: nowrap; overflow: hidden; }
+.mockbar .tag { font-weight: 700; letter-spacing: .06em; font-size: 10.5px; border: 1px solid #9aa5bd; color: #cdd5e6; border-radius: 4px; padding: 3px 6px; }
+.mockbar .seg { display: inline-flex; background: #171b25; border-radius: 8px; padding: 2px; }
+.mockbar .seg button, .mockbar .tgl { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 6px; font-weight: 600; color: #9aa5bd; }
+.mockbar .seg button.on, .mockbar .tgl.on { background: #a9c6fb; color: #082d6b; }
+.mockbar .tgl { background: #171b25; }
+.mockbar .note { color: #aab4cb; overflow: hidden; text-overflow: ellipsis; }
+.mockbar .note b { color: #e2e7f2; font-weight: 600; }
+
+/* drawer: track selector sits right under the Foundations | Problems switch */
+.fnd .trk { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 4px 12px; }
+.fnd .trk button { height: 30px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: 600; color: var(--sub); background: var(--card2); }
+.fnd .trk button:hover { color: var(--text); }
+.fnd .trk button.on { background: var(--pri-c); color: var(--on-pri-c); }
+.fnd.min .trk, .fnd.min .legend { display: none; }
+.fnd .item { gap: 8px; padding: 6px 8px 6px 12px; height: auto; min-height: 40px; white-space: normal; line-height: 1.3; }
+.fnd .item .ttl { overflow: visible; text-overflow: clip; }
+.fnd .item .kind { font-size: 16px; color: var(--sub); opacity: .85; }
+.fnd .item.on .kind { color: var(--on-pri-c); }
+.fnd .item.dim { cursor: default; }
+.fnd .legend { display: flex; gap: 4px 14px; padding: 8px 12px 0; margin-top: 8px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--sub); flex-wrap: wrap; }
+.fnd .legend span { display: inline-flex; gap: 4px; align-items: center; }
+.fnd .legend .ms { font-size: 14px; }
+.fnd .grp-h .art.ic .ms { color: var(--pri); }
+
+/* task strip */
+.fnd .task { align-items: center; flex-wrap: wrap; }
+.fnd .task .txt { flex: 1 1 280px; }
+.fnd .task code, .fnd .prose code, .fnd .gloss code { white-space: nowrap; }
+
+/* concept card */
+.fnd .concept { padding: 0; overflow: hidden; }
+.fnd .concept .ch { display: flex; align-items: center; gap: 12px; padding: 14px 8px 8px 24px; }
+.fnd .concept .ch h2 { font-size: 22px; font-weight: 700; letter-spacing: -.01em; flex: 1; }
+.fnd .concept .cb { padding: 4px 24px 6px; display: grid; gap: 12px; }
+.fnd .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fnd .pane { border-radius: 8px; background: var(--ed-bg); border: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.fnd .pane .pl { display: flex; align-items: center; gap: 8px; padding: 8px 12px 0; font-size: 12px; font-weight: 600; color: var(--sub); }
+.fnd .pane .codeview { padding: 8px 0 10px; font-size: 13px; line-height: 1.7; }
+.fnd .pane .ln { grid-template-columns: 16px 1fr; }
+.fnd .pane .ln > span:first-child { padding-right: 0; }
+.fnd .outcome { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; }
+.fnd .outcome .ms { font-size: 18px; }
+.fnd .outcome.ok { background: var(--ok-c); color: var(--ok); }
+.fnd .outcome.bad { background: var(--bad-c); color: var(--bad); }
+.fnd .why { font-size: 14.5px; color: var(--text); max-width: 78ch; }
+.fnd .turn { display: flex; align-items: center; gap: 10px; padding: 12px 24px 14px; border-top: 1px solid var(--line); font-size: 14.5px; }
+.fnd .turn .ms { color: var(--pri); }
+.fnd .turn b { font-weight: 600; }
+
+/* editor body scrolls so a tall result never clips the code */
+.fnd .editor-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: thin; }
+.fnd .editor-body .code-wrap { flex: 1 0 auto; min-height: 170px; }
+.fnd .ed-h .note { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--sub); padding: 0 6px 8px; }
+.fnd .ed-h .note .ms { font-size: 16px; }
+.fnd .ed-h .btn.text { margin-bottom: 8px; }
+.fnd .btn[disabled] { opacity: .45; pointer-events: none; }
+.fnd .spin { animation: fnd-spin 1s linear infinite; }
+@keyframes fnd-spin { to { transform: rotate(360deg); } }
+
+/* results */
+.fnd .res .pad { display: grid; gap: 12px; padding: 14px 0 16px; }
+.fnd .res .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fnd .test.tle { background: var(--bad-c); color: var(--bad); }
+.fnd .test.bad { cursor: pointer; }
+.fnd .gloss { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; }
+.fnd .gloss > .ms { color: var(--pri); margin-top: 2px; }
+.fnd .gloss .lk { margin-left: auto; flex-shrink: 0; font-size: 13px; font-weight: 600; color: var(--pri); display: inline-flex; gap: 4px; align-items: center; padding: 2px 8px; border-radius: 6px; }
+.fnd .gloss .lk:hover { background: var(--pri-c); }
+.fnd .gloss .lk .ms { font-size: 16px; color: inherit; margin: 0; }
+.fnd .ecode { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 10px; border-radius: 8px; font: 600 12.5px var(--mono); background: var(--card2); color: var(--pri); text-decoration: none; position: relative; overflow: hidden; }
+.fnd .ecode .ms { font-size: 15px; }
+.fnd .ecode:hover::after { content: ''; position: absolute; inset: 0; background: currentColor; opacity: .08; }
+.fnd .rerr { font: 12.5px/1.65 var(--mono); white-space: pre; overflow: auto; max-height: 250px; padding: 12px 16px; border-radius: 8px; background: var(--card2); color: var(--text); tab-size: 4; scrollbar-width: thin; }
+.fnd .rerr .er { color: var(--bad); font-weight: 600; }
+.fnd .rerr .em { font-weight: 600; }
+.fnd .rerr .dm { color: var(--sub); }
+.fnd .rerr .pr { color: var(--bad); font-weight: 600; }
+.fnd .rerr .sc { color: var(--pri); font-weight: 600; }
+.fnd .rerr .ad { color: var(--ok); font-weight: 600; }
+.fnd .rerr .nt { color: var(--pri); font-weight: 600; }
+.fnd .rerr .hp { color: var(--ok); font-weight: 600; }
+.fnd .rerr-h { font-size: 11.5px; font-weight: 600; color: var(--sub); margin-bottom: 4px; display: flex; gap: 6px; align-items: center; }
+.fnd .out pre { font: 12.5px/1.7 var(--mono); white-space: pre-wrap; background: var(--card2); border-radius: 8px; padding: 10px 16px; margin-top: 4px; max-height: 160px; overflow: auto; }
+.fnd .out .lbl { font-size: 11.5px; font-weight: 600; color: var(--sub); }
+.fnd .detail { padding: 2px 2px 0; }
+
+/* waiting state */
+.fnd .wait { display: flex; align-items: center; gap: 14px; padding: 18px 0; }
+.fnd .wait .big { width: 40px; height: 40px; border-radius: 50%; background: var(--pri-c); color: var(--on-pri-c); display: grid; place-items: center; flex-shrink: 0; }
+.fnd .wait .t { font-weight: 600; font-size: 14.5px; }
+.fnd .wait .s { font-size: 13px; color: var(--sub); }
+.fnd .steps { display: flex; gap: 6px; margin-left: auto; align-items: center; font-size: 12.5px; color: var(--sub); }
+.fnd .steps span { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; background: var(--card2); font-weight: 600; }
+.fnd .steps span.on { background: var(--pri-c); color: var(--on-pri-c); }
+.fnd .steps span.done { color: var(--ok); }
+.fnd .steps .ms { font-size: 15px; }
+
+/* predict */
+.fnd .predict { padding: 14px 20px 6px; display: grid; gap: 10px; border-top: 1px solid var(--line); }
+.fnd .predict .pt { font-size: 12.5px; font-weight: 600; color: var(--sub); }
+.fnd .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.fnd .choice { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px 0 10px; border-radius: 8px; background: var(--card2); font-weight: 600; font-size: 14px; position: relative; overflow: hidden; }
+.fnd .choice .ms { font-size: 20px; color: var(--sub); }
+.fnd .choice:hover::after { content: ''; position: absolute; inset: 0; background: currentColor; opacity: .08; }
+.fnd .choice.sel { background: var(--pri-c); color: var(--on-pri-c); box-shadow: inset 0 0 0 2px var(--pri); }
+.fnd .choice.sel .ms { color: var(--pri); }
+.fnd .choice.right { background: var(--ok-c); color: var(--ok); box-shadow: none; }
+.fnd .choice.right .ms { color: var(--ok); }
+.fnd .choice.wrong { background: var(--bad-c); color: var(--bad); box-shadow: none; }
+.fnd .choice.wrong .ms { color: var(--bad); }
+.fnd .choice.locked { pointer-events: none; }
+.fnd .choice.faded { opacity: .5; }
+.fnd .verdict { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 8px; font-size: 14.5px; }
+.fnd .verdict.ok { background: var(--ok-c); }
+.fnd .verdict.bad { background: var(--bad-c); }
+.fnd .verdict > .ms { margin-top: 1px; }
+.fnd .verdict.ok > .ms, .fnd .verdict.ok b { color: var(--ok); }
+.fnd .verdict.bad > .ms, .fnd .verdict.bad b { color: var(--bad); }
+.fnd .verdict b { font-weight: 700; }
+.fnd .verdict span { color: var(--text); }
+.fnd .rounds { display: inline-flex; gap: 6px; align-items: center; margin-right: 4px; }
+.fnd .rounds i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.fnd .rounds i.on { background: var(--pri); }
+.fnd .rounds i.done { background: var(--ok); }
+.fnd .rounds span { font-size: 12.5px; font-weight: 600; color: var(--sub); margin-right: 4px; }
+.fnd .nextrow { display: flex; justify-content: flex-end; }
+
+/* side panel content */
+.fnd .side.open { width: 380px; }
+.fnd .side-in { width: 380px; }
+.fnd .prose { font-size: 14.5px; line-height: 1.65; display: grid; gap: 12px; }
+.fnd .pair { display: grid; gap: 10px; margin-bottom: 16px; }
+.fnd .pair .box { background: var(--ed-bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.fnd .pair .box .pl { padding: 8px 12px 0; font-size: 12px; font-weight: 600; color: var(--sub); }
+.fnd .pair .codeview { font-size: 12.5px; padding: 6px 0 10px; line-height: 1.65; }
+.fnd .pair .ln { grid-template-columns: 12px 1fr; }
+.fnd .pair .ln > span:first-child { padding-right: 0; }
+.fnd .pair .codeview { scrollbar-width: thin; }
+.fnd .note-t { font-size: 14px; color: var(--text); line-height: 1.6; }
+.fnd .hintmore { margin-top: 10px; }
+.fnd .answer .codeview { max-height: 360px; }
+.fnd .answer .ln { grid-template-columns: 40px 1fr; }
+
+@media (max-width: 1250px) {
+  .fnd .side.open, .fnd .side-in { width: 330px; }
+  .fnd .ed-h { flex-wrap: wrap; }
+  .fnd .ed-h .btn.text .lbl { display: none; }
+}
+@media (max-width: 900px) {
+  .fnd .side.open, .fnd .side-in { width: 100%; }
+  .fnd .cmp { grid-template-columns: 1fr; }
+}
+.fnd .shell-note { padding: 32px; color: var(--sub); max-width: 520px; display: grid; gap: 10px; font-size: 14.5px; }
+.fnd .shell-note h3 { color: var(--text); font-size: 18px; }
+
+/* v5 fixes */
+.fnd .grp-h { height: auto; min-height: 46px; padding: 6px 12px; white-space: normal; line-height: 1.3; }
+.fnd .grp-h .n { overflow: visible; text-overflow: clip; }
+.fnd .src, .fnd .codeview, .fnd .rerr, .fnd .gutter, .fnd .out pre, .fnd .detail, .fnd code, .fnd .ecode { font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; }
+.fnd .work { overflow-y: auto; scrollbar-width: thin; }
+.fnd .work > .card { flex-shrink: 0; }
+.fnd .work > .editor { flex: 1 0 auto; min-height: 460px; }
+.fnd .editor-body { flex: 1 0 auto; overflow: visible; }
+.fnd .rerr { max-height: none; }
+.fnd .gloss .lk { margin-left: auto; }
+
+.fnd .rerr.cap { max-height: 230px; }
+
+.fnd .gloss > span:nth-child(2) { flex: 1; min-width: 0; }
+.fnd .pair .box .pl { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 0 12px; }
+.fnd .pair .box .pl .tag { height: 20px; font-size: 11px; }
+
+.fnd .status span { white-space: nowrap; }
+.fnd .hint.fresh, .fnd .answer { animation: fnd-chip .45s var(--ease); }
+@media (max-width: 1150px) {
+  .fnd > .main { position: relative; }
+  .fnd .side.open { position: absolute; right: 84px; top: 12px; bottom: 12px; z-index: 5; width: 360px; box-shadow: var(--float); border-radius: 8px; }
+  .fnd .side.open .side-in { width: 360px; }
+  .fnd .status span:last-child { display: none; }
+}
+.fnd .res .pad { grid-template-columns: minmax(0, 1fr); }
+.fnd .res .pad > * { min-width: 0; }
+.fnd .editor, .fnd .editor-body { min-width: 0; }
+
+</style>
+</head>
+<body>
+<div class="mockbar">
+  <span class="tag">MOCK ONLY</span>
+  <span class="seg" id="stepSeg"><button data-k="A" class="on">A Concept</button><button data-k="B">B Predict</button><button data-k="C">C Make it compile</button><button data-k="D">D Write the function</button></span>
+  <button class="tgl" id="hold">Hold waiting state</button>
+  <button class="tgl" id="fill">Paste a solution</button>
+  <span class="note"><b>Click:</b> A to D · Check my code or Compile it (about 2.5s wait, canned results) · edit the code · C++ | Rust · rail tabs · theme</span>
+</div>
+<div class="fnd" id="app" data-theme="light">
+  <aside class="drawer">
+    <div class="brand">
+      <button class="iconbtn" id="min" aria-label="Collapse or expand the list"><span class="ms">menu</span></button>
+      <div class="seg2" id="modeSeg" role="tablist" aria-label="Mode"></div>
+      <button class="iconbtn theme" id="theme" aria-label="Switch theme"><span class="ms to-dark">dark_mode</span><span class="ms to-light">light_mode</span></button>
+    </div>
+    <div class="trk" id="trk" role="tablist" aria-label="Language track"></div>
+    <div class="overall" id="overall"></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="legend" id="legend"></div>
+  </aside>
+  <div class="main" id="main"></div>
+  <div class="snack" id="snack"><span class="ms">info</span><span id="snackt"></span></div>
+</div>
+<script>
+const ERR = {
+ "A": "error[E0382]: borrow of moved value: `a`\n --> src/main.rs:4:23\n  |\n2 |     let a = String::from(\"hi\");\n  |         - move occurs because `a` has type `String`, which does not implement the `Copy` trait\n3 |     let b = a;\n  |             - value moved here\n4 |     println!(\"{} {}\", a, b);\n  |                       ^ value borrowed here after move\n  |\nhelp: consider cloning the value if the performance cost is acceptable\n  |\n3 |     let b = a.clone();\n  |              ++++++++\n\nerror: aborting due to 1 previous error\n\nFor more information about this error, try `rustc --explain E0382`.",
+ "B1": "error[E0382]: borrow of moved value: `name`\n --> src/main.rs:8:20\n  |\n6 |     let name = String::from(\"Ada\");\n  |         ---- move occurs because `name` has type `String`, which does not implement the `Copy` trait\n7 |     consume(name);\n  |             ---- value moved here\n8 |     println!(\"{}\", name);\n  |                    ^^^^ value borrowed here after move\n  |\nnote: consider changing this parameter type in function `consume` to borrow instead if owning the value isn't necessary\n --> src/main.rs:1:15\n  |\n1 | fn consume(s: String) {\n  |    -------    ^^^^^^ this parameter takes ownership of the value\n  |    |\n  |    in this function\nhelp: consider cloning the value if the performance cost is acceptable\n  |\n7 |     consume(name.clone());\n  |                 ++++++++\n\nerror: aborting due to 1 previous error\n\nFor more information about this error, try `rustc --explain E0382`.",
+ "C": "error[E0502]: cannot borrow `v` as mutable because it is also borrowed as immutable\n --> src/main.rs:4:5\n  |\n3 |     let first = &v[0];\n  |                  - immutable borrow occurs here\n4 |     v.push(4);\n  |     ^^^^^^^^^ mutable borrow occurs here\n5 |     println!(\"{}\", first);\n  |                    ----- immutable borrow later used here\n\nerror: aborting due to 1 previous error\n\nFor more information about this error, try `rustc --explain E0502`."
+};
+
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+/* ---------- code highlighting ---------- */
+const RE = {
+  rust: /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*"|'[^'\\\n]')|\b(fn|let|mut|match|if|else|for|while|in|return|struct|impl|enum|use|pub|self|as|loop|break|continue|true|false|where)\b|\b(i32|u32|i64|u64|usize|String|Vec|Option|Result|bool|str|char|f64|Self)\b|(\b\w+!)/g,
+  cpp: /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*")|(#include|\b(?:int|void|for|while|return|const|auto|using|namespace|true|false|if|else|class)\b)|\b(std|string|vector|size_t|bool)\b/g,
+};
+function hl(src, lang = 'rust') {
+  const re = new RegExp(RE[lang].source, 'g');
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const t = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'k' : 't';
+    out += `<span class="${t}">${esc(m[0])}</span>`;
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+const lines = s => Array.from({ length: s.split('\n').length }, (_, i) => i + 1).join('\n');
+const codeview = (src, lang = 'rust', numbered = false) =>
+  `<div class="codeview">${src.split('\n').map((l, i) => `<div class="ln"><span>${numbered ? i + 1 : ''}</span><span>${hl(l, lang) || ' '}</span></div>`).join('')}</div>`;
+
+/* ---------- rustc output, coloured the way rustc colours it ---------- */
+function rustErr(t) {
+  const mark = rest => {
+    let out = '', last = 0, m; const re = /(\^+|-+|\++)([^^\-+]*)/g;
+    while ((m = re.exec(rest))) {
+      out += esc(rest.slice(last, m.index));
+      const c = m[1][0] === '^' ? 'pr' : m[1][0] === '-' ? 'sc' : 'ad';
+      out += `<span class="${c}">${esc(m[0])}</span>`; last = re.lastIndex;
+    }
+    return out + esc(rest.slice(last));
+  };
+  return t.split('\n').map(line => {
+    let m;
+    if (/^error: aborting/.test(line) || /^For more information/.test(line)) return `<span class="dm">${esc(line)}</span>`;
+    if ((m = line.match(/^(error(?:\[E\d+\])?)(:.*)$/))) return `<span class="er">${esc(m[1])}</span><span class="em">${esc(m[2])}</span>`;
+    if ((m = line.match(/^(\s*)-->(.*)$/))) return `${m[1]}<span class="sc">--&gt;</span>${esc(m[2])}`;
+    if ((m = line.match(/^(note|help)(:.*)$/))) return `<span class="${m[1] === 'help' ? 'hp' : 'nt'}">${m[1]}</span>${esc(m[2])}`;
+    if ((m = line.match(/^(\s*\d*\s*\|)(.*)$/))) {
+      const isCode = /\d/.test(m[1]);
+      return `<span class="dm">${esc(m[1])}</span>${isCode ? esc(m[2]) : mark(m[2])}`;
+    }
+    return esc(line);
+  }).join('\n');
+}
+
+/* ---------- lesson data ---------- */
+/* kind: c = concept, p = predict, f = make it compile, w = write the function (no mark) */
+const KIND = { c: ['school', 'Idea'], p: ['quiz', 'Predict'], f: ['build', 'Fix'] };
+const RUST = [
+  ['Rust for C++ people', 'rocket_launch', [['Hello, and what println! prints', 'c'], ['let and mut: constant by default', 'c'], ['Integer types and no silent casts', 'c'], ['Everything is an expression', 'c'], ['if, while, and for over ranges', 'w'], ['match instead of switch', 'c'], ['Tuples and destructuring', 'w'], ['Functions and the final expression', 'w'], ['Printing with {} and {:?}', 'w']]],
+  ['Ownership and borrowing', 'key', [['Moves, not copies', 'c', 'A'], ['Copy types and .clone()', 'c'], ['Passing a String to a function', 'p', 'B'], ['Borrowing with &', 'c'], ['&mut: one writer at a time', 'c'], ['Push while holding a reference', 'f', 'C'], ['Slices: &v[1..3]', 'c'], ['String versus &str', 'c'], ['Returning a reference', 'p'], ['Lifetimes: why \'a exists', 'c']]],
+  ['Types that replace C++ habits', 'category', [['Structs and impl blocks', 'c'], ['Enums that carry data', 'c'], ['Option instead of null', 'c'], ['match on an Option', 'w'], ['Result instead of exceptions', 'c'], ['The ? operator', 'w'], ['Traits versus virtual functions', 'c'], ['Generics versus templates', 'c'], ['Closures', 'c'], ['Iterators: map, filter, collect', 'c'], ['Which error will this give?', 'p']]],
+  ['Sort and search by hand', 'swap_vert', [['Bubble sort', 'w'], ['Selection sort', 'w'], ['Insertion sort', 'w', 'D'], ['Merge sort', 'w'], ['Quick sort', 'w'], ['Counting sort', 'w'], ['Binary search', 'w'], ['Lower and upper bound', 'w']]],
+  ['Build it yourself', 'construction', [['Stack', 'w'], ['Circular queue', 'w'], ['Min-heap', 'w'], ['Hash map', 'w'], ['Linked list with Box', 'f'], ['Binary search tree', 'w'], ['Graph and BFS', 'w'], ['Union-find', 'w']]],
+  ['Standard collections', 'inventory_2', [['Vec essentials', 'w'], ['HashMap and the entry API', 'w'], ['HashSet', 'w'], ['BTreeMap', 'w'], ['BinaryHeap with Reverse', 'w'], ['VecDeque', 'w'], ['sort_by and sort_by_key', 'w'], ['Iterator chains', 'w']]],
+  ['Algorithms', 'route', [['Prefix sums', 'w'], ['Two pointers', 'w'], ['BFS on a grid', 'w'], ['Cycle detection', 'w'], ['Topological sort', 'w'], ['Dijkstra', 'w'], ['Coin change', 'w'], ['Subsets and backtracking', 'w']]],
+];
+const CPP = [['C++ warm-up', 'terminal', 12], ['Sort and search by hand', 'swap_vert', 10], ['Build it yourself', 'construction', 12], ['The standard library', 'inventory_2', 22], ['Algorithms', 'route', 22]];
+const CPP_FIRST = ['Sum of N numbers', 'Read until the input ends', 'Count the vowels', 'Swap: value or reference', 'Reverse a vector', 'Is it a palindrome?', 'A struct of students', 'Pointers and arrays', 'Walk a 2D grid', 'Print a number triangle', 'The average that rounds down', 'The copy that never changed'];
+const STEP_AT = { A: [1, 0], B: [1, 2], C: [1, 5], D: [3, 2] };
+const TOTAL = RUST.reduce((n, s) => n + s[2].length, 0);
+
+/* ---------- step content (all Rust verified with rustc, see report) ---------- */
+const EX = {
+  A: {
+    title: 'Moves, not copies', kd: ['school', 'Concept'],
+    starter: `fn main() {\n    let a = String::from("hi");\n    let b = a;\n    println!("{} {}", a, b);\n}`,
+    solution: `fn main() {\n    let a = String::from("hi");\n    let b = a.clone();\n    println!("{} {}", a, b);\n}`,
+    refresher: ['<code>let b = a;</code> on a <code>String</code> moves it. <code>a</code> cannot be used afterwards.', '<code>i32</code>, <code>bool</code>, <code>char</code> and other small plain types are <code>Copy</code>: <code>let y = x;</code> leaves <code>x</code> usable.', '<code>.clone()</code> makes an explicit deep copy, like the C++ copy constructor.'],
+    hints: ['<code>b</code> took ownership of the String. Who owns it now?', 'Either give <code>b</code> its own copy, or let <code>b</code> only look at <code>a</code>.', 'Try <code>a.clone()</code> for a copy, or <code>&amp;a</code> to borrow.'],
+    cpp: [['C++ also has an explicit move', 'cpp', `std::string a = "hi";\nstd::string c = std::move(a);\n// a is valid but unspecified:\n// usually empty, still compiles`, 'In C++ you ask for a move with <code>std::move</code> and can still touch <code>a</code> afterwards. Rust makes the move the default and rejects any later use.'], ['Small types copy in both', 'rust', `let x = 5;\nlet y = x;      // i32 is Copy\nprintln!("{} {}", x, y);`, 'Only types that opt in to <code>Copy</code> behave like C++ values. <code>String</code> and <code>Vec</code> do not.']],
+    tests: ['Compiles', 'Prints "hi hi"'], gloss: '<code>a</code> was moved into <code>b</code> on line 3, so line 4 cannot use it.', code: 'E0382', errKey: 'A',
+  },
+  B: {
+    title: 'What will the compiler say?', kd: ['quiz', 'Predict'],
+    refresher: ['A parameter of type <code>String</code> takes ownership: the caller\'s variable is moved.', '<code>&amp;s</code> lends a read-only reference. A borrow lasts until its <em>last use</em>, not until the end of the block.'],
+    cpp: [['By value in C++ copies', 'cpp', `void consume(std::string s) {\n    std::cout << s << "\\n";\n}\n\nstd::string name = "Ada";\nconsume(name);        // copy\nstd::cout << name;    // fine`, 'The same shape compiles in C++ because the argument is copied. In Rust the argument is moved.'], ['What C++ spells const&', 'rust', `fn show(s: &str) {\n    println!("{}", s);\n}\n\nlet name = String::from("Ada");\nshow(&name);      // lend it\nprintln!("{}", name);`, 'Borrowing with <code>&amp;</code> is Rust\'s <code>const std::string&amp;</code>: the caller keeps ownership.']],
+    rounds: [
+      { code: `fn consume(s: String) {\n    println!("{}", s);\n}\n\nfn main() {\n    let name = String::from("Ada");\n    consume(name);\n    println!("{}", name);\n}`, truth: 'move', errKey: 'B1', ecode: 'E0382', why: '<code>consume(name)</code> moved the String into the function, so <code>name</code> is gone on line 8.' },
+      { code: `fn main() {\n    let mut s = String::from("hi");\n    let r = &s;\n    println!("{}", r);\n    s.push('!');\n    println!("{}", s);\n}`, truth: 'ok', out: 'hi\nhi!', why: 'The borrow <code>r</code> ends after its last use on line 4, so <code>s.push</code> on line 5 is allowed.' },
+    ],
+  },
+  C: {
+    title: 'Push while holding a reference', kd: ['build', 'Make it compile'],
+    desc: 'The borrow checker rejects the starter. Change it so it compiles and still prints the first item.',
+    starter: `fn main() {\n    let mut v = vec![1, 2, 3];\n    let first = &v[0];\n    v.push(4);\n    println!("{}", first);\n}`,
+    solution: `fn main() {\n    let mut v = vec![1, 2, 3];\n    let first = &v[0];\n    println!("{}", first);\n    v.push(4);\n}`,
+    refresher: ['Many readers (<code>&amp;</code>) <em>or</em> one writer (<code>&amp;mut</code>), never both at once.', '<code>Vec::push</code> needs <code>&amp;mut self</code>, so it counts as a writer.', 'A borrow lasts until its last use. Finish using the reference and the writer is allowed.'],
+    hints: ['Which line uses <code>first</code> last? Does <code>v</code> have to change before that?', 'Either let the borrow finish before pushing, or copy the number instead of borrowing it.', 'Move the <code>println!</code> above <code>v.push(4)</code>, or write <code>let first = v[0];</code> (an <code>i32</code> is <code>Copy</code>).'],
+    cpp: [['The same code in C++', 'cpp', `std::vector<int> v{1, 2, 3};\nint& first = v[0];\nv.push_back(4);   // may reallocate\nstd::cout << first;  // dangling`, 'This compiles in C++. If <code>push_back</code> reallocates, <code>first</code> dangles and reading it is undefined behaviour. Rust turns that bug into a compile error.']],
+    tests: ['Compiles', 'Prints 1', 'Keeps v.push(4)'], gloss: '<code>first</code> still points into <code>v</code> on line 5, so <code>v</code> cannot change on line 4.', code: 'E0502', errKey: 'C',
+  },
+  D: {
+    title: 'Insertion sort', kd: ['code', 'Write the function'],
+    desc: 'Write <code>insertion_sort</code> so it sorts the slice in place, smallest first.',
+    starter: `fn insertion_sort(v: &mut [i32]) {\n    // sort v in place\n}`,
+    solution: `fn insertion_sort(v: &mut [i32]) {\n    for i in 1..v.len() {\n        let mut j = i;\n        while j > 0 && v[j - 1] > v[j] {\n            v.swap(j - 1, j);\n            j -= 1;\n        }\n    }\n}`,
+    refresher: ['<code>&amp;mut [i32]</code> is a mutable borrow of a run of integers: it works for a <code>Vec</code> or an array and cannot change its length.', '<code>for i in 1..v.len()</code> excludes the end. <code>v.swap(a, b)</code> swaps two elements.', 'Indexes are <code>usize</code>, which cannot go below 0: guard with <code>j &gt; 0</code> before using <code>j - 1</code>.'],
+    hints: ['Start the outer loop at index 1: everything left of <code>i</code> is already sorted.', 'Swap item <code>j</code> leftward while the one before it is larger.', 'Check <code>j &gt; 0</code> first. In a debug build <code>0usize - 1</code> panics instead of wrapping.'],
+    cpp: [['The same function in C++', 'cpp', `void insertion_sort(std::vector<int>& v) {\n    for (size_t i = 1; i < v.size(); i++) {\n        size_t j = i;\n        while (j > 0 && v[j - 1] > v[j]) {\n            std::swap(v[j - 1], v[j]);\n            j--;\n        }\n    }\n}`, 'Same loops. Two Rust differences: the parameter is a slice (<code>&amp;mut [i32]</code>) rather than a vector reference, and <code>0usize - 1</code> panics in a debug build where C++ silently wraps to 18446744073709551615.']],
+    tests: ['Example', 'Empty list', 'One item', 'Already sorted', 'Reversed', 'Duplicates'],
+  },
+};
+/* canned test detail for D (verified by running the buggy loops with rustc) */
+const D_CASES = [
+  ['Example', '[5, 2, 4, 6, 1, 3]', '[1, 2, 3, 4, 5, 6]', { none: '[5, 2, 4, 6, 1, 3]', off: '[1, 2, 4, 5, 6, 3]' }],
+  ['Empty list', '[]', '[]', { none: '[]', off: 'panic: attempt to subtract with overflow' }],
+  ['One item', '[7]', '[7]', { none: '[7]', off: '[7]' }],
+  ['Already sorted', '[1, 2, 3]', '[1, 2, 3]', { none: '[1, 2, 3]', off: '[1, 2, 3]' }],
+  ['Reversed', '[5, 4, 3, 2, 1]', '[1, 2, 3, 4, 5]', { none: '[5, 4, 3, 2, 1]', off: '[2, 3, 4, 5, 1]' }],
+  ['Duplicates', '[3, 1, 3, 2]', '[1, 2, 3, 3]', { none: '[3, 1, 3, 2]', off: '[1, 3, 3, 2]' }],
+];
+
+/* ---------- state ---------- */
+const S = {
+  mode: 'f', lang: 'rust', step: 'A', min: false, theme: 'light', hold: false,
+  open: { 1: true }, tab: null, ideaOpen: true, dopen: { 0: true },
+  done: new Set(RUST[0][2].map((_, i) => `0,${i}`)),
+  st: {}, pending: null, snackT: 0,
+};
+for (const k of 'ABCD') S.st[k] = { code: EX[k].starter ?? '', hints: 0, misses: 0, passed: false, res: null, sel: null, round: 0, pick: null, revealed: false, busy: false, stage: 0, rounds: [] };
+const ST = () => S.st[S.step];
+
+/* ---------- drawer ---------- */
+function doneCount() { return S.done.size; }
+function renderDrawer() {
+  $('#modeSeg').innerHTML = `<button data-m="f" class="${S.mode === 'f' ? 'on' : ''}">Foundations</button><button data-m="p" class="${S.mode === 'p' ? 'on' : ''}">Problems</button>`;
+  $('#trk').style.display = S.mode === 'f' ? '' : 'none';
+  $('#trk').innerHTML = `<button data-lang="cpp" class="${S.lang === 'cpp' ? 'on' : ''}">C++</button><button data-lang="rust" class="${S.lang === 'rust' ? 'on' : ''}">Rust</button>`;
+  const ov = $('#overall'), nav = $('#nav'), lg = $('#legend');
+  if (S.mode === 'p') { ov.innerHTML = ''; lg.innerHTML = ''; nav.innerHTML = `<div class="shell-note" style="padding:12px"><h3 style="font-size:15px">Problems</h3>See docs/mockups/v4/problems.html. Nothing changes here for Rust.</div>`; return; }
+  if (S.lang === 'cpp') {
+    ov.innerHTML = `<span>C++ · 0 of 78 done</span><div class="bar-track"><i style="width:0"></i></div>`;
+    lg.innerHTML = '';
+    nav.innerHTML = CPP.map(([n, ic, c], i) => `<div class="grp${S.dopen[i] ? ' open' : ''}"><button class="grp-h" data-cg="${i}"><span class="art ic"><span class="ms">${ic}</span></span><span class="n">${n}</span><small>${c}</small><span class="ms chev">expand_more</span></button>
+      <div class="fold${S.dopen[i] ? ' open' : ''}"><div>${i === 0 ? CPP_FIRST.map(t => `<div class="item dim"><span class="ms">radio_button_unchecked</span><span class="ttl">${esc(t)}</span></div>`).join('') : `<div class="item dim"><span class="ttl">${c} lessons, unchanged</span></div>`}</div></div></div>`).join('');
+    return;
+  }
+  ov.innerHTML = `<span>Rust · ${doneCount()} of ${TOTAL} done</span><div class="bar-track"><i style="width:${doneCount() / TOTAL * 100}%"></i></div>`;
+  lg.innerHTML = Object.values(KIND).map(([ic, n]) => `<span><span class="ms">${ic}</span>${n}</span>`).join('') + `<span>No mark: write the code</span>`;
+  const stepOf = (si, li) => Object.entries(STEP_AT).find(([, v]) => v[0] === si && v[1] === li)?.[0];
+  nav.innerHTML = RUST.map(([n, ic, ls], si) => {
+    const dn = ls.filter((_, li) => S.done.has(`${si},${li}`)).length;
+    return `<div class="grp${S.open[si] ? ' open' : ''}"><button class="grp-h" data-g="${si}"><span class="art ic"><span class="ms">${ic}</span></span><span class="n">${n}</span><small>${dn}/${ls.length}</small><span class="ms chev">expand_more</span></button>
+    <div class="fold${S.open[si] ? ' open' : ''}"><div>${ls.map(([t, k, step], li) => {
+      const on = step && step === S.step, dn2 = S.done.has(`${si},${li}`);
+      return `<button class="item${on ? ' on' : ''}${dn2 ? ' done' : ''}" data-s="${si}" data-l="${li}" ${step ? `data-step="${step}"` : ''}><span class="ms${dn2 ? ' fill' : ''}">${dn2 ? 'check_circle' : 'radio_button_unchecked'}</span><span class="ttl">${esc(t)}</span>${KIND[k] ? `<span class="ms kind" title="${KIND[k][1]}">${KIND[k][0]}</span>` : ''}</button>`;
+    }).join('')}</div></div></div>`;
+  }).join('');
+}
+
+/* ---------- pieces ---------- */
+function codeEditor(code, readonly) {
+  return `<div class="code-wrap"><div class="gutter" id="gut">${lines(code)}</div><div class="src" id="src" contenteditable="${readonly ? 'false' : 'plaintext-only'}" spellcheck="false" aria-label="Code editor">${hl(code)}</div></div>`;
+}
+function editorCard(st, { header, body, status = 'Rust 2021 · stable', foot = '' }) {
+  return `<section class="card editor">
+    <div class="ed-h-wrap"><div class="ed-h">${header}</div></div>
+    <div class="busyline${st.busy ? ' on' : ''}"><i></i></div>
+    <div class="editor-body">${body}</div>
+    ${foot}
+    <div class="status"><span>${status}</span><span class="sp"></span><span>Sends your code for compiling · no input is read</span></div>
+  </section>`;
+}
+const pgNote = `<span class="note" title="Your code is sent to play.rust-lang.org to be compiled and run"><span class="ms">cloud</span>Runs on the Rust Playground</span>`;
+function runButtons(st, canRun = true) {
+  const b = st.busy;
+  return `${pgNote}<span class="sp"></span>
+    ${canRun ? `<button class="btn text" data-act="run" ${b ? 'disabled' : ''}><span class="ms fill">play_arrow</span><span class="lbl">Run</span></button>` : ''}
+    <button class="btn fill" data-act="check" ${b ? 'disabled' : ''}>${b ? '<span class="ms spin">progress_activity</span>Compiling…' : 'Check my code<kbd>⌘↵</kbd>'}</button>`;
+}
+function taskStrip(k) {
+  const e = EX[k];
+  return `<section class="card task"><div class="txt"><h2>${e.title}</h2><p>${e.desc}</p></div><span class="kd"><span class="ms">${e.kd[0]}</span>${e.kd[1]}</span></section>`;
+}
+function onward(next, pct, word = 'Passed.') {
+  return `<div class="onward"><span class="ms fill">check_circle</span><div class="where"><span><b>${word}</b> Next: ${esc(next)}</span><div class="bar-track"><i style="width:${pct}%"></i></div></div><button class="btn fill big" data-act="next">Next lesson<span class="ms">arrow_forward</span></button></div>`;
+}
+const wait = (st, what = 'Compiling') => {
+  const labels = ['Sent', 'Compiling', 'Running'];
+  return `<div class="wait"><span class="big"><span class="ms spin">progress_activity</span></span>
+    <div><div class="t">${what} on the Rust Playground…</div><div class="s">Usually two to five seconds. Your code stays here.</div></div>
+    <div class="steps">${labels.map((l, i) => `<span class="${i < st.stage ? 'done' : i === st.stage ? 'on' : ''}">${i < st.stage ? '<span class="ms">check</span>' : ''}${l}</span>`).join('')}</div></div>`;
+};
+function errBlock(key, gloss, code, label = 'rustc says') {
+  return `<div class="gloss"><span class="ms">info</span><span>${gloss}</span><button class="lk" data-act="cppTab" title="See the same code in C++"><span class="ms">compare_arrows</span>In C++</button></div>
+    <div><div class="rerr-h">${label}${code ? `<a class="ecode" href="https://doc.rust-lang.org/error_codes/${code}.html" target="_blank" rel="noopener" title="Open the long explanation of ${code}"><span>${code}</span><span class="ms">open_in_new</span></a>` : ''}</div><div class="rerr" tabindex="0" role="region" aria-label="Compiler output">${rustErr(ERR[key])}</div></div>`;
+}
+
+/* ---------- evaluation (canned: reads the editor text just enough to feel real) ---------- */
+function evalStep(k, code) {
+  if (k === 'A') {
+    const m = code.match(/let\s+b\s*=\s*([^;]*);/);
+    const ok = m && (/^a\.clone\(\)$/.test(m[1].trim()) || /^&\s*a$/.test(m[1].trim()));
+    return ok ? { ok: true, out: 'hi hi', tests: [['Compiles', 'ok'], ['Prints "hi hi"', 'ok']] } : { ok: false, err: true, tests: [['Compiles', 'bad'], ['Prints "hi hi"', 'skip']] };
+  }
+  if (k === 'C') {
+    const pi = code.indexOf('v.push'), pr = code.indexOf('println!');
+    const keeps = /v\.push\(4\)/.test(code);
+    if (/let\s+first\s*=\s*&/.test(code) && pi >= 0 && pr >= 0 && pi < pr) return { ok: false, err: true, tests: [['Compiles', 'bad'], ['Prints 1', 'skip'], ['Keeps v.push(4)', 'skip']] };
+    if (!keeps) return { ok: false, out: '1', tests: [['Compiles', 'ok'], ['Prints 1', 'ok'], ['Keeps v.push(4)', 'bad']], detail: 'The check looks for <b>v.push(4)</b> in your code. Removing it would hide the problem, not fix it.' };
+    return { ok: true, out: '1', tests: [['Compiles', 'ok'], ['Prints 1', 'ok'], ['Keeps v.push(4)', 'ok']] };
+  }
+  /* D */
+  const mode = !/for\s/.test(code) ? 'none' : /len\(\)\s*-\s*1/.test(code) ? 'off' : 'ok';
+  const tests = D_CASES.map(([n, inp, exp, got]) => {
+    const g = mode === 'ok' ? exp : got[mode];
+    return [n, g === exp ? 'ok' : 'bad', `<b>Input</b>  ${inp}\n<b>Expected</b>  ${exp}\n<b>Got</b>  <u>${g}</u>`];
+  });
+  const sample = mode === 'ok' ? '[1, 2, 3, 4, 5, 6]' : D_CASES[0][3][mode];
+  return { ok: mode === 'ok', out: sample, tests };
+}
+
+/* ---------- results ---------- */
+function resHtml(k) {
+  const st = S.st[k]; if (st.busy) return `<div class="res"><div class="pad">${wait(st, st.what)}</div></div>`;
+  const r = st.res; if (!r) return '';
+  const e = EX[k];
+  let h = '';
+  if (r.kind === 'check') {
+    const n = r.tests.filter(t => t[1] === 'ok').length;
+    h += `<div class="row tests">${r.tests.map((t, i) => `<span class="test ${t[1]}${st.sel === i ? ' sel' : ''}" ${t[1] === 'bad' && t[2] ? `data-sel="${i}"` : ''} style="animation-delay:${i * 60}ms"><span class="ms fill">${t[1] === 'ok' ? 'check_circle' : t[1] === 'bad' ? 'cancel' : 'remove_circle'}</span>${esc(t[0])}</span>`).join('')}
+      ${r.err ? `<a class="ecode" href="https://doc.rust-lang.org/error_codes/${e.code}.html" target="_blank" rel="noopener" title="Open the long explanation of ${e.code}"><span>${e.code}</span><span class="ms">open_in_new</span></a>` : ''}
+      <span class="summary${r.ok ? ' win' : ''}">${r.ok ? 'All passed' : r.err ? 'Does not compile' : `${n} of ${r.tests.length} passed`}</span></div>`;
+  }
+  if (r.err) h += `<div class="gloss"><span class="ms">info</span><span>${e.gloss}</span><button class="lk" data-act="cppTab" title="See the same code in C++"><span class="ms">compare_arrows</span>In C++</button></div><div><div class="rerr-h">rustc says</div><div class="rerr" tabindex="0" role="region" aria-label="Compiler output">${rustErr(ERR[e.errKey])}</div></div>`;
+  else if (r.kind === 'run') h += `<div class="out"><div class="lbl">Printed</div><pre>${esc(r.out)}</pre></div>`;
+  if (r.kind === 'check' && !r.err) {
+    if (r.detail) h += `<div class="notice bad"><span class="ms">info</span><span>${r.detail}</span></div>`;
+    const t = st.sel != null ? r.tests[st.sel] : null;
+    if (t && t[2]) h += `<div class="detail">${t[2]}</div>`;
+  }
+  return `<div class="res"><div class="pad">${h}</div></div>`;
+}
+
+/* ---------- help rail + panels ---------- */
+function tabsFor(k) { return k === 'B' ? [['ref', 'menu_book', 'Refresher'], ['cpp', 'compare_arrows', 'In C++']] : [['ref', 'menu_book', 'Refresher'], ['cpp', 'compare_arrows', 'In C++'], ['hint', 'lightbulb', 'Hints'], ['ans', 'lock', 'Answer']]; }
+function panel(k, tab) {
+  const e = EX[k], st = S.st[k];
+  if (tab === 'ref') return ['Refresher', `<ul class="refresher">${e.refresher.map(r => `<li><span>${r}</span></li>`).join('')}</ul>`];
+  if (tab === 'cpp') return ['In C++', e.cpp.map(([t, lang, code, note]) => {
+    const cpp = lang === 'cpp';
+    return `<div class="pair"><div class="box"><div class="pl"><span>${esc(t)}</span><span class="tag">${cpp ? 'C++' : 'Rust'}</span></div>${codeview(code, lang)}</div><div class="note-t">${note}</div></div>`;
+  }).join('')];
+  if (tab === 'hint') {
+    const n = st.hints;
+    return ['Hints', `<div class="hints">${e.hints.slice(0, n).map((h, i) => `<div class="hint${i === n - 1 && st.freshHint ? ' fresh' : ''}"><b>${i + 1}</b><span>${h}</span></div>`).join('')}</div>
+      ${n < e.hints.length ? `<button class="btn tone hintmore" data-act="hint">${n ? 'Show another hint' : 'Show a hint'}<span style="opacity:.7;font-weight:500">${n}/${e.hints.length}</span></button>` : '<div class="note-t hintmore" style="color:var(--sub)">That was the last hint.</div>'}`];
+  }
+  const open = st.passed || st.misses >= 3;
+  return ['Answer', open ? `<div class="answer"><div class="answer-h"><span class="ms fill">check_circle</span>One way to write it</div>${codeview(e.solution, 'rust', true)}</div>` :
+    `<div class="lockrow"><span class="ms">lock</span><span>Unlocks when you pass, or after three misses.</span><span class="tries"><i class="${st.misses > 0 ? 'used' : ''}"></i><i class="${st.misses > 1 ? 'used' : ''}"></i><i class="${st.misses > 2 ? 'used' : ''}"></i></span></div>`];
+}
+
+/* ---------- step views ---------- */
+function viewA() {
+  const e = EX.A, st = S.st.A;
+  const concept = `<section class="card concept">
+    <div class="ch"><h2>${e.title}</h2><span class="kd" style="display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--on-pri-c);background:var(--pri-c);padding:5px 11px 5px 8px;border-radius:6px"><span class="ms" style="font-size:16px">school</span>Concept</span>
+      <button class="iconbtn" data-act="idea" aria-label="${S.ideaOpen ? 'Hide the idea' : 'Show the idea'}" title="${S.ideaOpen ? 'Hide the idea' : 'Show the idea'}"><span class="ms">${S.ideaOpen ? 'expand_less' : 'expand_more'}</span></button></div>
+    <div class="fold${S.ideaOpen ? ' open' : ''}"><div><div class="cb">
+      <div class="cmp">
+        <div class="pane"><div class="pl">C++</div>${codeview(`std::string a = "hi";\nstd::string b = a;   // copy\nstd::cout << a << b;`, 'cpp')}<div class="outcome ok"><span class="ms fill">check_circle</span>Both usable: two buffers</div></div>
+        <div class="pane"><div class="pl">Rust</div>${codeview(`let a = String::from("hi");\nlet b = a;           // move\nprintln!("{} {}", a, b);`, 'rust')}<div class="outcome bad"><span class="ms fill">cancel</span>Error: <code style="background:none;padding:0;font-size:12px">a</code> was moved</div></div>
+      </div>
+      <p class="why">Rust moves by default: after <code>let b = a;</code>, <code>b</code> is the only owner and <code>a</code> is dead. That is how every buffer is freed exactly once, with no garbage collector and no copy you did not ask for.</p>
+    </div></div></div>
+    <div class="turn"><span class="ms">edit_note</span><span><b>Your turn.</b> The starter below does not compile. Make it print <code>hi hi</code>.</span></div></section>`;
+  const ed = editorCard(st, { header: runButtons(st), body: codeEditor(st.code) + resHtml('A'), foot: st.passed ? onward('Copy types and .clone()', 20) : '' });
+  return concept + ed;
+}
+function viewB() {
+  const st = S.st.B, e = EX.B, r = e.rounds[st.round];
+  const OPTS = [['ok', 'Compiles'], ['move', 'Error: use after move'], ['mutb', 'Error: mutable borrow while borrowed']];
+  const label = k => OPTS.find(o => o[0] === k)[1];
+  const hdr = `<span class="rounds"><span>Snippet ${st.round + 1} of 2</span>${[0, 1].map(i => `<i class="${i === st.round ? 'on' : S.st.B.rounds[i] ? 'done' : ''}"></i>`).join('')}</span>${pgNote}<span class="sp"></span>
+    <button class="btn fill" data-act="compile" ${(!st.pick || st.revealed || st.busy) ? 'disabled' : ''}>${st.busy ? '<span class="ms spin">progress_activity</span>Compiling…' : '<span class="ms fill">play_arrow</span>Compile it'}</button>`;
+  const choices = OPTS.map(([k, t]) => {
+    let c = '', ic = st.pick === k ? 'radio_button_checked' : 'radio_button_unchecked';
+    if (st.revealed) {
+      c = 'locked';
+      if (k === r.truth) { c += ' right'; ic = 'check_circle'; } else if (k === st.pick) { c += ' wrong'; ic = 'cancel'; } else c += ' faded';
+    } else if (st.pick === k) c = 'sel';
+    if (st.busy) c += ' locked';
+    return `<button class="choice ${c}" data-pick="${k}"><span class="ms${c.includes('right') || c.includes('wrong') ? ' fill' : ''}">${ic}</span>${t}</button>`;
+  }).join('');
+  let reveal = '';
+  if (st.busy) reveal = `<div class="res"><div class="pad">${wait(st, 'Compiling')}</div></div>`;
+  else if (st.revealed) {
+    const good = st.pick === r.truth;
+    reveal = `<div class="res"><div class="pad">
+      <div class="verdict ${good ? 'ok' : 'bad'}"><span class="ms fill">${good ? 'check_circle' : 'cancel'}</span><span>${good ? '<b>Right.</b>' : `<b>Not quite.</b> You said “${label(st.pick)}”; the compiler says “${label(r.truth)}”.`} ${r.why}</span></div>
+      ${r.errKey ? `<div><div class="rerr-h">rustc says<a class="ecode" href="https://doc.rust-lang.org/error_codes/${r.ecode}.html" target="_blank" rel="noopener" title="Open the long explanation of ${r.ecode}"><span>${r.ecode}</span><span class="ms">open_in_new</span></a></div><div class="rerr cap" tabindex="0" role="region" aria-label="Compiler output">${rustErr(ERR[r.errKey])}</div></div>`
+        : `<div class="out"><div class="lbl">Compiled and ran. Printed</div><pre>${esc(r.out)}</pre></div>`}
+      ${st.round === 0 ? `<div class="nextrow"><button class="btn tone" data-act="round">Next snippet<span class="ms" style="margin:0 -6px 0 0">arrow_forward</span></button></div>` : ''}
+    </div></div>`;
+  }
+  const body = codeEditor(r.code, true) + `<div class="predict"><div class="pt">${st.revealed ? 'Your prediction' : 'What will rustc say about this? Pick one, then compile it.'}</div><div class="choices">${choices}</div></div>` + reveal;
+  return taskStrip('B').replace('<p>undefined</p>', '<p>Read the code, pick one, then see what the real compiler says.</p>') + editorCard(st, { header: hdr, body, foot: st.passed && st.revealed ? onward('Borrowing with &', 30, 'Done.') : '' });
+}
+function viewC() {
+  const st = S.st.C;
+  return taskStrip('C') + editorCard(st, { header: runButtons(st), body: codeEditor(st.code) + resHtml('C'), foot: st.passed ? onward('Slices: &v[1..3]', 55) : '' });
+}
+function viewD() {
+  const st = S.st.D;
+  return taskStrip('D') + editorCard(st, { header: runButtons(st), body: codeEditor(st.code) + resHtml('D'), foot: st.passed ? onward('Merge sort', 40) : '' });
+}
+
+/* ---------- main render ---------- */
+function syncCode() {
+  const src = $('#src');
+  if (src && src.getAttribute('contenteditable') !== 'false' && S.mode === 'f' && S.lang === 'rust' && S.step !== 'B') S.st[S.step].code = src.textContent.replace(/\u00a0/g, ' ');
+}
+function render() {
+  $('#app').dataset.theme = S.theme;
+  $('#app').classList.toggle('min', S.min);
+  renderDrawer();
+  const main = $('#main');
+  document.querySelectorAll('#stepSeg button').forEach(b => b.classList.toggle('on', b.dataset.k === S.step));
+  if (S.mode === 'p' || S.lang === 'cpp') {
+    main.innerHTML = `<div class="work"><section class="card task"><div class="txt"><h2>${S.mode === 'p' ? 'Problems mode' : 'The C++ track'}</h2><p>${S.mode === 'p' ? 'Unchanged here. See docs/mockups/v4/problems.html.' : 'The existing 78 lessons, unchanged. This mock only draws the Rust track: switch back with the C++ | Rust selector.'}</p></div></section></div>`;
+    return;
+  }
+  const t = S.tab, tabs = tabsFor(S.step), st = ST();
+  const v = { A: viewA, B: viewB, C: viewC, D: viewD }[S.step]();
+  const p = t ? panel(S.step, t) : ['', ''];
+  main.innerHTML = `<div class="work">${v}</div>
+    <div class="side${t ? ' open' : ''}"><div class="side-in card"><div class="side-h"><span>${p[0]}</span><button class="iconbtn" data-act="close" aria-label="Close"><span class="ms">close</span></button></div><div class="side-b">${p[1]}</div></div></div>
+    <div class="rail">${tabs.map(([id, ic, nm]) => {
+      const unlocked = id === 'ans' && (st.passed || st.misses >= 3);
+      return `<button class="${t === id ? 'on' : ''}${unlocked ? ' unlocked' : ''}" data-tab="${id}"><span class="ms">${id === 'ans' ? (unlocked ? 'lock_open' : 'lock') : ic}</span>${nm}</button>`;
+    }).join('')}</div>`;
+  st.freshHint = false;
+}
+
+/* ---------- actions ---------- */
+function snack(msg) { $('#snackt').textContent = msg; $('#snack').classList.add('on'); clearTimeout(S.snackT); S.snackT = setTimeout(() => $('#snack').classList.remove('on'), 2600); }
+function startBusy(k, what, done) {
+  const st = S.st[k]; st.busy = true; st.stage = 0; st.what = what; S.pending = () => { st.busy = false; done(); render(); };
+  render();
+  const adv = n => setTimeout(() => { if (st.busy) { st.stage = n; if (S.step === k) { render(); } } }, n === 1 ? 700 : 1700);
+  adv(1); adv(2);
+  setTimeout(() => { if (!S.hold && !S.instant && st.busy && S.pending) { const f = S.pending; S.pending = null; f(); } }, 2700);
+}
+function finishPending() { if (S.pending) { const f = S.pending; S.pending = null; f(); } }
+function runStep(k, kind) {
+  syncCode();
+  const st = S.st[k];
+  startBusy(k, kind === 'run' ? 'Compiling and running' : 'Compiling and checking', () => {
+    const r = evalStep(k, st.code);
+    st.res = { ...r, kind, err: !!r.err };
+    st.sel = kind === 'check' ? (r.tests.findIndex(t => t[1] === 'bad' && t[2])) : null; if (st.sel < 0) st.sel = null;
+    setTimeout(() => { const w = document.querySelector('.work'); if (w) w.scrollTop = w.scrollHeight; }, 30);
+    if (kind === 'check') {
+      if (r.ok) { st.passed = true; const [a, b] = STEP_AT[k]; S.done.add(`${a},${b}`); } else st.misses++;
+    }
+  });
+}
+function go(k) { syncCode(); S.step = k; S.mode = 'f'; S.lang = 'rust'; S.tab = null; S.open[STEP_AT[k][0]] = true; render(); }
+
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('button, a'); if (!t) return;
+  const d = t.dataset;
+  if (t.closest('#stepSeg')) return go(d.k);
+  if (t.id === 'hold') { S.hold = !S.hold; t.classList.toggle('on', S.hold); t.textContent = S.hold ? 'Waiting state: held (click to release)' : 'Hold waiting state'; if (!S.hold) setTimeout(finishPending, 300); return; }
+  if (t.id === 'fill') { const e = EX[S.step]; if (e.solution) { S.st[S.step].code = e.solution; S.tab = S.tab; render(); } else snack('This step has no editor: pick an answer instead'); return; }
+  if (t.id === 'theme') { syncCode(); S.theme = S.theme === 'dark' ? 'light' : 'dark'; return render(); }
+  if (t.id === 'min') { S.min = !S.min; return render(); }
+  if (d.m) { syncCode(); S.mode = d.m; return render(); }
+  if (d.lang) { syncCode(); S.lang = d.lang; return render(); }
+  if (d.cg) { S.dopen[d.cg] = !S.dopen[d.cg]; return renderDrawer(); }
+  if (d.g !== undefined) { S.open[d.g] = !S.open[d.g]; return renderDrawer(); }
+  if (d.s !== undefined && t.classList.contains('item')) { if (d.step) return go(d.step); return snack('Not drawn in this mock: only the four step types are'); }
+  if (d.tab) { S.tab = S.tab === d.tab ? null : d.tab; return render(); }
+  const a = d.act;
+  if (a === 'close') { S.tab = null; return render(); }
+  if (a === 'cppTab') { syncCode(); S.tab = 'cpp'; return render(); }
+  if (a === 'idea') { S.ideaOpen = !S.ideaOpen; return render(); }
+  if (a === 'check') return runStep(S.step, 'check');
+  if (a === 'run') return runStep(S.step, 'run');
+  if (a === 'hint') { const st = ST(); st.hints++; st.freshHint = true; return render(); }
+  if (a === 'next') return snack('Mock: this opens the next lesson');
+  if (d.sel !== undefined) { ST().sel = +d.sel; return render(); }
+  if (d.pick) { const st = S.st.B; if (!st.revealed && !st.busy) { st.pick = d.pick; render(); } return; }
+  if (a === 'compile') {
+    const st = S.st.B, r = EX.B.rounds[st.round];
+    startBusy('B', 'Compiling', () => { st.revealed = true; setTimeout(() => { const w = document.querySelector('.work'); if (w) w.scrollTop = w.scrollHeight; }, 30); st.rounds[st.round] = true; if (st.round === 1) { st.passed = true; S.done.add('1,2'); } });
+    return;
+  }
+  if (a === 'round') { const st = S.st.B; st.round = 1; st.pick = null; st.revealed = false; return render(); }
+});
+document.addEventListener('input', e => { if (e.target.id === 'src') { const g = $('#gut'); if (g) g.textContent = lines(e.target.textContent); } });
+document.addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && S.mode === 'f' && S.lang === 'rust' && ['A', 'C', 'D'].includes(S.step) && !ST().busy) runStep(S.step, 'check'); });
+
+/* deep links for review: #step=C&theme=dark&tab=cpp&act=check&fix=1&hold=1&pick=move&round=1 */
+(function boot() {
+  const q = new URLSearchParams(location.hash.slice(1)); if (![...q].length) return render();
+  if (q.get('theme')) S.theme = q.get('theme');
+  if (q.get('step')) S.step = q.get('step');
+  if (q.get('lang')) S.lang = q.get('lang');
+  if (q.get('idea') === '0') S.ideaOpen = false;
+  S.open[STEP_AT[S.step][0]] = true;
+  if (q.get('fix')) S.st[S.step].code = EX[S.step].solution;
+  if (q.get('bug')) S.st.D.code = EX.D.solution.replace('1..v.len()', '1..v.len() - 1');
+  S.instant = !q.get('hold'); if (q.get('hold')) S.hold = true;
+  if (q.get('round')) { S.st.B.round = 1; S.st.B.rounds[0] = true; }
+  if (q.get('pick')) S.st.B.pick = q.get('pick');
+  render();
+  const run = a => { if (S.instant) { document.querySelector(`[data-act=${a}]`).click(); finishPending(); } else document.querySelector(`[data-act=${a}]`).click(); };
+  if (q.get('act')) { if (q.get('act') === 'check2') { run('check'); run('check'); } else run(q.get('act')); }
+  if (q.get('tab')) { S.tab = q.get('tab'); const st = ST(); if (q.get('hints')) st.hints = +q.get('hints'); render(); }
+})();
+
+</script>
+</body>
+</html>
