@@ -41,3 +41,27 @@ export function Group({ id, open, art, name, count, onToggle, children }) {
     </div>
   )
 }
+
+// The C++ | Rust selector under the Foundations | Problems switch.
+export function TrackSwitch({ track, onTrack }) {
+  return (
+    <div className="trk" role="tablist" aria-label="Language track">
+      {[['cpp', 'C++'], ['rust', 'Rust']].map(([t, label]) => (
+        <button key={t} role="tab" aria-selected={track === t} className={track === t ? 'on' : ''} onClick={() => track !== t && onTrack(t)}>{label}</button>
+      ))}
+    </div>
+  )
+}
+
+// One lesson row. `mark` is an optional small icon for the lesson's kind: { icon, label }.
+export function Item({ title, done, current, again, due, justDone, mark, onPick }) {
+  const cls = ['item', 'rip', done && 'done', current && 'on', current && justDone && 'justdone'].filter(Boolean).join(' ')
+  return (
+    <button className={cls} onClick={onPick}>
+      <span className={`ms${done ? ' fill' : ''}`}>{again ? 'replay' : done ? 'check_circle' : 'circle'}</span>
+      <span className="ttl">{title}</span>
+      {mark && <span className="ms kind" title={mark.label}>{mark.icon}</span>}
+      {!again && due && <span className="ms again" title="Ready to write again">replay</span>}
+    </button>
+  )
+}

@@ -1,19 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { STAGES, LESSONS } from '../data/foundations'
-import { DAY, now } from './time'
+import { blankRec, enteringRedo, withCode, withMiss, withPass } from '../workbench/progress'
 
 // Besides lesson progress this holds the prefs both modes share: theme, collapsed drawer, open groups.
 const KEY = 'dsa-foundations'
-// Redo schedule: days after the first pass, then after each redo.
-export const REDO_DAYS = [3, 7, 21]
-
-export const blankRec = () => ({
-  code: null, misses: 0, passedAt: null,
-  redo: null,            // { dueAt, step } or null
-  redoCode: null, redoMisses: 0, redoPassed: false,
-})
-
-export const isDue = rec => !!rec?.redo && rec.redo.dueAt <= now()
 
 // First visit: open the stage the app will land on.
 function defaultOpen(saved) {
@@ -58,24 +48,13 @@ export function useFoundationsStore() {
       : { ...s, open: { ...s.open, [key]: !s.open[key] } })),
     setGroup: (key, open) => setState(s => ({ ...s, open: { ...s.open, [key]: open } })),
     setLast: (id, redoing = null) => setState(s => ({ ...s, last: id, redoing })),
-    setCode: (id, code, redo) => upd(id, r => (redo ? { ...r, redoCode: code } : { ...r, code })),
-    recordMiss: (id, redo) => upd(id, r => (redo ? { ...r, redoMisses: r.redoMisses + 1 } : { ...r, misses: r.misses + 1 })),
-    // Opening a due lesson from "Write again": fresh buffer unless one is already in progress.
+    setCode: (id, code, redo) => upd(id, r => withCode(r, code, redo)),
+    recordMiss: (id, redo) => upd(id, r => withMiss(r, redo)),
     enterRedo: id => setState(s => {
-      const r = { ...blankRec(), ...s.lessons[id] }
-      const fresh = r.redoPassed || r.redoCode == null
-      const next = fresh ? { ...r, redoCode: null, redoMisses: 0, redoPassed: false } : r
-      return { ...s, last: id, redoing: id, lessons: { ...s.lessons, [id]: next } }
+      const r = enteringRedo({ ...blankRec(), ...s.lessons[id] })
+      return { ...s, last: id, redoing: id, lessons: { ...s.lessons, [id]: r } }
     }),
-    recordPass: (id, redo) => upd(id, r => {
-      if (redo) {
-        if (r.redoPassed || !r.redo) return { ...r, redoPassed: true }
-        const step = r.redo.step + 1
-        return { ...r, redoPassed: true, redo: step < REDO_DAYS.length ? { dueAt: now() + REDO_DAYS[step] * DAY, step } : null }
-      }
-      if (r.passedAt) return r
-      return { ...r, passedAt: now(), redo: { dueAt: now() + REDO_DAYS[0] * DAY, step: 0 } }
-    }),
+    recordPass: (id, redo) => upd(id, r => withPass(r, redo)),
   }
 
   return { state, rec, ...actions }

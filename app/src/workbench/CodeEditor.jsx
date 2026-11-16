@@ -18,11 +18,21 @@ lambda None nonlocal not or pass raise return self True try while with yield int
 enumerate zip sorted reversed min max sum abs append pop extend insert remove index count sort reverse keys values items get
 heapq heappush heappop heapify deque appendleft popleft defaultdict Counter collections typing List Optional print input`.split(/\s+/)
 
+const RUST_WORDS = `as break const continue crate else enum false fn for if impl in let loop match mod move mut pub ref return
+self Self static struct trait true type unsafe use where while dyn async await i8 i16 i32 i64 i128 isize u8 u16 u32 u64 u128
+usize f32 f64 bool char str String Vec Option Result Some None Ok Err Box Rc RefCell Cell HashMap HashSet BTreeMap BTreeSet
+BinaryHeap VecDeque Reverse Ordering println print format panic assert assert_eq vec std collections cmp mem fmt iter
+new len push pop insert remove get get_mut contains is_empty clear swap sort sort_by sort_by_key sort_unstable reverse
+iter iter_mut into_iter map filter enumerate zip rev collect sum fold min max count any all position take skip chain
+windows chunks to_string to_owned clone unwrap expect unwrap_or unwrap_or_else is_some is_none as_ref as_mut as_str
+chars bytes lines split trim parse push_str abs pow wrapping_add checked_add saturating_sub entry or_insert or_default
+Default Debug Display Clone Copy PartialEq Eq PartialOrd Ord Hash Iterator From Into`.split(/\s+/)
+
 let completionReady = false
 function defineCompletion(monaco) {
   if (completionReady) return
   completionReady = true
-  for (const [lang, words] of [['cpp', WORDS], ['python', PY_WORDS]]) {
+  for (const [lang, words] of [['cpp', WORDS], ['python', PY_WORDS], ['rust', RUST_WORDS]]) {
     monaco.languages.registerCompletionItemProvider(lang, {
       provideCompletionItems(model, position) {
         const w = model.getWordUntilPosition(position)
@@ -82,7 +92,7 @@ const OPTIONS = {
   padding: { top: 16, bottom: 80 },
   automaticLayout: true,
   fixedOverflowWidgets: true,   // popups may extend past the editor card instead of being clipped
-  // Simple completion only: words already in the file plus C++ keywords and common STL names.
+  // Simple completion only: words already in the file plus the language's keywords and common library names.
   // No snippets, signatures or hovers: the typing is still the learner's.
   quickSuggestions: { other: true, comments: false, strings: false },
   suggestOnTriggerCharacters: false,

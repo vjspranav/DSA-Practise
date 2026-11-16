@@ -1,21 +1,20 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import EditorCard from '../workbench/EditorCard'
+import ReviewButton from '../workbench/ReviewButton'
+import { buildReviewPrompt } from '../workbench/reviewPrompt'
 import Onward from '../workbench/Onward'
 import HelpPanel from './HelpPanel'
+import { Rail, SidePanel } from '../workbench/SidePanel'
 import { ResultsBody } from '../workbench/Results'
 import { assembleSource, forbiddenHit, judge, splitOutput } from './grade'
 import { compile, exclusive, limitFor, runTest } from '../workbench/runner'
 import { vt } from '../workbench/motion'
+import { useHelpTabs, useLessonUi } from '../workbench/useHelp'
 import { STAGES } from '../data/foundations/index.js'
 
 const KIND = { program: 'Write the whole program', implement: 'Write the function', drill: 'Quick drill', bugfix: 'Find the bug' }
 const KIND_ICON = { program: 'terminal', implement: 'function', drill: 'bolt', bugfix: 'bug_report' }
 const TABS = [['refresher', 'menu_book', 'Refresher'], ['hints', 'lightbulb', 'Hints'], ['answer', 'lock', 'Answer']]
-
-const initUi = key => ({
-  key, res: null, sel: null, tab: null, panelTab: null, nudge: false,
-  hintsShown: 1, lastHint: 0, busy: null, justUnlocked: false,
-})
 
 // Compiler errors refer to the assembled source; point them at the learner's own lines.
 function mapErrors(lesson, text) {
@@ -31,11 +30,7 @@ function mapErrors(lesson, text) {
 
 export default function Workbench({ lesson, next, redoMode, rec, theme, store, onPick, onPassed }) {
   const key = `${lesson.id}:${redoMode ? 'redo' : 'main'}`
-  const [ui, setUi] = useState(() => initUi(key))
-    const u = ui.key === key ? ui : initUi(key)
-  if (ui.key !== key) setUi(u)
-
-  const patch = (k, p) => setUi(s => (s.key === k ? { ...s, ...(typeof p === 'function' ? p(s) : p) } : s))
+  const [u, patch] = useLessonUi(key)
 
   const starter = lesson.starter ?? ''
   const code = redoMode ? (rec.redoCode ?? starter) : (rec.code ?? starter)
@@ -112,18 +107,7 @@ export default function Workbench({ lesson, next, redoMode, rec, theme, store, o
     }
   }
 
-  function toggleTab(t) {
-    const was = u.tab, nextTab = was === t ? null : t
-    const base = { lastHint: 0, ...(nextTab === 'hints' || nextTab === 'answer' ? { nudge: false } : {}) }
-    if (was && nextTab) vt(() => patch(key, { ...base, tab: nextTab, panelTab: nextTab }))
-    else if (nextTab) patch(key, { ...base, tab: nextTab, panelTab: nextTab })
-    else {
-      patch(key, { ...base, tab: null })
-      setTimeout(() => patch(key, s => (s.tab === null ? { panelTab: null } : {})), 450)
-    }
-  }
-  const showTab = t => { if (u.tab !== t) toggleTab(t); else patch(key, { nudge: false }) }
-  const moreHint = () => vt(() => patch(key, s => ({ lastHint: s.hintsShown, hintsShown: s.hintsShown + 1 })))
+  const { toggleTab, showTab, moreHint } = useHelpTabs(key, u, patch)
 
   const res = u.res
   // Once a lesson is passed, always offer the way forward with the stage's progress.
@@ -149,6 +133,10 @@ export default function Workbench({ lesson, next, redoMode, rec, theme, store, o
           busy={u.busy} language="C++14"
           header={<>
             <span className="sp" />
+            <ReviewButton hasReference={unlocked && !!lesson.solution} build={preset => buildReviewPrompt({
+              mode: 'foundations', language: 'cpp', title: lesson.title, statement: lesson.task, kind: lesson.kind,
+              code, results: res, reference: unlocked ? lesson.solution : null, preset,
+            })} />
             <button className={`btn text${u.busy ? ' busy' : ''}`} onClick={() => run('run')}><span className="ms fill">play_arrow</span>Run</button>
             <button className={`btn fill${u.busy ? ' busy' : ''}`} onClick={() => run('check')} title="Ctrl or Cmd + Enter">
               Check my code<kbd>⌘↵</kbd>
@@ -174,29 +162,13 @@ export default function Workbench({ lesson, next, redoMode, rec, theme, store, o
         />
       </div>
 
-      <div className={`card side${u.tab ? ' open' : ''}`}>
-        <div className="side-in">
-          <div className="side-h">
-            <span>{panelName || ''}</span>
-            <button className="iconbtn" onClick={() => u.tab && toggleTab(u.tab)} aria-label="Close"><span className="ms">close</span></button>
-          </div>
-          <div className="side-b">
-            {u.panelTab && (
-              <HelpPanel tab={u.panelTab} lesson={lesson} hintsShown={u.hintsShown} lastHint={u.lastHint}
-                onMoreHint={moreHint} unlocked={unlocked} passed={passed} tries={tries} />
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="rail">
-        {TABS.map(([t, icon, name]) => (
-          <button key={t} className={`rip${u.tab === t ? ' on' : ''}${t === 'answer' && u.justUnlocked ? ' unlocked' : ''}`} onClick={() => toggleTab(t)}>
-            <span className="ms">{t === 'answer' && unlocked ? 'lock_open' : icon}</span>{name}
-            {t === 'hints' && u.nudge && !unlocked && <i className="badge" />}
-          </button>
-        ))}
-      </div>
+      <SidePanel open={!!u.tab} title={panelName} onClose={() => u.tab && toggleTab(u.tab)}>
+        {u.panelTab && (
+          <HelpPanel tab={u.panelTab} lesson={lesson} hintsShown={u.hintsShown} lastHint={u.lastHint}
+            onMoreHint={moreHint} unlocked={unlocked} passed={passed} tries={tries} />
+        )}
+      </SidePanel>
+      <Rail tabs={TABS} tab={u.tab} onToggle={toggleTab} unlocked={unlocked} justUnlocked={u.justUnlocked} nudge={u.nudge} />
     </>
   )
 }

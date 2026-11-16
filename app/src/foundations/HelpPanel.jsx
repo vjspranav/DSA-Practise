@@ -2,18 +2,19 @@ import { highlightLines } from './highlight'
 
 const html = h => ({ __html: h })
 
-function CodeBlock({ code }) {
+// Read-only highlighted code with line numbers (`numbered={false}` leaves the number column empty).
+export function CodeBlock({ code, lang = 'cpp', numbered = true }) {
   return (
     <div className="codeview">
-      {highlightLines(code).map((h, i) => (
-        <div className="ln" key={i}><span>{i + 1}</span><span dangerouslySetInnerHTML={html(h)} /></div>
+      {highlightLines(code, lang).map((h, i) => (
+        <div className="ln" key={i}><span>{numbered ? i + 1 : ''}</span><span dangerouslySetInnerHTML={html(h)} /></div>
       ))}
     </div>
   )
 }
 
 // Content of the side panel: refresher, hints (one at a time) or answer.
-export default function HelpPanel({ tab, lesson, hintsShown, lastHint, onMoreHint, unlocked, passed, tries }) {
+export default function HelpPanel({ lang = 'cpp', tab, lesson, hintsShown, lastHint, onMoreHint, unlocked, passed, tries }) {
   if (tab === 'refresher') {
     return (
       <>
@@ -57,7 +58,7 @@ export default function HelpPanel({ tab, lesson, hintsShown, lastHint, onMoreHin
   return (
     <div className="answer">
       <div className="answer-h"><span className="ms">lock_open</span>{passed ? 'Unlocked. Compare it with yours.' : 'Unlocked after three misses.'}</div>
-      <CodeBlock code={lesson.solution ?? ''} />
+      <CodeBlock code={lesson.solution ?? ''} lang={lang} />
     </div>
   )
 }

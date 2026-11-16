@@ -7,3 +7,8 @@ createRoot(document.getElementById('root')).render(<App />)
 if (import.meta.env.DEV && new URLSearchParams(location.search).has('fndSelfTest')) {
   import('./foundations/selftest.js').then(m => m.runSelfTest())
 }
+
+// Dev-only self-test of Rust reference solutions on the real Playground (see scripts/browser-selftest-rust.mjs).
+if (import.meta.env.DEV && new URLSearchParams(location.search).has('rustSelfTest')) {
+  import('./rust/selftest.js').then(m => m.runSelfTest())
+}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import EditorCard from '../workbench/EditorCard'
+import ReviewButton from '../workbench/ReviewButton'
+import { buildReviewPrompt } from '../workbench/reviewPrompt'
 import Onward from '../workbench/Onward'
 import { ResultsBody } from '../workbench/Results'
 import Description from './Description'
@@ -79,6 +81,10 @@ export default function ProblemWorkbench({
             <button className={`btn text${u.custom ? ' sel' : ''}`} onClick={() => patch(key, { custom: !u.custom })} title="Custom input" aria-expanded={u.custom}>
               <span className="ms">edit_note</span><span className="lbl">Custom input</span>
             </button>
+            <ReviewButton hasReference={false} build={preset => buildReviewPrompt({
+              mode: 'problems', language, title: problem.title, statement: problem.description, constraints: problem.constraints,
+              examples: problem.examples, kind: problem.difficulty, code, results: res, reference: null, preset,
+            })} />
             <button className={`btn text${busy}`} onClick={() => run('run')} title="Run the first example"><span className="ms fill">play_arrow</span>Run</button>
             <button className={`btn fill${busy}`} onClick={() => run('submit')} title="Ctrl or Cmd + Enter">Submit<kbd>⌘↵</kbd></button>
           </>}

@@ -62,20 +62,23 @@ export function ResultsBody({ res, sel, onSel }) {
   const ok = res.tests.filter(t => t.status === 'ok').length
   const tle = res.tests.some(t => t.status === 'tle')
   const skipped = res.tests.filter(t => t.status === 'skipped').length
+  const failed = res.compile ? 'Does not compile' : null
   const chosen = sel != null ? res.tests[sel] : null
   return (
     <>
       <div className="tests">
         {res.tests.map((t, i) => {
           const good = t.status === 'ok', skip = t.status === 'skipped'
-          const icon = good ? 'check' : skip ? 'remove' : t.status === 'tle' ? 'schedule' : 'close'
+          const icon = t.icon ?? (good ? 'check' : skip ? 'remove' : t.status === 'tle' ? 'schedule' : 'close')
           const cls = `test ${good ? 'ok' : skip ? 'skip' : 'bad'}${sel === i ? ' sel' : ''}`
-          return good || skip
-            ? <span key={i} className={cls} style={{ animationDelay: `${i * 60}ms` }} title={t.name}><span className="ms">{icon}</span>Test {i + 1}</span>
-            : <button key={i} className={cls} style={{ animationDelay: `${i * 60}ms` }} title={t.name} onClick={() => onSel(sel === i ? null : i)}><span className="ms">{icon}</span>Test {i + 1}</button>
+          const label = <span className="tl">{t.label ?? `Test ${i + 1}`}</span>
+          return good || skip || t.static
+            ? <span key={i} className={cls} style={{ animationDelay: `${i * 60}ms` }} title={t.name}><span className="ms">{icon}</span>{label}</span>
+            : <button key={i} className={cls} style={{ animationDelay: `${i * 60}ms` }} title={t.name} onClick={() => onSel(sel === i ? null : i)}><span className="ms">{icon}</span>{label}</button>
         })}
+        {res.chipExtra}
         <span className={`summary${res.win ? ' win' : ''}`}>
-          {res.win ? 'All passed' : `${ok} of ${res.tests.length} passed${tle ? ' · time limit exceeded' : ''}${skipped ? ` · ${skipped} not run` : ''}`}
+          {res.win ? 'All passed' : failed ?? `${ok} of ${res.tests.length} passed${tle ? ' · time limit exceeded' : ''}${skipped ? ` · ${skipped} not run` : ''}`}
         </span>
       </div>
       <div className={`fold${chosen ? ' open' : ''}`}><div>{chosen && <Detail test={chosen} />}</div></div>

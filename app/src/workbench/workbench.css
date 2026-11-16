@@ -177,3 +177,39 @@ html, body, #root { height: 100%; margin: 0; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .fnd *, .fnd *::before, .fnd *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Track selector under the Foundations | Problems switch, per-kind lesson markers and the drawer legend. */
+.fnd .trk { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 4px 12px; }
+.fnd .trk button { height: 30px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: 600; color: var(--sub); background: var(--card2); }
+.fnd .trk button:hover { color: var(--text); }
+.fnd .trk button.on { background: var(--pri-c); color: var(--on-pri-c); }
+.fnd.min .trk { grid-template-columns: 1fr; margin: 0 0 8px; }
+.fnd.min .trk button { font-size: 12px; }
+.fnd.min .legend { display: none; }
+.fnd .item .kind { font-size: 16px; color: var(--sub); opacity: .85; }
+.fnd .item.on .kind { color: var(--on-pri-c); }
+.fnd .item.dim { cursor: default; }
+.fnd .legend { display: flex; gap: 4px 14px; padding: 8px 12px 0; margin-top: 8px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--sub); flex-wrap: wrap; }
+.fnd .legend span { display: inline-flex; gap: 4px; align-items: center; }
+.fnd .legend .ms { font-size: 14px; }
+
+/* Copy for review: a split text button in the editor header (label + caret menu) */
+.fnd .ed-h .rv { position: relative; display: flex; align-items: center; margin-bottom: 8px; min-width: 0; }
+.fnd .ed-h .rv .btn { margin-bottom: 0; }
+.fnd .rv .rv-main { padding: 0 8px 0 12px; border-radius: 8px 0 0 8px; }
+.fnd .rv .rv-main { min-width: 0; }
+.fnd .rv .rv-main .ms { margin-left: 0; flex-shrink: 0; }
+.fnd .rv .rv-main .lbl { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fnd .rv .rv-caret { width: 28px; padding: 0; border-radius: 0 8px 8px 0; }
+.fnd .rv .rv-caret .ms { margin: 0; font-size: 22px; }
+.fnd .rv.copied .rv-main { color: var(--ok); }
+.fnd .rv.failed .rv-main { color: var(--bad); }
+.fnd .rv-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 30; min-width: 220px; padding: 6px; background: var(--card); border-radius: 8px; box-shadow: var(--float); display: flex; flex-direction: column; }
+.fnd .rv-menu button { text-align: left; height: 40px; padding: 0 12px; border-radius: 6px; font-size: 14px; color: var(--text); white-space: nowrap; }
+.fnd .rv-menu button:hover, .fnd .rv-menu button:focus-visible { background: var(--pri-c); color: var(--on-pri-c); outline: none; }
+.fnd .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 1250px) {
+  .fnd .rv .rv-main .lbl { display: none; }
+  .fnd .rv .rv-main { padding: 0 6px 0 10px; }
+}
+.fnd .ed-h > .rv.rv { flex-shrink: 1; }
