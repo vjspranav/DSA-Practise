@@ -1,3 +1,5 @@
+import BackupMenu from './BackupMenu'
+
 // Drawer building blocks shared by the Foundations and Problems lists.
 
 export function Bar({ pct }) {
@@ -19,9 +21,7 @@ export function Brand({ mode, onMode, onMin, onTheme }) {
       <button className="iconbtn swap" onClick={() => onMode(other)} aria-label={`Switch to ${other}`} title={`Switch to ${other === 'problems' ? 'Problems' : 'Foundations'}`}>
         <span className="ms">swap_horiz</span>
       </button>
-      <button className="iconbtn theme" onClick={onTheme} aria-label="Switch theme">
-        <span className="ms to-dark">dark_mode</span><span className="ms to-light">light_mode</span>
-      </button>
+      <BackupMenu onTheme={onTheme} />
     </div>
   )
 }
