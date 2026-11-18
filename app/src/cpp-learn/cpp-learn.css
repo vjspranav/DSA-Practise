@@ -1,0 +1,15 @@
+/* C++ Learn path only. It reuses the Rust track's look (../rust/rust.css, shell class `rs`); only the differences live here,
+   scoped under .fnd.cl. */
+
+/* a predict round's stdin sits between the snippet and the choices */
+.fnd.cl .exout.pin { border-top: 1px solid var(--line); border-bottom: 0; }
+.fnd.cl .exout.exin pre { color: var(--text); }
+
+/* undefined behaviour is explained in words, never shown as program output */
+.fnd.cl .ub { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 8px; background: var(--card2); }
+.fnd.cl .ub > .ms { color: var(--pri); margin-top: 1px; }
+.fnd.cl .ub .lbl { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--sub); margin-bottom: 2px; }
+.fnd.cl .ub p { font-size: 14.5px; line-height: 1.6; max-width: 78ch; }
+
+/* a teach example's Input line sits under the code, like Output */
+.fnd.cl .exbox .exin { border-top: 1px solid var(--line); }

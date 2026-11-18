@@ -4,12 +4,12 @@ import Track from '../workbench/Track'
 import './foundations.css'
 
 // The C++ track. `store` is the shared state from App: lessons, plus the theme / collapsed drawer / open groups
-// both modes use. `onTrack` switches to the Rust track.
-export default function Foundations({ store, onMode, onTrack }) {
+// both modes use. `onTrack` switches to the Rust track; `path`/`onPath` drive the Learn | Revise switch.
+export default function Foundations({ store, onMode, onTrack, path, onPath }) {
   return (
     <Track
       prefs={store} store={store} stages={STAGES} lessons={LESSONS} Workbench={Workbench} onMode={onMode}
-      drawerProps={{ track: 'cpp', onTrack }}
+      drawerProps={{ track: 'cpp', onTrack, path, onPath }}
     />
   )
 }

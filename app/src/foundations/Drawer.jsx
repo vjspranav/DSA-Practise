@@ -1,17 +1,18 @@
 import { ART } from './art'
-import { Brand, Group, Item, Overall, TrackSwitch } from '../workbench/DrawerParts'
+import { Brand, Group, Item, Overall, PathSwitch, TrackSwitch } from '../workbench/DrawerParts'
 
 // The lesson list for a track. Optional extras (the Rust track uses them): `track`/`onTrack` for the C++ | Rust
-// selector, `stageArt(stage)` for a custom stage icon, `markOf(lesson)` for a per-kind marker, `legend`, `className`.
+// selector, `path`/`onPath` for the Learn | Revise selector under it (C++ track only), `stageArt(stage)` for a custom stage icon, `markOf(lesson)` for a per-kind marker, `legend`, `className`.
 export default function Drawer({
   stages, total, doneCount, againList, isDone, isDue, currentId, inRedo, justDone, open, onToggleGroup, onPick, onMin, onTheme, onMode,
-  overall = `${doneCount} of ${total} lessons done`, track, onTrack, stageArt, markOf, legend, className = '', emptyText = 'No lessons yet',
+  overall = `${doneCount} of ${total} lessons done`, track, onTrack, path, onPath, stageArt, markOf, legend, className = '', emptyText = 'No lessons yet',
 }) {
   const inAgainNow = inRedo && againList.some(a => a.id === currentId)
   return (
     <aside className={`drawer ${className}`.trim()}>
       <Brand mode="foundations" onMode={onMode} onMin={onMin} onTheme={onTheme} />
       {onTrack && <TrackSwitch track={track} onTrack={onTrack} />}
+      {onPath && track === 'cpp' && <PathSwitch path={path} onPath={onPath} />}
       <Overall text={overall} pct={total ? doneCount / total * 100 : 0} />
       <nav className="nav">
         {againList.length > 0 && (

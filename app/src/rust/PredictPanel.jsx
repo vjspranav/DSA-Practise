@@ -26,7 +26,12 @@ export function Choices({ round, pick, revealed, onPick }) {
   )
 }
 
-export function Reveal({ round, pick, last, onNext }) {
+// The stored real result under the verdict. The Rust track's version is the default; the C++ Learn track passes its own.
+const rustOutcome = round => round.errorCode
+  ? <Rustc text={round.output} cap code={round.errorCode} />
+  : <div className="out"><div className="lbl">{round.panic ? 'Compiled, then panicked with' : 'Compiled and ran. Printed'}</div><pre>{round.output === '' ? '(nothing printed)' : round.output}</pre></div>
+
+export function Reveal({ round, pick, last, onNext, outcome = rustOutcome }) {
   const good = pick === round.answer
   return (
     <>
@@ -37,9 +42,7 @@ export function Reveal({ round, pick, last, onNext }) {
           {' '}<span dangerouslySetInnerHTML={html(round.why)} />
         </span>
       </div>
-      {round.errorCode
-        ? <Rustc text={round.output} cap code={round.errorCode} />
-        : <div className="out"><div className="lbl">{round.panic ? 'Compiled, then panicked with' : 'Compiled and ran. Printed'}</div><pre>{round.output === '' ? '(nothing printed)' : round.output}</pre></div>}
+      {outcome(round)}
       {!last && <div className="nextrow"><button className="btn tone" onClick={onNext}>Next snippet<span className="ms">arrow_forward</span></button></div>}
     </>
   )

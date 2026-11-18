@@ -12,3 +12,8 @@ if (import.meta.env.DEV && new URLSearchParams(location.search).has('fndSelfTest
 if (import.meta.env.DEV && new URLSearchParams(location.search).has('rustSelfTest')) {
   import('./rust/selftest.js').then(m => m.runSelfTest())
 }
+
+// Dev-only self-test of C++ Learn lessons in the real in-browser compiler (see scripts/browser-selftest-cpp-learn.mjs).
+if (import.meta.env.DEV && new URLSearchParams(location.search).has('cppLearnSelfTest')) {
+  import('./cpp-learn/selftest.js').then(m => m.runSelfTest())
+}

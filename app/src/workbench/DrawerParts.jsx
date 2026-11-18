@@ -53,6 +53,17 @@ export function TrackSwitch({ track, onTrack }) {
   )
 }
 
+// The Learn | Revise selector under the C++ | Rust switch (C++ track only). Looks like TrackSwitch.
+export function PathSwitch({ path, onPath }) {
+  return (
+    <div className="trk" role="tablist" aria-label="Learn or Revise">
+      {[['learn', 'Learn'], ['revise', 'Revise']].map(([p, label]) => (
+        <button key={p} role="tab" aria-selected={path === p} className={path === p ? 'on' : ''} onClick={() => path !== p && onPath(p)}>{label}</button>
+      ))}
+    </div>
+  )
+}
+
 // One lesson row. `mark` is an optional small icon for the lesson's kind: { icon, label }.
 export function Item({ title, done, current, again, due, justDone, mark, onPick }) {
   const cls = ['item', 'rip', done && 'done', current && 'on', current && justDone && 'justdone'].filter(Boolean).join(' ')

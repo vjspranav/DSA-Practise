@@ -12,12 +12,15 @@ function Pane({ label, lang, side }) {
   )
 }
 
-function Compare({ compare }) {
+// The two sides of a comparison. The Rust track compares C++ with Rust; the C++ Learn track passes its own
+// `bridge` (Python with C++), so only the defaults below are Rust-specific.
+const RUST_BRIDGE = { title: 'Coming from C++', lang: 'rust', panes: [['C++', 'cpp', 'cpp'], ['Rust', 'rust', 'rust']] }
+
+function Compare({ compare, bridge }) {
   return (
     <>
       <div className="cmp">
-        <Pane label="C++" lang="cpp" side={compare.cpp} />
-        <Pane label="Rust" lang="rust" side={compare.rust} />
+        {bridge.panes.map(([label, slot, lang]) => <Pane key={slot} label={label} lang={lang} side={compare[slot]} />)}
       </div>
       {compare.text && <p className="why" dangerouslySetInnerHTML={html(compare.text)} />}
     </>
@@ -25,7 +28,7 @@ function Compare({ compare }) {
 }
 
 // The teaching section of a lesson: reading text, worked examples, and the "New in this lesson" list.
-function Teach({ teach }) {
+function Teach({ teach, lang }) {
   const { body = [], examples = [], terms = [] } = teach
   return (
     <div className="teach">
@@ -34,7 +37,10 @@ function Teach({ teach }) {
         <figure className="ex" key={i}>
           {ex.caption && <figcaption dangerouslySetInnerHTML={html(ex.caption)} />}
           <div className={`exbox${ex.wrap ? ' wrap' : ''}`}>
-            <CodeBlock code={ex.code.replace(/\n$/, '')} lang="rust" numbered={false} />
+            <CodeBlock code={ex.code.replace(/\n$/, '')} lang={lang} numbered={false} />
+            {ex.stdin != null && (
+              <div className="exout exin"><span className="lbl">Input</span><pre>{ex.stdin.replace(/\n$/, '') || '(nothing)'}</pre></div>
+            )}
             {ex.output != null && (
               <div className="exout"><span className="lbl">Output</span><pre>{ex.output.replace(/\n$/, '')}</pre></div>
             )}
@@ -60,7 +66,7 @@ function Teach({ teach }) {
 
 // A lesson's top card: title and kind, the teaching section (when the lesson has one), the C++ bridge, and the
 // "Your turn" line. The card can be collapsed; the task and the editor below it stay.
-export default function ConceptCard({ lesson, open, onToggle, kind = ['school', 'Concept'] }) {
+export default function ConceptCard({ lesson, open, onToggle, kind = ['school', 'Concept'], bridge = RUST_BRIDGE }) {
   const { compare, teach } = lesson
   const label = open ? (teach ? 'Hide the explanation' : 'Hide the idea') : (teach ? 'Show the explanation' : 'Show the idea')
   return (
@@ -75,10 +81,10 @@ export default function ConceptCard({ lesson, open, onToggle, kind = ['school', 
       <div className={`fold${open ? ' open' : ''}`}>
         <div>
           <div className="cb">
-            {teach && <Teach teach={teach} />}
+            {teach && <Teach teach={teach} lang={bridge.lang} />}
             {compare && (teach
-              ? <div className="bridge"><h3><span className="ms">compare_arrows</span>Coming from C++</h3><Compare compare={compare} /></div>
-              : <Compare compare={compare} />)}
+              ? <div className="bridge"><h3><span className="ms">compare_arrows</span>{bridge.title}</h3><Compare compare={compare} bridge={bridge} /></div>
+              : <Compare compare={compare} bridge={bridge} />)}
           </div>
         </div>
       </div>

@@ -101,7 +101,7 @@ export const PRESETS = [
 
 const LANG = { cpp: 'C++', rust: 'Rust', python: 'Python' }
 const TAG = { cpp: 'cpp', rust: 'rust', python: 'python' }
-const MODE = { foundations: 'Foundations (lessons)', rust: 'Rust track (lessons)', problems: 'Problems' }
+const MODE = { foundations: 'Foundations (lessons)', rust: 'Rust track (lessons)', 'cpp-learn': 'C++ Learn track (lessons)', problems: 'Problems' }
 
 // language: 'cpp' | 'rust' | 'python'. statement: HTML string (or array of HTML strings); constraints: string[].
 // reference: the solution text, or null/undefined when it is still locked (then nothing about it appears).
@@ -109,9 +109,11 @@ export function buildReviewPrompt({ mode, language, title, statement, constraint
   const lang = LANG[language] ?? language
   const hasRef = !!reference
   const use = preset === 'compare' && !hasRef ? 'better' : preset
-  const who = language === 'rust'
-    ? "I'm a C++ developer learning Rust"
-    : 'I\'m relearning C++ and data structures & algorithms'
+  const who = mode === 'cpp-learn'
+    ? "I'm learning C++ from scratch and I'm strong in Python; relate advice to Python where useful"
+    : language === 'rust'
+      ? "I'm a C++ developer learning Rust"
+      : 'I\'m relearning C++ and data structures & algorithms'
   const out = []
   out.push(`I'm practising in a local app. ${who}. Mode: ${MODE[mode] ?? mode}. Language: ${lang}. ${mode === 'problems' ? 'Problem' : 'Lesson'}: ${title}${kind ? ` (${kind})` : ''}.`)
   const stmt = (Array.isArray(statement) ? statement : [statement]).map(htmlToMarkdown).filter(Boolean).join('\n\n')
