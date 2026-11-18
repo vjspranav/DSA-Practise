@@ -401,3 +401,22 @@ The lead merges any registry conflicts.
   Small parameterisation is preferred over copy-paste, but the Rust track must not change visibly.
 - Exact registry ids and patterns.
 - Lesson wording and exact counts within about ±20% per stage.
+
+## What stage 1 taught
+
+Stage 1 is 30 lessons (`app/src/data/cpp-learn/stage-1-first.js`): 7 concept, 8 program, 6 fix (incl. block comments), 5 predict, plus practice at the end. Only whole programs with `main`; no functions. Ids taught, with what "for now" means:
+
+- `include-iostream`, `int-main`, `return-zero`, `cout`, `stream-insert`, `endl`, `string-literal`, `semicolon`, `comment` (c1-hello-main): compile-then-run, the skeleton of a file.
+- `using-namespace-std` (c1-hello-main): used "for now"; stage 3 explains it. `std-qualified` (c1-std-qualified): `std::cout` written out, `::` read as "inside".
+- `newline-escape` (c1-lines): `"\n"` versus `endl` (endl also flushes). `block-comment` (c1-block-comment).
+- `int`, `assign` (c1-int-variables): declare with a type, assign without; an uninitialised read is UB, taught in prose and a `ub: true` predict round (c1-predict-uninit).
+- `double`, `bool`, `char` (c1-double-bool-char): bool prints as 1/0; single quotes make a char. `include-string`, `string-type` (c1-string): double-quoted text only; joining is by `<<` chain (no `+` on strings yet).
+- `arithmetic` (c1-arithmetic): int / int drops the fraction toward zero. `modulo` (c1-predict-modulo): `%` takes the sign of the left operand.
+- `static-cast` (c1-cast-double): `static_cast<double>(x)`; casting before dividing, not after.
+- `cin`, `stream-extract` (c1-sum-two): whitespace-separated reads, no prompt; `cin >> string` reads one word (c1-read-mixed).
+- `compound-assign`, `incr-decr` (c1-compound-assign): used only as statements; `++` is not an expression yet.
+- `const` (c1-const), `auto` (c1-auto): auto only for simple numbers; `auto s = "hi"` is warned against.
+- `include-climits`, `int-max`, `long-long`, `unsigned` (c1-int-limits): int is fixed size; signed overflow is UB (prose, compare with `ok: false`, and a `ub: true` predict round c1-predict-overflow); unsigned wrap is shown as defined.
+- `include-cmath`, `math-functions` (c1-math): `sqrt`, `pow`, `abs`, default 6 significant digits (c1-predict-doubles). `include-iomanip`, `setprecision` (c1-setprecision): `fixed << setprecision(n)` as a sticky stream setting, versus an f-string.
+
+Not taught in stage 1 (left for later stages): `if`/comparison (stage 2), functions and references (3), `vector`, `getline`, `char` arithmetic and string operations such as `+`/`substr` (4).
