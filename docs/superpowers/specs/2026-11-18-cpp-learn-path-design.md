@@ -390,7 +390,8 @@ The lead merges any registry conflicts.
      from the stored `output` is only reported as a warning.
    - Stored predict `output` uses local clang 21 text.
 4. **The default path rule.** The default is `'learn'` when no Revise lesson has ever passed. Use the field the
-   Foundations store sets on a pass, as read through `useFoundationsStore.js`.
+   Foundations store sets on a pass, as read through `useFoundationsStore.js`. The resolved default is saved to
+   `dsa-cpp-path` the first time it is resolved, so later progress in the other path does not flip it.
 5. **Learn is entirely separate.** It has its own counts and Onward panel, shares no global progress or streaks with
    Revise or Rust, and needs no `progress.js` changes beyond what the shared `Track` frame already supports.
 6. **Stage 3 also ends with 2 to 3 practice lessons**, like every stage.

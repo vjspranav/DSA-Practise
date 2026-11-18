@@ -13,14 +13,18 @@ const PATH_KEY = 'dsa-cpp-path'
 function read(key) { try { return localStorage.getItem(key) } catch { return null } }
 function write(key, v) { try { localStorage.setItem(key, v) } catch { /* storage blocked */ } }
 
-// Learn | Revise inside the C++ track. With no saved choice, Learn is the default until a Revise lesson has been passed.
+// Learn | Revise inside the C++ track. With no saved choice, Learn is the default until a Revise lesson has been
+// passed; the resolved default is saved at once so later progress in the other path does not flip it.
 function initialPath() {
   const saved = read(PATH_KEY)
   if (saved === 'learn' || saved === 'revise') return saved
+  let resolved = 'learn'
   try {
     const lessons = JSON.parse(read('dsa-foundations'))?.lessons ?? {}
-    return Object.values(lessons).some(r => r?.passedAt) ? 'revise' : 'learn'
-  } catch { return 'learn' }
+    if (Object.values(lessons).some(r => r?.passedAt)) resolved = 'revise'
+  } catch { /* unreadable progress: Learn */ }
+  write(PATH_KEY, resolved)
+  return resolved
 }
 
 export default function App() {

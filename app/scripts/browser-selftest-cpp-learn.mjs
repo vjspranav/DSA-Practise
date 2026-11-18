@@ -100,9 +100,9 @@ if (state?.done) {
 
   // ---- Case 5a: default path ----
   await openWith({})
-  check('empty storage opens Learn', (await pathTab()) === 'Learn', String(await pathTab()))
+  check('empty storage opens Learn and saves it', (await pathTab()) === 'Learn' && (await store('dsa-cpp-path')) === 'learn', `${await pathTab()} / ${await store('dsa-cpp-path')}`)
   await openWith({ 'dsa-foundations': REVISE_PASSED })
-  check('a passed Revise lesson opens Revise', (await pathTab()) === 'Revise', String(await pathTab()))
+  check('a passed Revise lesson (no saved path) opens Revise and saves it', (await pathTab()) === 'Revise' && (await store('dsa-cpp-path')) === 'revise', `${await pathTab()} / ${await store('dsa-cpp-path')}`)
 
   // ---- Case 4: Revise storage is byte-identical after passing a Learn lesson ----
   await openWith({ 'dsa-foundations': REVISE_PASSED, 'dsa-cpp-path': 'revise', 'dsa-cpp-learn': { last: sum.id, lessons: { [sum.id]: { code: sum.solution } } } })
