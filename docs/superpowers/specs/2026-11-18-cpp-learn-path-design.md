@@ -404,7 +404,7 @@ The lead merges any registry conflicts.
 
 ## What stage 1 taught
 
-Stage 1 is 30 lessons (`app/src/data/cpp-learn/stage-1-first.js`): 7 concept, 8 program, 6 fix (incl. block comments), 5 predict, plus practice at the end. Only whole programs with `main`; no functions. Ids taught, with what "for now" means:
+Stage 1 is 30 lessons (`app/src/data/cpp-learn/stage-1-first.js`): 10 concept, 10 program (4 are the closing practice lessons), 6 fix, 4 predict. Only whole programs with `main`; no functions. Ids taught, with what "for now" means:
 
 - `include-iostream`, `int-main`, `return-zero`, `cout`, `stream-insert`, `endl`, `string-literal`, `semicolon`, `comment` (c1-hello-main): compile-then-run, the skeleton of a file.
 - `using-namespace-std` (c1-hello-main): used "for now"; stage 3 explains it. `std-qualified` (c1-std-qualified): `std::cout` written out, `::` read as "inside".
