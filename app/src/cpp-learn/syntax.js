@@ -15,7 +15,7 @@
 // Stages add ids to their own section freely; patterns only need to be good enough to catch honest mistakes.
 //
 // Known limits (regexes cannot parse C++):
-//   - `<` and `>` count as comparison only when spaced (`i < n`) or next to a digit; `vector<int>` is never one.
+//   - `<` and `>` count as comparison only when spaced (`i < n`) or next to a digit (`i<10`, `x>5`); `vector<int>`, `get<0>(t)` and `array<int, 3>` are never one.
 //     `>>` is "extract" only inside a statement that starts with cin; the closer of `vector<vector<int>>` is not.
 //   - `*` is multiplication only when spaced (`a * b`) or next to a digit; `int *p` / `Node* p` are declarations.
 //     Unspaced `a*b` between plain names is invisible, and `int * p` with spaces reads as a declaration.
@@ -24,7 +24,7 @@
 //   - Calls of user-defined methods (`obj.area()`) are not tracked; calls of the std methods listed here are.
 //   - Function definitions are recognised at the start of a line as `type name(...) {`; constructors are
 //     `Capitalised(...) {` or `... : init(...) {` at the start of a line.
-//   - Names a learner defines themselves (a function called `max` or `sort`) trip the matching id.
+//   - Names a learner defines themselves (a function called `max` or `sort`, a call to their own `swap`) trip the matching id.
 import { stripComments } from './grade.js'
 
 const inc = (h, stage) => ({ id: `include-${h}`, stage, label: `#include <${h}>`, headers: [h] })
@@ -70,7 +70,7 @@ export const SYNTAX = [
   { id: 'setprecision', stage: 1, label: 'fixed << setprecision(2)', patterns: [/\b(?:fixed|setprecision|setw|setfill)\b/] },
 
   // ── stage 2: control flow ──
-  { id: 'comparison', stage: 2, label: '== != < > <= >=', patterns: [/==|!=|<=|>=/, /(?<=\s)[<>](?=\s)/, /[\w)\]]\s*[<>]\s*\d/, /\d\s*[<>]\s*[\w(]/] },
+  { id: 'comparison', stage: 2, label: '== != < > <= >=', patterns: [/==|!=|<=|>=/, /(?<=\s)[<>](?=\s)/, /\b(?!(?:get|array|bitset)\b)\w+\s*<\s*\d/, /[\w)\]]\s*>\s*\d/] },
   { id: 'logical-ops', stage: 2, label: '&& ||', patterns: [/&&|\|\|/] },
   { id: 'not-op', stage: 2, label: '! (not)', patterns: [/(?<![\w)\]])!(?!=)/] },
   { id: 'alt-operators', stage: 2, label: 'and / or / not', patterns: [/\b(?:and|or|not)\b/] },
@@ -90,17 +90,22 @@ export const SYNTAX = [
     patterns: [/^[ \t]*(?!(?:else|return|new|delete|case|goto|typedef|using|struct|class|namespace|do)\b)(?:(?:const|static|inline|unsigned)\s+)*[A-Za-z_][\w:]*(?:<[^()\n]*>)?[ \t]*[&*]*[ \t]+[&*]*(?!(?:if|for|while|switch|main|return)\b)[A-Za-z_]\w*\s*\([^;{}]*\)\s*(?:const\s*)?\{/m] },
   { id: 'void', stage: 3, label: 'void', patterns: [/\bvoid\b/] },
   { id: 'return-value', stage: 3, label: 'return value;', patterns: [/\breturn\b(?!\s*0\s*;)/] },
-  { id: 'prototype', stage: 3, label: 'type name(params);', patterns: [/^[ \t]*(?!(?:return|else|delete|case|new|throw|using|goto)\b)[A-Za-z_][\w:<>&*]*[ \t]+[&*]*[A-Za-z_]\w*\s*\(\s*(?:\)|(?:const\s+)?[A-Za-z_][\w:<>,]*[\s&*]+\w+[^;{}()]*\))\s*;/m] },
+  { id: 'prototype', stage: 3, label: 'type name(params);', patterns: [/^[ \t]*(?!(?:return|else|delete|case|new|throw|using|goto)\b)[A-Za-z_][\w:<>&*]*[ \t]+[&*]*[A-Za-z_]\w*\s*\(\s*(?:\)|(?:const\s+)?[A-Za-z_][\w:]*(?:<[^()]*?>)?[\s&*]+\w+[^;{}()]*\))\s*;/m] },
   { id: 'reference-param', stage: 3, label: 'int& x (reference)', patterns: [new RegExp(String.raw`(?:\b${TYPE_WORD}|>)\s*&(?!&)\s*\w+`)] },
   { id: 'const-ref', stage: 3, label: 'const T& x', patterns: [/\bconst\s+[\w:<>,\s]*?&(?!&)/] },
   { id: 'default-arg', stage: 3, label: 'int x = 5 in a parameter list', patterns: [/[(,]\s*(?:const\s+)?[\w:<>]+[\s&*]+\w+\s*=\s*[^=,;()]+[,)]/] },
+  inc('cassert', 3),
+  { id: 'assert', stage: 3, label: 'assert(cond)', patterns: [/\bassert\s*\(/] },
+  { id: 'swap', stage: 3, label: 'swap(a, b)', patterns: [/(?<!\b(?:void|int|double|char|bool|string)\s+)(?<![.\w])swap\s*\(/] },
   { id: 'min-max', stage: 3, label: 'min(a, b) / max(a, b)', patterns: [/(?<![.\w])(?:min|max)\s*\(/] },
   { id: 'using-declaration', stage: 3, label: 'using std::cout;', patterns: [/\busing\s+(?!namespace\b)\w+(?:::\w+)+\s*;/] },
   { id: 'namespace-def', stage: 3, label: 'namespace name { }', patterns: [/\bnamespace\s+\w+\s*\{/] },
   { id: 'scope-resolution', stage: 3, label: 'Name::member', patterns: [/\b(?!std\b)\w+\s*::\s*\w/] },
 
   // ── stage 4: arrays, vectors and strings ──
-  inc('vector', 4), inc('cctype', 4),
+  inc('vector', 4), inc('cctype', 4), inc('sstream', 4), inc('array', 4),
+  { id: 'stringstream', stage: 4, label: 'stringstream', patterns: [/\b(?:stringstream|istringstream|ostringstream)\b/] },
+  { id: 'std-array', stage: 4, label: 'array<T, N>', patterns: [/\barray\s*</] },
   { id: 'c-array', stage: 4, label: 'int a[5]', patterns: [new RegExp(String.raw`(?:\b${TYPE_WORD}|>)\s+\w+\s*\[`)] },
   { id: 'indexing', stage: 4, label: 'a[i]', patterns: [/[\w)\]]\[[^\]\n]*\]/] },
   { id: 'brace-init', stage: 4, label: '{1, 2, 3} initialiser', patterns: [/=\s*\{/, /(?:>|\b(?:int|double|char|bool|string|auto))\s+\w+\s*\{[^{}]*\}\s*;/, /\b[A-Z]\w*\s+\w+\s*\{[^{}]*\}\s*;/] },
@@ -126,7 +131,7 @@ export const SYNTAX = [
   { id: 'stoi', stage: 4, label: 'stoi / stod', patterns: [/\b(?:stoi|stol|stoll|stod)\s*\(/] },
 
   // ── stage 5: memory and pointers ──
-  inc('memory', 5),
+  inc('memory', 5), inc('cstdint', 5),
   { id: 'sizeof', stage: 5, label: 'sizeof', patterns: [/\bsizeof\b/] },
   { id: 'address-of', stage: 5, label: '&x (address of)', patterns: [/(?:[=(,]|\breturn)\s*&\s*[A-Za-z_]/] },
   { id: 'pointer-decl', stage: 5, label: 'int* p', patterns: [
@@ -160,7 +165,8 @@ export const SYNTAX = [
 
   // ── stage 7: the STL ──
   inc('algorithm', 7), inc('numeric', 7), inc('map', 7), inc('set', 7), inc('unordered_map', 7), inc('unordered_set', 7),
-  inc('queue', 7), inc('stack', 7), inc('deque', 7), inc('utility', 7), inc('tuple', 7), inc('functional', 7),
+  inc('queue', 7), inc('stack', 7), inc('deque', 7), inc('utility', 7), inc('tuple', 7), inc('functional', 7), inc('list', 7),
+  { id: 'list', stage: 7, label: 'list<T>', patterns: [/\blist\s*</] },
   { id: 'pair', stage: 7, label: 'pair / make_pair', patterns: [/\b(?:pair|make_pair)\b/] },
   { id: 'pair-fields', stage: 7, label: '.first / .second', patterns: [/\.(?:first|second)\b/] },
   { id: 'tuple', stage: 7, label: 'tuple / get<0>', patterns: [/\b(?:tuple|make_tuple|tie)\b/, /\bget\s*<\s*\d+/] },
@@ -237,7 +243,7 @@ function blank(code) {
     }
     if (c === "'") {
       const m = /^'(?:\\(?:x[0-9a-fA-F]+|[0-7]{1,3}|.)|[^\\'\n])'/.exec(code.slice(i, i + 12))
-      if (m) { view += "'~'"; i += m[0].length; continue }
+      if (m) { strings.push(m[0].slice(1, -1)); view += "'~'"; i += m[0].length; continue }
     }
     view += c; i++
   }

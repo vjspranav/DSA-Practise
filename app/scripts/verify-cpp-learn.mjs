@@ -70,11 +70,11 @@ function compileCpp(src, extra = []) {
 }
 // Run a compiled program on one stdin; the result has the browser runTest shape ({status, stdout, message}).
 async function runOnce(dir, stdin, limitMs) {
-  const r = await exec(join(dir, 'main'), [], { cwd: dir, timeout: limitMs, input: stdin })
+  const r = await exec(join(dir, 'main'), [], { cwd: dir, timeout: limitMs, input: stdin, env: { ...process.env, ASAN_OPTIONS: 'detect_leaks=0:abort_on_error=0', UBSAN_OPTIONS: 'print_stacktrace=0' } })
   if (r.timedOut) return { status: 'tle' }
-  if (r.ok) return { status: 'ok', stdout: r.stdout }
+  if (r.ok) return { status: 'ok', stdout: r.stdout, stderr: r.stderr }
   const why = r.signal ? `The program was stopped by ${r.signal}` : `The program exited with code ${r.code}`
-  return { status: 'error', message: (r.stderr.trim().split('\n').slice(-1)[0] || why), stdout: r.stdout, exit: why }
+  return { status: 'error', message: (r.stderr.trim().split('\n').slice(-1)[0] || why), stdout: r.stdout, stderr: r.stderr, exit: why }
 }
 const ranCache = new Map()
 function runCpp(src, stdin, limitMs) {
@@ -90,6 +90,32 @@ function runCpp(src, stdin, limitMs) {
     return first
   })())
   return ranCache.get(key)
+}
+
+// Sanitizer build: the stored outputs of teach examples, solutions and non-ub predict rounds must come from
+// defined behaviour. Returns null when the sanitized run is clean, else a short description of the report.
+const SAN = ['-fsanitize=undefined,address', '-fno-sanitize-recover=all', '-g']
+const SAN_RE = /runtime error|AddressSanitizer|UndefinedBehaviorSanitizer|SUMMARY: /
+const sanCache = new Map()
+function sanRun(src, stdin, limitMs) {
+  const key = `${limitMs}\0${stdin}\0${src}`
+  if (!sanCache.has(key)) sanCache.set(key, (async () => {
+    const c = await compileCpp(src, SAN)
+    if (!c.ok) return { built: false, report: null, stderr: c.stderr }
+    const r = await runOnce(c.dir, stdin, limitMs * 3)
+    const hit = r.status !== 'ok' && SAN_RE.test(r.stderr ?? '')
+    const line = hit ? (r.stderr.split('\n').find(l => /runtime error|ERROR: AddressSanitizer/.test(l)) ?? 'sanitizer report').trim() : null
+    return { built: true, report: line }
+  })())
+  return sanCache.get(key)
+}
+// First sanitizer report over a list of stdin values, or null.
+async function sanitizerProblem(src, stdins, limitMs) {
+  for (const stdin of stdins) {
+    const r = await sanRun(src, stdin, limitMs)
+    if (r.report) return r.report
+  }
+  return null
 }
 
 // ---------- Python snippets ----------
@@ -142,11 +168,12 @@ function fragmentErrors(code) {
 const text = html => String(html).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&')
 const sentences = html => text(html).split(/[.!?](?:\s|$)/).filter(s => s.trim()).length
 const str = v => typeof v === 'string' && v.trim() !== ''
+const UB_WORDS = /undefined|anything can happen|unspecified/i
 const BANNED = [
   [/\b(?:rand|srand|random_device|mt19937|default_random_engine|uniform_int_distribution)\b/, 'uses randomness'],
   [/\b(?:chrono|clock|time|gettimeofday|sleep_for|usleep)\s*[(:<]|<chrono>|<ctime>|<time\.h>/, 'uses time'],
   [/\b(?:thread|mutex|atomic|async|future)\b|<thread>|<mutex>|<atomic>|<future>/, 'uses threads'],
-  [/\b(?:fstream|ifstream|ofstream|fopen|freopen|remove|rename|system|getenv)\s*[(\s<]|<fstream>|<filesystem>/, 'uses files, processes or the environment'],
+  [/\b(?:fstream|ifstream|ofstream|fopen|freopen|system|getenv)\s*[(\s<]|<fstream>|<filesystem>/, 'uses files, processes or the environment'],
   [/\b(?:try|throw|catch)\b/, 'uses exceptions (the browser compiler has them off)'],
   [/<bits\/stdc\+\+\.h>/, 'includes <bits/stdc++.h>'],
   [/<(?:optional|variant|string_view|any|filesystem|execution)>|\bstd::(?:optional|variant|string_view|any)\b|\bnullopt\b/, 'uses a C++17 library feature (the browser compiler is C++14)'],
@@ -211,7 +238,7 @@ function shape(l, stageNo) {
     need(Array.isArray(l.rounds) && l.rounds.length >= 1 && l.rounds.length <= 2, 'rounds needs 1 or 2 items')
     for (const [i, r] of (l.rounds ?? []).entries()) {
       const w = `round ${i + 1}: `
-      for (const k of Object.keys(r ?? {})) need(['snippet', 'choices', 'answer', 'why', 'output', 'error', 'stdin', 'ub'].includes(k), w + `unknown field "${k}"`)
+      for (const k of Object.keys(r ?? {})) need(['snippet', 'choices', 'answer', 'why', 'output', 'error', 'stdin', 'ub', 'ubKind'].includes(k), w + `unknown field "${k}"`)
       need(str(r.snippet) && /\bint\s+main\b/.test(r.snippet), w + 'snippet must be a whole program with int main')
       need(Array.isArray(r.choices) && r.choices.length === 3 && r.choices.every(c => str(c) && c.length <= 60), w + 'choices must be 3 strings of at most 60 characters')
       need(Number.isInteger(r.answer) && r.answer >= 0 && r.answer <= 2, w + 'answer must be 0, 1 or 2')
@@ -220,6 +247,11 @@ function shape(l, stageNo) {
       need(r.error === undefined || r.error === true, w + 'error must be true when present')
       need(r.ub === undefined || r.ub === true, w + 'ub must be true when present')
       need(!(r.error && r.ub), w + 'a round cannot be both error and ub')
+      need(r.ubKind === undefined || (r.ub && r.ubKind === 'uninit'), w + 'ubKind is only "uninit", and only on a ub round')
+      if (r.ub) {
+        need(UB_WORDS.test(r.output ?? ''), w + 'a ub round\'s output must say it is undefined ("undefined", "anything can happen" or "unspecified"), never a stored result')
+        need(UB_WORDS.test(r.choices?.[r.answer] ?? ''), w + 'a ub round\'s correct choice must say it is undefined ("undefined", "anything can happen" or "unspecified")')
+      }
       need(r.stdin === undefined || typeof r.stdin === 'string', w + 'stdin must be a string')
     }
     return p
@@ -298,12 +330,26 @@ async function checkRounds(l, p) {
       continue
     }
     if (!c.ok) { p.push(w + `snippet does not compile: ${errLines(c.stderr)}`); continue }
-    // An undefined-behaviour round must compile but is never run: nothing about its output may be stored.
-    if (r.ub) continue
+    // An undefined-behaviour round must compile but is never run for its output. Unless it is a kind the sanitizers
+    // cannot see (ubKind: 'uninit'), a sanitizer build must report it, so the round is shown to really be UB.
+    if (r.ub) {
+      if (r.ubKind !== 'uninit') {
+        const rep = await sanitizerProblem(r.snippet, [r.stdin ?? ''], DEFAULT_RUN_MS)
+        if (!rep) p.push(w + 'is marked ub but the sanitizer build (undefined,address) reports nothing: the snippet is not shown to be undefined behaviour (use ubKind: "uninit" for an uninitialised read)')
+      }
+      continue
+    }
     const run = await runCpp(r.snippet, r.stdin ?? '', DEFAULT_RUN_MS)
     if (run.nondeterministic) p.push(w + 'output differs between runs (unordered_map/unordered_set order?)')
     if (run.status !== 'ok') p.push(w + `program ${run.status === 'tle' ? 'timed out' : `fails at run time: ${clip(run.message ?? '', 120)}`} (use "ub: true" for undefined behaviour)`)
     else if (normalise(run.stdout) !== normalise(r.output)) p.push(w + `program prints ${q(normalise(run.stdout))} but output says ${q(normalise(r.output))}`)
+    else {
+      const rep = await sanitizerProblem(r.snippet, [r.stdin ?? ''], DEFAULT_RUN_MS)
+      if (rep) p.push(w + `sanitizer reports undefined behaviour, so its output cannot be stored as truth: ${clip(rep, 120)} (use ub: true)`)
+    }
+    // A one-line short output is the right answer's text: the marked choice must agree with it.
+    const o = normalise(r.output)
+    if (!o.includes('\n') && o.length <= 60 && normalise(r.choices[r.answer]) !== o) p.push(w + `choices[answer] is ${q(r.choices[r.answer])} but the output is ${q(o)}`)
   }
 }
 
@@ -328,6 +374,8 @@ async function checkLesson(l, stageNo) {
     if (run.status !== 'ok') { p.push(w + `fails at run time: ${clip(run.message ?? 'timed out', 120)} (an example cannot crash)`); continue }
     if (run.nondeterministic) p.push(w + 'output differs between runs')
     if (e.output !== undefined && normalise(run.stdout) !== normalise(e.output)) p.push(w + `prints ${q(normalise(run.stdout))} but output says ${q(normalise(e.output))}`)
+    const rep = await sanitizerProblem(src, [e.stdin ?? ''], DEFAULT_RUN_MS)
+    if (rep) p.push(w + `sanitizer reports undefined behaviour: ${clip(rep, 120)}`)
   }
 
   if (l.kind === 'predict') await checkRounds(l, p)
@@ -342,6 +390,10 @@ async function checkLesson(l, stageNo) {
       if (sol.nondeterministic) p.push('solution output differs between runs (unordered_map/unordered_set order?)')
       if (sol.extra) p.push(sol.extra)
       if (!sol.graded.tests.every(t => t.status === 'pass')) p.push(`solution fails: ${failures(sol.graded)}`)
+      else {
+        const rep = await sanitizerProblem(assembleSource(l, l.solution), l.harness ? [''] : l.tests.map(t => t.stdin), limitOf(l))
+        if (rep) p.push(`solution reports undefined behaviour under the sanitizers: ${clip(rep, 120)}`)
+      }
     }
 
     const st = await exercise(l, l.starter)
@@ -399,7 +451,9 @@ if (filePath) {
 // Walk the whole track in order. CPP_LEARN_ASSUME=K starts with every id of stage <= K already taught.
 const syntaxProblems = new Map()
 {
-  const assume = Number(process.env.CPP_LEARN_ASSUME ?? 0)
+  const assumeRaw = process.env.CPP_LEARN_ASSUME ?? '0'
+  const assume = Number(assumeRaw)
+  if (!/^[0-8]$/.test(assumeRaw)) { console.error(`CPP_LEARN_ASSUME must be an integer from 0 to 8, got ${JSON.stringify(assumeRaw)}`); process.exit(1) }
   const taught = new Set(SYNTAX.filter(s => s.stage <= assume).map(s => s.id))
   for (const { l } of tracks) {
     for (const id of l.introduces ?? []) taught.add(id)

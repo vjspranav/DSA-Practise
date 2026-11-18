@@ -93,7 +93,7 @@ export function errorMatches(lesson, compilerText) {
   return !!e && new RegExp(lesson.errorMatch).test(e.message)
 }
 
-const TLE_MESSAGE = 'The program ran too long and was stopped.'
+const TLE_MESSAGE = 'A test ran too long and the program was stopped.'
 const row = (t, got, status, extra) => ({ name: t.name, expected: normalise(t.expected), got, status, ...extra })
 
 // One test of a program (no harness): the whole stdout of its own run is compared with `expected`.

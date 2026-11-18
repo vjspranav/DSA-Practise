@@ -18,6 +18,15 @@ const base = (id, over) => ({
   ...over,
 })
 
+const UBINTRO = ['int', 'assign', 'c-array', 'indexing', 'brace-init']
+const OOB = '#include <iostream>\nusing namespace std;\n\nint main() {\n    int a[3] = {1, 2, 3};\n    int i = 5;\n    cout << a[i] << endl;\n    return 0;\n}'
+// A predict lesson with one ub round; `over` overrides parts of the round.
+const ubRound = (id, over) => ({
+  id, title: 'Fixture', kind: 'predict', task: 'Pick what it prints.', introduces: [...INTRO, ...UBINTRO], teach: TEACH,
+  refresher: ['Print with cout.'],
+  rounds: [{ snippet: OOB, choices: ['0', 'A crash', 'Anything can happen'], answer: 2, why: 'Reading past the end is undefined behaviour.', ub: true, output: 'undefined: anything can happen', ...over }],
+})
+
 export const LESSONS = [
   // taught-before-used: the task mentions cout, but nothing taught it (the code itself uses printf, which the
   // registry does not track, so this is the only violation).
@@ -50,4 +59,19 @@ export const LESSONS = [
   base('c1-bad-unknown-field', { colour: 'blue' }),
   // a teach example whose output is wrong
   base('c1-bad-teach-output', { teach: { ...TEACH, examples: [{ code: HELLO, output: 'bye' }] } }),
+  // a ub round whose stored output and correct choice are a real result, not "undefined"
+  ubRound('c1-bad-ub-wording', { output: '5', choices: ['5', 'a crash', 'a compile error'], answer: 0 }),
+  // a ub round whose snippet is well defined: the sanitizer build reports nothing
+  ubRound('c1-bad-ub-not-ub', { snippet: HELLO }),
+  // a teach example that reads a[5] of int a[5]: the sanitizer build reports it
+  base('c1-bad-teach-sanitizer', {
+    introduces: [...INTRO, ...UBINTRO],
+    teach: { ...TEACH, examples: [{ code: '#include <iostream>\nusing namespace std;\n\nint main() {\n    int a[5] = {1, 2, 3, 4, 5};\n    int i = 5;\n    cout << a[i] << endl;\n    return 0;\n}' }] },
+  }),
+  // a non-ub round whose marked answer disagrees with the one-line output
+  {
+    id: 'c1-bad-choice-mismatch', title: 'Fixture', kind: 'predict', task: 'Pick what it prints.', introduces: INTRO, teach: TEACH,
+    refresher: ['Print with cout.'],
+    rounds: [{ snippet: HELLO, choices: ['bye', 'hi', 'nothing'], answer: 0, why: 'It prints hi.', output: 'hi' }],
+  },
 ]
