@@ -45,4 +45,12 @@ const fixtureLoop = {
   ],
 }
 
-export const FIXTURES = [fixtureCrash, fixtureLoop]
+// Loops only in test 2: test 1 must pass, test 2 fail with the time-limit message, test 3 be "not run".
+const fixtureLoop2 = {
+  ...fixtureLoop,
+  id: 'c0-loop2',
+  title: 'Late timeout fixture',
+  starter: '#include <iostream>\nusing namespace std;\n\nint twice(int x) {\n    volatile int harness_spin = 0;\n    while (x == 0) { harness_spin = harness_spin + 1; }\n    return x * 2;\n}',
+}
+
+export const FIXTURES = [fixtureCrash, fixtureLoop, fixtureLoop2]

@@ -851,7 +851,8 @@ public:
         s.push(1);
         s.push(2);
         s.push(3);
-        cout << s.pop() << " " << s.top() << endl;
+        int popped = s.pop();
+        cout << popped << " " << s.top() << endl;
     }
     cout << "\n@@TEST 2@@" << endl;
     {
@@ -863,9 +864,11 @@ public:
     cout << "\n@@TEST 3@@" << endl;
     {
         IntStack s;
-        cout << s.pop() << " ";
+        int first = s.pop();
         s.push(4);
-        cout << s.pop() << " " << s.pop() << endl;
+        int second = s.pop();
+        int third = s.pop();
+        cout << first << " " << second << " " << third << endl;
     }
     cout << "\n@@TEST 4@@" << endl;
     {

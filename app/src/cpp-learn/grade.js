@@ -109,7 +109,7 @@ function programTest(t, run) {
 // the run: tests whose marker was followed by a later marker are graded, the one that was running fails with
 // the message (or timeout note), and the rest are "not run".
 function harnessTests(lesson, run) {
-  const split = splitTests(run.status === 'tle' ? '' : run.stdout)
+  const split = splitTests(run.stdout ?? '')
   const printed = normalise(split.printed)
   const started = split.outputs.length
   const failed = run.status === 'error' || run.status === 'tle'

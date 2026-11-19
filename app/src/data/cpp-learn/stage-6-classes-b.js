@@ -686,7 +686,7 @@ int main() {
     introduces: ['static-member'],
     teach: {
       body: [
-        `<p>Normally every object has its own copy of each field. A <code>static</code> data member is different: there is <em>one</em> copy shared by the whole class, whatever the number of objects. It is a field that belongs to the class itself. Python has the same thing as a class attribute: <code>made = 0</code> written in the class body and used as <code>Widget.made</code>.</p>`,
+        `<p>Normally every object has its own copy of each field. A <code>static</code> data member is different: there is <em>one</em> copy shared by the whole class, whatever the number of objects. It is a field that belongs to the class itself. Python has the same thing as a class attribute: <code>counter = 0</code> written in the class body and used as <code>Widget.counter</code>.</p>`,
         `<p>A static variable is declared inside the class with <code>static</code>, but because it is not part of any object, it also needs one definition outside the class, with the class name and <code>::</code> in front: <code>int Widget::made = 0;</code>. Forgetting that line is a linker error. A <code>static</code> method belongs to the class too: it has no <code>this</code> and no object, so it can only use static members, and you call it as <code>Widget::made()</code>.</p>`,
       ],
       examples: [

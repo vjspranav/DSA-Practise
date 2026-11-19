@@ -18,7 +18,7 @@ async function runKeepingOutput(stdin, limit) {
   })
   try {
     const r = await runTest(stdin, limit)
-    if (r.status !== 'error' || r.stdout) return r
+    if ((r.status !== 'error' && r.status !== 'tle') || r.stdout) return r
     const lines = printed.split('\n').filter(l => !l.startsWith('>'))
     while (lines.length && !lines[lines.length - 1].trim()) lines.pop()
     while (lines.length && !lines[0].trim()) lines.shift()

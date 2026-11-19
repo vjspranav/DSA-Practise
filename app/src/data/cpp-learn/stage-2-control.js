@@ -1510,7 +1510,7 @@ int main() {
       ],
     },
     compare: {
-      py: { code: 'nums = [4, 5, 6]\ntotal = 0\nfor x in nums:\n    total += x\nprint(total)', outcome: 'Sums every number in the input', ok: true },
+      py: { code: 'nums = [4, 5, 6]\ntotal = 0\nfor x in nums:\n    total += x\nprint(total)', outcome: 'Sums every number in the list', ok: true },
       cpp: { code: C`int x;
 int total = 0;
 while (cin >> x) {

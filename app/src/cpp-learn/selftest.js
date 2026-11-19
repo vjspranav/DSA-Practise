@@ -54,7 +54,7 @@ export async function runSelfTest() {
   }
 
   // Case 3 (runner level): a runaway loop times out; a crash grades pass / fail / not run.
-  const [crash, loop] = FIXTURES
+  const [crash, loop, loop2] = FIXTURES
   {
     const fails = []
     const run = await attempt(loop, loop.starter)
@@ -66,6 +66,17 @@ export async function runSelfTest() {
     const ok = gradeRun(loop, loop.solution, await attempt(loop, loop.solution))
     if (!ok.win) fails.push('loop: the solution should still pass after a timeout (worker restarted)')
     add('c0-loop (tle)', fails)
+  }
+  {
+    const fails = []
+    const g = gradeRun(loop2, loop2.starter, await attempt(loop2, loop2.starter))
+    const got = g.tests.map(t => t.status).join(',')
+    if (got !== 'pass,fail,notrun') fails.push(`loop2: statuses ${got}, expected pass,fail,notrun`)
+    if (!/too long/.test(g.tests[1]?.message ?? '')) fails.push('loop2: test 2 should fail with the time-limit message')
+    await sleep(500)
+    const ok = gradeRun(loop2, loop2.solution, await attempt(loop2, loop2.solution))
+    if (!ok.win) fails.push('loop2: the solution should pass after a timeout')
+    add('c0-loop2 (pass,fail(tle),notrun)', fails)
   }
   {
     const fails = []

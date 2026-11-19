@@ -445,6 +445,9 @@ if (filePath) {
   const g = gradeRun(lesson, '', { status: 'error', message: 'boom', stdout: '\n@@TEST 1@@\n5\n\n@@TEST 2@@\n' })
   const got = g.tests.map(t => t.status).join()
   if (got !== 'pass,fail,notrun' || g.win) { console.error(`gradeRun self-check failed: ${got}`); process.exit(1) }
+  const t = gradeRun(lesson, '', { status: 'tle', stdout: '\n@@TEST 1@@\n5\n\n@@TEST 2@@\n' })
+  const tgot = t.tests.map(x => x.status).join(',')
+  if (tgot !== 'pass,fail,notrun' || t.win) { console.error(`gradeRun tle self-check failed: ${tgot}`); process.exit(1) }
 }
 
 // ---------- taught-before-used ----------

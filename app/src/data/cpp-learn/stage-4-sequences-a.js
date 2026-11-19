@@ -168,7 +168,7 @@ export const LESSONS = [
         ),
         choices: ['10, 20, 30 and then it stops', 'Undefined: the fourth read is out of bounds', 'A compile error about index 3'],
         answer: 1,
-        why: 'The loop uses <code>i &lt;= 3</code>, so the last pass reads <code>a[3]</code>, which does not exist. The compiler does not mind and the program does not stop; the result is undefined behaviour.',
+        why: 'The loop uses <code>i &lt;= 3</code>, so the last pass reads <code>a[3]</code>, which does not exist. The compiler does not mind and the program may not stop; the result is undefined behaviour.',
         ub: true,
         output: 'Undefined: anything can happen (a[3] is past the end).',
       },

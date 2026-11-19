@@ -2,7 +2,7 @@
 // A key is part of a backup if it starts with one of BACKUP_PREFIXES (so future dsa-* / rust-* keys are included
 // automatically) or is listed in BACKUP_EXTRA_KEYS (none today: every key the app uses already matches a prefix).
 //   dsa-code, dsa-status, dsa-last-problem, dsa-desc-hidden, dsa-foundations (also holds theme/drawer prefs),
-//   dsa-rust, dsa-mode, dsa-track, rust-teach-folded
+//   dsa-rust, dsa-mode, dsa-track, dsa-cpp-learn, dsa-cpp-path, dsa-cpp-learn-folded, rust-teach-folded
 export const BACKUP_PREFIXES = ['dsa-', 'rust-']
 export const BACKUP_EXTRA_KEYS = []
 export const BACKUP_APP = 'dsa-practice'
