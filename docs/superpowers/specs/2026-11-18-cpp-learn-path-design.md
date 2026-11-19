@@ -422,6 +422,21 @@ Stage 1 is 30 lessons (`app/src/data/cpp-learn/stage-1-first.js`): 10 concept, 1
 
 Not taught in stage 1 (left for later stages): `if`/comparison (stage 2), functions and references (3), `vector`, `getline`, `char` arithmetic and string operations such as `+`/`substr` (4).
 
+## What stage 4 taught
+
+Stage 4 is 29 lessons in `stage-4-sequences-a.js` (c4-c-array to c4-vector-2d, arrays and vectors, 14 lessons) and `stage-4-sequences-b.js` (strings, chars, input and the practice set, 15 lessons); `index.js` joins them. Kinds: 13 concept, 5 program (2 are practice), 3 predict, 3 fix, 3 implement (practice), 1 drill, 1 bugfix. It uses stages 1 to 3 (functions, `&`, `const &`, `for`, `if`, `while (cin >> x)`). Ids taught:
+
+- `c-array`, `indexing`, `brace-init` (c4-c-array): `int a[n]`, the size kept by hand (no `len`), 0-based `a[i]`, `int a[3] = {..}`. Out of bounds is undefined behaviour (prose, `compare` with `ok: false` on both sides, and a `ub: true` round in c4-predict-array-oob).
+- `include-vector`, `vector`, `push-back`, `size-method` (c4-vector-basics); `pop-back`, `back-front`, `empty-method`, `clear-method` (c4-vector-methods); `vector-sized` (c4-vector-init: `vector<int> v(n, 0)`, `{...}` lists, counters); `at-method` (c4-safe-index: `[]` is unchecked, `.at()` aborts, check `i >= 0 && i < n` first; the abort is shown in `compare` only).
+- `size-t` (c4-predict-size-t): `size()` is unsigned; `v.size() - 1` on an empty vector is the trap (a `ub: true` round); the safe form `i + 1 < v.size()` is drilled in c4-adjacent-pairs. The huge wrapped value is never printed (it differs between the 32-bit browser and 64-bit local).
+- `range-for` (c4-range-for): `for (int x : v)` copies; `for (int& x : v)` edits (c4-fix-range-copy, a bugfix). Vectors as parameters: copy versus `&` versus `const &` (c4-vector-params, with the Python shared-list contrast). Returning a vector by value is used in the practice lessons.
+- `vector-2d` (c4-vector-2d): `vector<vector<int>> g(r, vector<int>(c, 0))`, `g[i][j]`, `g.size()` and `g[0].size()`; compare with the Python `[[0]*c]*r` trap.
+- Strings (c4-string-ops, c4-string-mutable): `+`, `+=`, `size()`, `[i]`, `==`, `<`; two literals cannot be added (`compare.cpp` with `errorMatch`); strings are mutable (`s[0] = 'b'`, `push_back`). `char` versus `string` and `c - 'a'`, `static_cast<char>`, `static_cast<int>` (c4-char-arith, c4-fix-char-string, c4-predict-char).
+- `substr`, `find-method`, `npos` (c4-substr-find): `string::npos` is compared with, never printed. `include-cctype`, `cctype-fns` (c4-cctype): `isdigit`, `isalpha`, `toupper`, `tolower` on one `char`. `getline` (c4-getline) and `cin-ignore` (c4-getline-mix: the newline left by `cin >> n`). `to-string`, `stoi` (c4-to-string-stoi): `stoi` of a non-number aborts (prose only).
+- Practice: c4-practice-reverse (`vector<int> reversedCopy(const vector<int>&)`), c4-practice-palindrome (`bool isPalindrome(const string&)`), c4-practice-matrix (`rowSums` over `vector<vector<int>>`), c4-practice-letter-counts (a 26-slot counter), c4-practice-word-stats (`while (cin >> w)`).
+
+Not taught in stage 4 (left for later stages): `std::array` and `stringstream` (registered, unused), iterators and `sort` (stage 7), `size_t` printing, `string_view`, `emplace_back`. `.at()` out of range and `stoi` failures are never run in a stored output.
+
 ## What stage 5 taught
 
 Stage 5 is 25 lessons, split across `stage-5-memory-a.js` (c5-sizeof to c5-fix-sizeof-param) and `stage-5-memory-b.js` (the rest); `stage-5-memory.js` joins them, so `index.js` is unchanged. Kinds: 6 concept (plus 4 more teach-bearing implement, drill and bugfix lessons), 4 predict, 2 fix, 2 bugfix, 3 drill/implement before the heap, and 3 closing practice lessons. No registry ids were added: every id used was already in the stage 5 section. Ids taught:
@@ -436,3 +451,18 @@ Stage 5 is 25 lessons, split across `stage-5-memory-a.js` (c5-sizeof to c5-fix-s
 - Practice: c5-practice-swap (`swapInts(int*, int*)`), c5-practice-max (`int* findMax(int*, int)`), c5-practice-grow (an `IntList` struct with an `append` that doubles its heap array, a reference parameter to a struct).
 
 Not taught in stage 5 (left for later stages): constructors, methods, `class`, destructors and the rule of three (stage 6); `vector` is introduced in stage 4 and used as the safe default; `shared_ptr` and `std::move` are not taught.
+
+## What stage 6 taught
+
+Stage 6 is 25 lessons in `stage-6-classes-a.js`, `-b.js` and `-c.js`, joined by `stage-6-classes.js` (the only file `index.js` imports): 17 concept, 3 predict... in detail 16 concept, 2 predict, 3 fix, 3 implement (practice), 1 more concept-with-harness among the concepts. No registry additions; ids introduced:
+
+- `this` (c6-methods-this): methods, `this->w = w` against a shadowing parameter. `const-method` (c6-const-methods, fix c6-fix-const-method).
+- `class`, `access-spec` (c6-class-private, fix c6-fix-private): private default, `public:`, Python `_name` compared. `protected:` is taught inside c6-inheritance.
+- `constructor` (c6-constructors), `init-list` (c6-init-list, const members), default constructors and the "no matching constructor" trap (c6-default-ctor, fix c6-fix-no-default).
+- `destructor` (c6-destructors, reverse order), RAII with `new[]`/`delete[]` (c6-raii-buffer).
+- Copying: c6-copy-semantics (`b = a` copies; reference is the alias), `copy-ctor` and the rule of three (c6-copy-ctor), shallow-copy double delete as a `ub: true` predict (c6-predict-double-delete).
+- `operator-overload`: `operator<` (c6-operator-less) and `ostream& operator<<` (c6-operator-print). `static-member` (c6-static-members, out-of-class definition).
+- `inheritance` (c6-inheritance, base constructor in the init list), `virtual` and `override` (c6-virtual). `template`, `template-args` (c6-templates, `maxOf<T>`, `Box<T>`).
+- Practice: c6-practice-point, c6-practice-account (static live-object count), c6-practice-stack (`IntStack` over `vector`).
+
+Naming note for later stages: method names `set`, `count`, `fill`, `first` trip stage 7/8 registry ids, so stage 6 uses `put`, `len`, `load`, `head`. Harnesses copy objects with `new` and never delete the copy, so a starter with a shallow copy never frees twice.
