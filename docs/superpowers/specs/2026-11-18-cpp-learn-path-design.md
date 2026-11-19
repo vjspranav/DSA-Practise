@@ -454,7 +454,7 @@ Not taught in stage 5 (left for later stages): constructors, methods, `class`, d
 
 ## What stage 6 taught
 
-Stage 6 is 25 lessons in `stage-6-classes-a.js`, `-b.js` and `-c.js`, joined by `stage-6-classes.js` (the only file `index.js` imports): 17 concept, 3 predict... in detail 16 concept, 2 predict, 3 fix, 3 implement (practice), 1 more concept-with-harness among the concepts. No registry additions; ids introduced:
+Stage 6 is 25 lessons in `stage-6-classes-a.js`, `-b.js` and `-c.js`, joined by `stage-6-classes.js` (the only file `index.js` imports): 17 concept (two with harnesses), 2 predict, 3 fix, 3 implement (the practice lessons). No registry additions; ids introduced:
 
 - `this` (c6-methods-this): methods, `this->w = w` against a shadowing parameter. `const-method` (c6-const-methods, fix c6-fix-const-method).
 - `class`, `access-spec` (c6-class-private, fix c6-fix-private): private default, `public:`, Python `_name` compared. `protected:` is taught inside c6-inheritance.
@@ -466,3 +466,42 @@ Stage 6 is 25 lessons in `stage-6-classes-a.js`, `-b.js` and `-c.js`, joined by 
 - Practice: c6-practice-point, c6-practice-account (static live-object count), c6-practice-stack (`IntStack` over `vector`).
 
 Naming note for later stages: method names `set`, `count`, `fill`, `first` trip stage 7/8 registry ids, so stage 6 uses `put`, `len`, `load`, `head`. Harnesses copy objects with `new` and never delete the copy, so a starter with a shallow copy never frees twice.
+
+## What stage 2 taught
+
+Stage 2 is 25 lessons (`app/src/data/cpp-learn/stage-2-control.js`): 12 concept, 6 program (5 are practice), 4 predict, 3 fix; whole programs only, no functions. Ids taught:
+
+- `comparison`, `if`, `else` (c2-if-else); `else if` is plain `else` (c2-else-if); c2-fix-if-parens (missing parentheses); c2-braces and c2-predict-braces (braces make blocks, no-brace `if` controls one statement, dangling else).
+- `logical-ops`, `not-op`, `alt-operators` (c2-logical): `&&`, `||`, `!`, with `and`/`or`/`not` as legal but rare spellings; a condition stored in a `bool`.
+- `assign-in-condition` (c2-truthiness, predict): 0 is false, other numbers true; `if (x = 5)` is always true.
+- `switch`, `break-continue` (c2-switch): `break` is introduced here for switch; c2-predict-fallthrough; c2-fix-switch-decl (a variable in a case needs braces). `continue` is taught in c2-break-continue.
+- `while` (c2-while), `for-classic` (c2-for, with counting down, step 2 and the loop variable's scope; c2-predict-for-bounds, c2-for-countdown, c2-fix-loop-scope), `do-while` (c2-do-while), nested loops (c2-nested), `ternary` (c2-ternary), `while-cin` (c2-while-cin).
+- Practice: FizzBuzz, digit sum, primes up to n, a hollow box, a guessing check.
+
+Not taught in stage 2 (left for later stages): functions (3); string `+`, `==` on strings and `getline` (4).
+
+## What stage 3 taught
+
+Stage 3 is 21 lessons (`app/src/data/cpp-learn/stage-3-functions.js`): 9 concept, 3 predict, 2 fix, 1 bugfix, 3 drill, 3 implement (practice). Harness lessons start here. Ids taught:
+
+- `function-def`, `return-value` (c3-first-function), `void` (c3-void), c3-predict-scope (locals), c3-fix-order (define before use), `prototype` (c3-prototype; headers explained as bundles of declarations).
+- c3-predict-by-value (copies); `reference-param` (c3-reference-swap, `swapInts`; c3-bugfix-ordered); `const-ref` (c3-const-ref; c3-fix-const-ref); c3-multi-return (output parameters, `divmod`).
+- Overloading (c3-overloading, no registry id) and `default-arg` (c3-default-args).
+- Recursion: c3-recursion (factorial, base case, call stack and stack overflow in prose and a `compare` with `ok: false`), c3-predict-recursion-order, c3-fibonacci, c3-power.
+- `using-declaration`, `namespace-def`, `scope-resolution` (c3-namespaces): `using namespace std;` explained; the fix starter lacks it and the solution uses `using std::cout;`.
+- Practice: c3-practice-primes (`isPrime`, `nextPrime`), c3-practice-gcd (`gcd`, `lcm`), c3-practice-split (`splitSeconds` with three reference outputs).
+
+Not taught in stage 3: `min`, `max`, `swap` and `assert` ids (registered for stage 3 but unused: `<algorithm>` and `<utility>` belong to stage 7, so the lessons write their own `swapInts`); `vector` and arrays (4).
+
+## What stage 7 taught
+
+Stage 7 is 26 lessons in `stage-7-stl-a.js` (12) and `stage-7-stl-b.js` (14): concept, drill, implement, bugfix and 2 predict lessons, all with C++ harnesses except the whole-program concepts. Ids taught, in order:
+
+- a: `include-utility`, `pair`, `pair-fields` (c7-pair); `include-tuple`, `tuple` with `get<0>` (c7-tuple); `include-algorithm`, `sort`, `iterator-begin-end` (c7-sort; `*it`, `begin()+1`, `end()` is one past, `*end()` is a `ub: true` predict round); `lambda` (c7-lambda); `lambda-capture` (c7-lambda-capture, `[x]` versus `[&x]`); `include-map`, `map` (c7-map; iteration with `kv.first` and `it->first`); `count-method` (c7-map-lookup, with `find` against `end()`); `include-unordered_map`, `unordered-map` (c7-unordered-map, keys sorted before printing).
+- b: `include-set`, `set`, `insert-method` (c7-set); `include-unordered_set`, `unordered-set`; `multiset`, `erase-method` (value versus iterator); `include-stack`, `include-queue`, `stack`, `queue`, `stack-ops` (pop returns nothing); `include-deque`, `deque`; `include-functional`, `priority-queue`, `greater` (max-heap default, `greater<int>` min-heap); `lower-bound` (with `upper_bound`, `binary_search`); `reverse`, `min-max-element`; `include-numeric`, `accumulate`, `count-algo`, `find-algo`; `unique-algo` (sort, unique, erase).
+- Bugfixes: c7-fix-erase (erase while iterating; the starter skips items deterministically and never runs past the end) and c7-fix-comparator (`<=` comparator; tested through the comparator itself, since a real `sort` with it can hang). Practice: c7-practice-top-k, c7-practice-two-sum.
+- Not taught: `list`, `numeric_limits`, `count_if`, `tie`, `fill`, structured bindings.
+
+## What stage 8 taught
+
+Stage 8 is 22 lessons in `stage-8-dsa.js`, no new syntax ids (everything is stage 1 to 7 syntax): Big-O (c8-big-o, counting steps), binary search by hand and a bugfix for `lo < hi`, insertion sort, merge, merge sort (vector built from two iterators), a singly linked list (`pushFront`, `printList`, `reverseList`, with harness helpers that free the nodes), adjacency list, BFS (`queue`, dist with -1), DFS (recursion with shared references), grid BFS (`dr`/`dc` arrays), subsets by backtracking, prefix sums (`long long`), two pointers, sliding window, DP: climbing stairs, coin change, LIS (O(n^2)); practice: count islands, longest unique stretch; and a closing concept (c8-whats-next) that points to Revise and Problems. `fill-algo` and `type-alias` are registered but unused.
