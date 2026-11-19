@@ -421,3 +421,18 @@ Stage 1 is 30 lessons (`app/src/data/cpp-learn/stage-1-first.js`): 10 concept, 1
 - `include-cmath`, `math-functions` (c1-math): `sqrt`, `pow`, `abs`, default 6 significant digits (c1-predict-doubles). `include-iomanip`, `setprecision` (c1-setprecision): `fixed << setprecision(n)` as a sticky stream setting, versus an f-string.
 
 Not taught in stage 1 (left for later stages): `if`/comparison (stage 2), functions and references (3), `vector`, `getline`, `char` arithmetic and string operations such as `+`/`substr` (4).
+
+## What stage 5 taught
+
+Stage 5 is 25 lessons, split across `stage-5-memory-a.js` (c5-sizeof to c5-fix-sizeof-param) and `stage-5-memory-b.js` (the rest); `stage-5-memory.js` joins them, so `index.js` is unchanged. Kinds: 6 concept (plus 4 more teach-bearing implement, drill and bugfix lessons), 4 predict, 2 fix, 2 bugfix, 3 drill/implement before the heap, and 3 closing practice lessons. No registry ids were added: every id used was already in the stage 5 section. Ids taught:
+
+- `sizeof` (c5-sizeof): a variable is a fixed-size box; `sizeof(type)` / `sizeof(x)`; the `sizeof(arr) / sizeof(arr[0])` trick on a real array. Pointer size is never printed (4 in the browser, 8 locally).
+- `address-of`, `pointer-decl`, `deref` (c5-address-deref): `&x`, `int* p`, `*p` to read and write; addresses are never printed, pointers are compared with `==`. c5-predict-aliasing, c5-write-through, c5-fix-pointer-type practise it.
+- `nullptr` (c5-nullptr): `p == nullptr` checks, "check before you follow"; null dereference is UB (c5-predict-null, `ub: true`). Pointers versus references: c5-pointer-or-reference (no new id; a reference variable `int& r = x;` appears here for the first time).
+- `pointer-arith` (c5-array-decay): an array name decays to `&a[0]`; `p + i` steps by elements; `a[i]` is `*(a + i)`. c5-pointer-walk teaches `p++`, pointer difference and start/stop ranges with `const int*`; c5-predict-past-end (`ub: true`) covers reading one past the end. c5-array-param and c5-fix-sizeof-param: arrays are passed as pointer plus length, never `sizeof` on a parameter.
+- `new`, `delete` (c5-new-delete): stack versus heap; every `new` has one `delete`; set the pointer to `nullptr` afterwards. `new[]` / `delete[]` and the mismatch are in c5-new-array (the mismatch is `compare` with `ok: false`, because the sanitizers do not report it on macOS). c5-leak: leaks in prose, the lesson `require`s the `delete[]` since the sanitizer run has leak detection off. c5-predict-use-after-free (`ub: true`, the sanitizer proves use-after-free) and c5-dangling-local (a returned `&local` is `compare` with `ok: false`).
+- `include-memory`, `unique-ptr` (c5-unique-ptr): RAII, `unique_ptr<int>`, `unique_ptr<int[]>` and `make_unique` (C++14); one owner only. c5-fix-unique-copy: a copy of a `unique_ptr` fails with "copy constructor", fixed with a `const` reference.
+- `struct`, `field-access`, `arrow` (c5-struct-arrow): `struct Point { int x; int y; };`, `Point a = {3, 4};`, `a.x`, `p->x` as `(*p).x`. c5-node-walk: `struct Node { int value; Node* next; };`, walking with `for (Node* n = head; n != nullptr; n = n->next)`, and `new Node{1, nullptr}`.
+- Practice: c5-practice-swap (`swapInts(int*, int*)`), c5-practice-max (`int* findMax(int*, int)`), c5-practice-grow (an `IntList` struct with an `append` that doubles its heap array, a reference parameter to a struct).
+
+Not taught in stage 5 (left for later stages): constructors, methods, `class`, destructors and the rule of three (stage 6); `vector` is introduced in stage 4 and used as the safe default; `shared_ptr` and `std::move` are not taught.
