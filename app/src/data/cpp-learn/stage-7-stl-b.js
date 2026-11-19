@@ -408,16 +408,17 @@ export const LESSONS = [
     title: 'reverse, min_element, max_element',
     kind: 'concept',
     task: 'Read a count <code>n</code> and then <code>n</code> numbers (n is at least 1). Print the numbers in reverse order on the first line, then the smallest and the largest, separated by a space, on the second.',
-    introduces: ['reverse', 'min-max-element'],
+    introduces: ['reverse', 'min-max-element', 'min-max'],
     teach: {
       body: [
         `<p>More helpers from <code>&lt;algorithm&gt;</code>, all taking a begin and an end position. <code>reverse(v.begin(), v.end());</code> reverses the vector in place, like <code>v.reverse()</code> in Python (not <code>v[::-1]</code>, which makes a copy).</p>`,
         `<p><code>min_element(v.begin(), v.end())</code> and <code>max_element(...)</code> return an <em>iterator</em> to the smallest and largest item, not the value itself. Put a <code>*</code> in front to read the value: <code>*min_element(v.begin(), v.end())</code>. Subtract <code>v.begin()</code> to get the index instead. They need a non-empty range: on an empty vector the result is <code>end()</code>, and reading it with <code>*</code> is undefined behaviour. Python's <code>min(v)</code> would raise an error there.</p>`,
+        `<p>For just two values, <code>&lt;algorithm&gt;</code> also has <code>min(a, b)</code> and <code>max(a, b)</code>, which return the smaller or larger value itself, like Python's <code>min(a, b)</code>. Both arguments must have the same type: <code>max(x, 0)</code> works for an int <code>x</code>, but <code>max(x, 0.5)</code> does not compile. You will use them constantly in the algorithms of the next stage, such as <code>best = max(best, current);</code>.</p>`,
       ],
       examples: [
         {
-          code: '#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    vector<int> v = {4, 9, 2, 7};\n    reverse(v.begin(), v.end());                       // in place\n    cout << v[0] << " " << v[3] << endl;               // 7 4\n    cout << *min_element(v.begin(), v.end()) << endl;  // 2: * reads the value\n    cout << *max_element(v.begin(), v.end()) << endl;  // 9\n    cout << max_element(v.begin(), v.end()) - v.begin() << endl;   // 2: its index now\n    return 0;\n}',
-          output: '7 4\n2\n9\n2',
+          code: '#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    vector<int> v = {4, 9, 2, 7};\n    reverse(v.begin(), v.end());                       // in place\n    cout << v[0] << " " << v[3] << endl;               // 7 4\n    cout << *min_element(v.begin(), v.end()) << endl;  // 2: * reads the value\n    cout << *max_element(v.begin(), v.end()) << endl;  // 9\n    cout << max_element(v.begin(), v.end()) - v.begin() << endl;   // 2: its index now\n    cout << min(3, 8) << " " << max(3, 8) << endl;     // 3 8: two plain values\n    return 0;\n}',
+          output: '7 4\n2\n9\n2\n3 8',
           caption: 'The helpers return positions; star reads the value, subtracting begin() gives the index.',
         },
       ],
@@ -426,6 +427,7 @@ export const LESSONS = [
         { code: 'min_element(b, e)', meaning: 'iterator to the smallest item' },
         { code: 'max_element(b, e)', meaning: 'iterator to the largest item' },
         { code: '*it', meaning: 'the value an iterator points at' },
+        { code: 'min(a, b) / max(a, b)', meaning: 'the smaller / larger of two values of the same type' },
       ],
     },
     compare: {
